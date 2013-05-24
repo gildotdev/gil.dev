@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: javascript | Gil Creque]]></title>
+  <link href="http://gilcreque.com/tag/javascript/atom.xml" rel="self"/>
+  <link href="http://gilcreque.com/"/>
+  <updated>2013-05-24T14:44:46-04:00</updated>
+  <id>http://gilcreque.com/</id>
+  <author>
+    <name><![CDATA[Gil Creque]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Github Activity Aside for Octopress]]></title>
+    <link href="http://gilcreque.com/github-activity-aside-for-octopress/"/>
+    <updated>2013-05-23T09:00:00-04:00</updated>
+    <id>http://gilcreque.com/github-activity-aside-for-octopress</id>
+    <content type="html"><![CDATA[<p>While working on my new <a href="http://octopress.org/">Octopress</a> powered site I began to look at the plugins provided by default. The Github repo plugin didn&rsquo;t really show what I wanted on my site so I refactored it to show my GitHub activity instead. I&rsquo;ve only coded about 7 or so event types thus far but I will continue to work on this plugin and release it on GitHub of course.</p>
+
+<!--more-->
+
+
+<p><div><script src='https://gist.github.com/5632365.js'></script>
+<noscript><pre><code></code></pre></noscript></div>
+</p>
+]]></content>
+  </entry>
+  
+</feed>

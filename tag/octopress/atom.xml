@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: octopress | Gil Creque]]></title>
+  <link href="http://gilcreque.com/tag/octopress/atom.xml" rel="self"/>
+  <link href="http://gilcreque.com/"/>
+  <updated>2013-05-24T14:44:46-04:00</updated>
+  <id>http://gilcreque.com/</id>
+  <author>
+    <name><![CDATA[Gil Creque]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Github Activity Aside for Octopress]]></title>
+    <link href="http://gilcreque.com/github-activity-aside-for-octopress/"/>
+    <updated>2013-05-23T09:00:00-04:00</updated>
+    <id>http://gilcreque.com/github-activity-aside-for-octopress</id>
+    <content type="html"><![CDATA[<p>While working on my new <a href="http://octopress.org/">Octopress</a> powered site I began to look at the plugins provided by default. The Github repo plugin didn&rsquo;t really show what I wanted on my site so I refactored it to show my GitHub activity instead. I&rsquo;ve only coded about 7 or so event types thus far but I will continue to work on this plugin and release it on GitHub of course.</p>
+
+<!--more-->
+
+
+<p><div><script src='https://gist.github.com/5632365.js'></script>
+<noscript><pre><code></code></pre></noscript></div>
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Octopress]]></title>
+    <link href="http://gilcreque.com/octopress/"/>
+    <updated>2013-05-21T09:00:00-04:00</updated>
+    <id>http://gilcreque.com/octopress</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m finally updating my nameplate site and migrating my blogging to <a href="http://octopress.org/">Octopress</a> which is based on <a href="http://jekyllrb.com/">Jekyll</a>, arguably the most developed static site generator that is currently available.</p>
+
+<p>Another reason I went with <a href="http://octopress.org/">Octopress</a> is to learn some basic Ruby. Most of my web development has been in PHP either through custom code, Wordpress, or Drupal. Lately most of my webdev work has been in ASP.NET/C# while updating an existing application to work on AWS as well as general refactoring. However, Ruby has a huge following in the web development world, one of my main areas of interest, so it would behoove me to learn as much as I can.</p>
+]]></content>
+  </entry>
+  
+</feed>
