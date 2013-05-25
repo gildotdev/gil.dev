@@ -35,6 +35,8 @@ var github = (function(){
           var events = [];
           if (!data || !data.data) { return; }
           for (var i = 0; i < data.data.length; i++) {
+            if (data.data[i].repo.name=="gilcreque/gilcreque.github.com")
+              continue
             events.push(data.data[i]);
           }
           if (options.count) { events.splice(options.count); }
