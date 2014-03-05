@@ -4,7 +4,7 @@
   <title><![CDATA[Category: google | Gil Creque]]></title>
   <link href="http://gilcreque.com/tag/google/atom.xml" rel="self"/>
   <link href="http://gilcreque.com/"/>
-  <updated>2014-03-05T13:53:27-05:00</updated>
+  <updated>2014-03-05T13:57:22-05:00</updated>
   <id>http://gilcreque.com/</id>
   <author>
     <name><![CDATA[Gil Creque]]></name>
@@ -19,6 +19,9 @@
     <updated>2014-03-05T12:54:00-05:00</updated>
     <id>http://gilcreque.com/googles-dead-man-switch</id>
     <content type="html"><![CDATA[<p>While looking up ways of implementing a Dead man&rsquo;s switch via software I stumbled upon an <a href="https://www.google.com/settings/account/inactive">option from Google</a> for sharing your data when your account has be inactive for at least 3 months (you can set it to be longer).</p>
+
+<!--more-->
+
 
 <p><img class="img-rounded <a" src="href="http://s3.gilcreque.com/img/Google_Inactive.png">http://s3.gilcreque.com/img/Google_Inactive.png</a>" width="600" height="1450" title="&ldquo;Google Inactive Account Manager&rdquo;" ></p>
 ]]></content>
