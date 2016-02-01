@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>World Clock</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/full-slider.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript">
+	
+	function checkTime(i) {
+	if (i < 10) {
+	    i = "0" + i;
+	}
+	return i;
+	}
+	
+	function startTime(idName, offset) {
+	    var today = new Date();
+	    var apm = "AM";
+	    var h = today.getHours() + offset;
+	    if (h > 12) {
+		    h = h-12;
+		    apm = "PM";
+	    }
+	    var m = today.getMinutes();
+	    // add a zero in front of numbers<10
+	    m = checkTime(m);
+	    document.getElementById(idName).innerHTML = h + ":" + m + " " + apm;
+	    t = setTimeout(function () {
+	        startTime(idName, offset)
+	    }, 60000);
+	}
+	</script>
+
+</head>
+
+<body>
+    <!-- Full Page Image Background Carousel Header -->
+    <header id="myCarousel" class="carousel slide">
+        <!-- Indicators -->
+        <ol class="carousel-indicators hidden-sm hidden-xs">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+            <li data-target="#myCarousel" data-slide-to="3"></li>
+        </ol>
+
+        <!-- Wrapper for Slides -->
+        <div class="carousel-inner">
+        	        
+            <div class="item active">
+                <!-- Set the first background image using inline CSS below. -->
+                <div class="fill" style="background-image:url('img/1.jpg');"></div>
+                <div class="carousel-caption hidden-sm hidden-xs">
+                    <h2><!-- https://www.flickr.com/photos/expressmonorail/4538390020 -->Main Street USA, Magic Kingdom, Walt Disney World</a></h2>
+                </div>            
+            </div>
+            <div class="item">
+                <!-- Set the second background image using inline CSS below. -->
+                <div class="fill" style="background-image:url('img/2.jpg');"></div>
+                <div class="carousel-caption hidden-sm hidden-xs">
+                    <h2><!-- https://en.wikipedia.org/wiki/Limerick#mediaviewer/File:Limerick-King-Johns-Castle-2012.JPG -->King John's Castle on the River Shannon, Limerick, Ireland</a></h2>
+                </div>            
+            </div>
+            <div class="item">
+                <!-- Set the second background image using inline CSS below. -->
+                <div class="fill" style="background-image:url('img/3.jpg');"></div>
+                <div class="carousel-caption hidden-sm hidden-xs">
+                    <h2><!-- http://upload.wikimedia.org/wikipedia/commons/d/d5/Paris_at_night,_4_July_2013.jpg -->Paris at night, Paris, France</a></h2>
+                </div>          
+            </div>
+            <div class="item">
+                <!-- Set the second background image using inline CSS below. -->
+                <div class="fill" style="background-image:url('img/4.jpg');"></div>
+                <div class="carousel-caption hidden-sm hidden-xs">
+                    <h2><!-- http://upload.wikimedia.org/wikipedia/commons/3/33/Blue_Mosque_Istanbul_Mirrored.JPG -->Blue Mosque, Istanbul, Turkey</a></h2>
+                </div>     
+            </div>
+            <!--
+            <div class="item">-->
+                <!-- Set the third background image using inline CSS below. -->
+                <!-- <div class="fill" style="background-image:url('http://placehold.it/1900x1080&text=Slide Three');"></div>
+                <div class="carousel-caption">
+                    <h2>Caption 3</h2>
+                </div>
+            </div>
+            -->
+        </div>
+
+        <!-- Controls -->
+        <!--
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+		-->
+		
+    </header>
+
+    <div class="main-text">
+        <div class="col-md-3 text-center">
+            <h1>Florida</h1>
+            <p id="florida" class="time">
+	        <script type="text/javascript">
+		    startTime("florida", 0);
+		    </script>
+            </p>
+        </div>
+        <div class="col-md-3 text-center">
+            <h1>Ireland</h1>
+            <p id="ireland" class="time">
+	        <script type="text/javascript">
+		    startTime("ireland", 5);
+		    </script>
+            </p>
+        </div>
+        <div class="col-md-3 text-center">
+            <h1>France</h1>
+            <p id="france" class="time">
+	        <script type="text/javascript">
+		    startTime("france", 6);
+		    </script>
+            </p>
+        </div>
+        <div class="col-md-3 text-center">
+            <h1>Turkey</h1>
+            <p id="turkey" class="time">
+	        <script type="text/javascript">
+		    startTime("turkey", 7);
+		    </script>
+            </p>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Script to Activate the Carousel -->
+    <script>
+    $('.carousel').carousel({
+        interval: 5000 //changes the speed
+    })
+    </script>
+    
+
+
+</body>
+
+</html>
