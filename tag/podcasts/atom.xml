@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: podcasts | Gil Creque]]></title>
+  <link href="http://gilcreque.com/tag/podcasts/atom.xml" rel="self"/>
+  <link href="http://gilcreque.com/"/>
+  <updated>2016-02-16T20:41:12-05:00</updated>
+  <id>http://gilcreque.com/</id>
+  <author>
+    <name><![CDATA[Gil Creque]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Developer Podcast Recommendations]]></title>
+    <link href="http://gilcreque.com/developer-podcast-recommendations/"/>
+    <updated>2016-02-16T20:19:00-05:00</updated>
+    <id>http://gilcreque.com/developer-podcast-recommendations</id>
+    <content type="html"><![CDATA[<p>Like a lot of people I know I rarely listen to the radio anymore. I listen to quite a few podcasts throughout the week and my list is ever changing depending on my mood. I have come across quite a few podcasts that are about software and web development and I thought I would share them here in case others are interested. There are plenty more podcasts where these came from but here are just a few to get you started.</p>
+
+<ul>
+<li><a href="http://hanselminutes.com/"><strong>The Hanselminutes Podcast</strong></a> Described as the &ldquo;Fresh Air for Developers&rdquo;, Scott Hanselman interviews a variety of technical people.</li>
+<li><a href="http://www.codenewbie.org/podcast"><strong>CodeNewbie</strong></a> This is somewhat focused on people who are just starting out in their developer career. This show also has a great community that allows new developers to help each other out.</li>
+<li><a href="https://developertea.com/"><strong>Developer Tea</strong></a> I found this podcast recently via someone&rsquo;s tweet asking for podcasts like CodeNewbie. It was a great find. I have already listened to quite few episodes in the week since I&rsquo;ve discovered it. This focuses on web development and the show&rsquo;s premise is it can be listened to while you have a cup of tea.</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
