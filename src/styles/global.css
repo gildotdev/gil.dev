@@ -1,0 +1,23 @@
+body {
+display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+header {
+    grid-area: 1 / 1 / 2 / 4;
+}
+
+aside {
+    grid-area: 2 / 1 / 4 / 2;
+}
+
+main {
+    grid-area: 2 / 2 / 3 / 4;
+}
+
+footer {
+    grid-area: 3 / 2 / 4 / 4;
+}
