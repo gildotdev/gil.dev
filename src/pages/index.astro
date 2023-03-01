@@ -48,18 +48,21 @@ import "../styles/global.css";
       href="https://secure.gravatar.com/blavatar/88bdddbfd6da295eb21536526cc2fdaf?s=114"
     />
   </head>
-  <body>
+  <body
+    class="bg-violet-50 dark:bg-stone-800 text-stone-800 dark:text-violet-50"
+  >
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-    <header>
-      <p>👋🏾, I'm</p>
+    <header class="flex justify-center gap-4 items-center">
+      <p>Hello, I'm</p>
       <h1>Gil Creque</h1>
       <img
-        src="images/profile_photo.jpg"
+        src="avatar-pink-tv.jpeg"
         alt="Gil Creque"
-        height="256px"
-        width="256px"
+        height="400px"
+        width="400px"
+        class="rounded-full"
       />
     </header>
     <aside>
@@ -96,25 +99,7 @@ import "../styles/global.css";
         Python, and Java.
       </p>
     </main>
-    <footer>
-      <header>
-        <h1>Social Links</h1>
-      </header>
-      <p>You can find me around the web:</p>
-      <ul>
-        <li>
-          <a href="https://discord.gg/TbQEhP6HPr">Build and Run</a>, a free and
-          public Discord for the tech and creative community
-        </li>
-        <li>
-          I try to share posts through <a href="https://gilcreque.blog/"
-            >my micro.blog</a
-          > and I also recently joined Mastodon and you can <a
-            href="https://hachyderm.io/@gilcreque">find me tooting over there</a
-          >
-        </li>
-      </ul>
-    </footer>
+    <footer>Powered by Astro and hosted on Github Pages</footer>
   </body>
 </html>
 <!-- End Document
