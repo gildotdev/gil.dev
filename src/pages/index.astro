@@ -70,21 +70,26 @@ function formatPublishDate(publishDate: string | number | Date): string {
     />
   </head>
   <body
-    class="bg-violet-50 dark:bg-stone-800 text-stone-800 dark:text-violet-50"
+    class="bg-violet-50 dark:bg-stone-800 text-stone-800 dark:text-violet-50 max-w-3xl mx-auto"
   >
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-    <header class="flex justify-center gap-4 items-center">
-      <p>Hello, I'm</p>
-      <h1>Gil Creque</h1>
+    <header class="flex justify-center gap-1 items-center align-bottom">
       <img
         src="avatar-pink-tv.jpeg"
         alt="Gil Creque"
-        height="400px"
-        width="400px"
+        height="40px"
+        width="40px"
         class="rounded-full"
       />
+      <p>Hello, I'm</p>
+      <h1>Gil Creque</h1>
+      <nav>
+        <ul>
+          <li>Blog</li>
+        </ul>
+      </nav>
     </header>
     <aside>
       <h2>Social Links</h2>
@@ -119,23 +124,23 @@ function formatPublishDate(publishDate: string | number | Date): string {
         dabble in PHP (I used to primarily work in Wordpress and then Drupal),
         Python, and Java.
       </p>
-      <section id="microblog" set:html={}>
-        <h2>Micro Blog</h2>
-        {
-          posts.items.slice(0, 5).map((post: any) => (
-            <>
-              <article set:html={post.content_html}>
-                <p>
-                  <time datetime={post.date_published}>
-                    {formatPublishDate(post.date_published)}
-                  </time>
-                </p>
-              </article>
-            </>
-          ))
-        }
-      </section>
     </main>
+    <section id="microblog" set:html={}>
+      <h2>Latest Micro Blog</h2>
+      {
+        posts.items.slice(0, 2).map((post: any) => (
+          <>
+            <article set:html={post.content_html}>
+              <p>
+                <time datetime={post.date_published}>
+                  {formatPublishDate(post.date_published)}
+                </time>
+              </p>
+            </article>
+          </>
+        ))
+      }
+    </section>
     <footer>
       Powered by <a href="https://astro.build/">Astro</a> and hosted on <a
         href="https://pages.github.com/">GitHub Pages</a
