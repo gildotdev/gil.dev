@@ -2,6 +2,25 @@
   --main-accent-color: #663399;
 }
 
+@font-face {
+  font-family: "Alfa Slab One";
+  src: local("Alfa Slab One"), url("AlfaSlabOne-Regular.ttf") format("truetype");
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Alfa Slab One", cursive;
+  font-size: 32px;
+}
+
+.slab {
+  font-family: "Alfa Slab One", cursive;
+}
+
 body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -15,6 +34,7 @@ header {
   margin-top: 2rem;
   padding-bottom: 2rem;
   border-bottom: 0.25rem solid var(--main-accent-color);
+  font-family: "Alfa Slab One", cursive;
 }
 
 aside {
@@ -35,6 +55,10 @@ main {
   padding-top: 2rem;
   margin-top: 2rem;
   border-top: 0.125rem solid var(--main-accent-color);
+}
+
+time {
+  font-family: "Alfa Slab One", cursive;
 }
 
 footer {
