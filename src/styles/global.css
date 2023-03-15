@@ -1,5 +1,9 @@
 :root {
-  --main-accent-color: #663399;
+  --main-accent-color: #2bf0c2;
+  --border-color: var(--pink);
+  --mint-green: #2bf0c2;
+  --yellow: yellow;
+  --pink: hotpink;
 }
 
 @font-face {
@@ -15,6 +19,10 @@ h5,
 h6 {
   font-family: "Alfa Slab One", cursive;
   font-size: 32px;
+  text-decoration: underline wavy var(--yellow);
+  color: var(--main-accent-color);
+  text-underline-offset: 1rem;
+  margin-bottom: 1rem;
 }
 
 .slab {
@@ -27,34 +35,39 @@ body {
   grid-template-rows: max-content;
   grid-column-gap: 2rem;
   grid-row-gap: 2rem;
+  font-size: 16px;
+}
+
+p {
+  margin-bottom: 1rem;
 }
 
 header {
   grid-area: 1 / 1 / 2 / 4;
   margin-top: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 0.25rem solid var(--main-accent-color);
   font-family: "Alfa Slab One", cursive;
+  font-size: 2rem;
 }
 
-aside {
-  grid-area: 2 / 1 / 3 / 2;
+header > img {
+  margin-bottom: 1rem;
 }
 
 main {
-  grid-area: 2 / 2 / 3 / 4;
+  grid-area: 2 / 1 / 3 / 4;
+  padding-bottom: 1.5rem;
+}
+
+aside {
+  grid-area: 3 / 1 / 3 / 2;
 }
 
 #microblog {
-  grid-area: 3 / 1 / 4 / 4;
-  padding-top: 2rem;
-  border-top: 0.25rem solid var(--main-accent-color);
+  grid-area: 3 / 2 / 4 / 4;
 }
 
 #microblog > article {
-  padding-top: 2rem;
   margin-top: 2rem;
-  border-top: 0.125rem solid var(--main-accent-color);
 }
 
 time {
@@ -65,5 +78,5 @@ footer {
   grid-area: 4 / 1 / 5 / 4;
   margin-bottom: 2rem;
   padding-top: 2rem;
-  border-top: 0.25rem solid var(--main-accent-color);
+  border-top: 0.25rem solid var(--border-color);
 }

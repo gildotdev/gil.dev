@@ -55,19 +55,16 @@ function formatPublishDate(publishDate: string | number | Date): string {
     <link
       rel="shortcut icon"
       type="image/x-icon"
-      href="https://secure.gravatar.com/blavatar/88bdddbfd6da295eb21536526cc2fdaf?s=32"
+      href="avatar-pink-tv.jpeg"
       sizes="16x16"
     />
     <link
       rel="icon"
       type="image/x-icon"
-      href="https://secure.gravatar.com/blavatar/88bdddbfd6da295eb21536526cc2fdaf?s=32"
+      href="avatar-pink-tv.jpeg"
       sizes="16x16"
     />
-    <link
-      rel="apple-touch-icon-precomposed"
-      href="https://secure.gravatar.com/blavatar/88bdddbfd6da295eb21536526cc2fdaf?s=114"
-    />
+    <link rel="apple-touch-icon-precomposed" href="avatar-pink-tv.jpeg" />
   </head>
   <body
     class="bg-violet-50 dark:bg-stone-800 text-stone-800 dark:text-violet-50 max-w-3xl mx-auto"
@@ -83,9 +80,27 @@ function formatPublishDate(publishDate: string | number | Date): string {
         width="40px"
         class="rounded-full"
       />
-      <p>Hello, I'm</p>
+      <p>&nbsp;Hello, I'm&nbsp;</p>
       <h1>Gil Creque</h1>
     </header>
+    <main>
+      <h2>About Me</h2>
+      <p>
+        I'm a Senior Software Engineer and full-stack web developer at <a
+          href="https://www.codecraftworks.com/">Codecraft Works</a
+        >, where I lead software development working on an <a
+          href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1831060&HistoricalAwards=false"
+          >NSF backed</a
+        > education technology platform.
+      </p>
+      <p>
+        I am graduate of UCF (Go Knights!) but I consider myself a life-long
+        learner, technologist, and tech early-adopter. I currently do work in
+        Angular, Firebase, Google Cloud, ASP.NET, AWS, and STEM Education. I
+        dabble in PHP (I used to primarily work in Wordpress and then Drupal),
+        Python, and Java.
+      </p>
+    </main>
     <aside>
       <h2>Social Links</h2>
       <p>You can find me around the web:</p>
@@ -103,27 +118,10 @@ function formatPublishDate(publishDate: string | number | Date): string {
         </li>
       </ul>
     </aside>
-    <main>
-      <p>
-        I'm a Senior Software Engineer and full-stack web developer at <a
-          href="https://www.codecraftworks.com/">Codecraft Works</a
-        >, where I lead software development working on an <a
-          href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1831060&HistoricalAwards=false"
-          >NSF backed</a
-        > education technology platform.
-      </p>
-      <p>
-        I am graduate of UCF (Go Knights!) but I consider myself a life-long
-        learner, technologist, and tech early-adopter. I currently do work in
-        Angular, Firebase, Google Cloud, ASP.NET, AWS, and STEM Education. I
-        dabble in PHP (I used to primarily work in Wordpress and then Drupal),
-        Python, and Java.
-      </p>
-    </main>
     <section id="microblog" set:html={}>
       <h2>Latest Micro Blog</h2>
       {
-        posts.items.slice(0, 2).map((post: any) => (
+        posts.items.slice(0, 1).map((post: any) => (
           <>
             <article set:html={post.content_html}>
               <p>
