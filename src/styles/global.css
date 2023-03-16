@@ -9,7 +9,8 @@
 
 @font-face {
   font-family: "Alfa Slab One";
-  src: local("Alfa Slab One"), url("AlfaSlabOne-Regular.ttf") format("truetype");
+  src: local("Alfa Slab One"),
+    url("/fonts/AlfaSlabOne-Regular.ttf") format("truetype");
 }
 
 ::selection {
