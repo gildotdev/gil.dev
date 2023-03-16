@@ -42,6 +42,22 @@ p {
   margin-bottom: 1rem;
 }
 
+mark {
+  background-color: var(--pink);
+  padding: 0.25rem;
+}
+
+a,
+a:visited {
+  color: var(--main-accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--main-accent-color);
+  text-decoration: underline wavy;
+}
+
 header {
   grid-area: 1 / 1 / 2 / 4;
   margin-top: 2rem;
