@@ -80,7 +80,7 @@ function formatPublishDate(publishDate: string | number | Date): string {
         width="40px"
         class="rounded-full"
       />
-      <p>&nbsp;Hello, I'm&nbsp;</p>
+      <p class="slab">&nbsp;Hello, I'm&nbsp;</p>
       <h1>Gil Creque</h1>
     </header>
     <main>
@@ -126,11 +126,9 @@ function formatPublishDate(publishDate: string | number | Date): string {
         posts.items.slice(0, 1).map((post: any) => (
           <>
             <article set:html={post.content_html}>
-              <p>
-                <time datetime={post.date_published}>
-                  {formatPublishDate(post.date_published)}
-                </time>
-              </p>
+              <time class="slab" datetime={post.date_published}>
+                {formatPublishDate(post.date_published)}
+              </time>
             </article>
           </>
         ))
