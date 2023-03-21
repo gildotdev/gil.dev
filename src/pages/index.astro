@@ -72,18 +72,20 @@ function formatPublishDate(publishDate: string | number | Date): string {
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-    <header class="flex justify-center gap-1 items-center align-bottom">
+    <header
+      class="flex flex-col md:flex-row justify-center gap-1 items-center align-bottom"
+    >
       <img
         src="img/avatar-pink-tv.jpeg"
         alt="Photo os Gil Creque in a pink TV"
         height="40px"
         width="40px"
-        class="rounded-full"
+        class="rounded-full md:mb-8"
       />
-      <p class="slab">&nbsp;Hello, I'm&nbsp;</p>
+      <p class="slab mb-0 md:mb-8">&nbsp;Hello, I'm&nbsp;</p>
       <h1>Gil Creque</h1>
     </header>
-    <main>
+    <main class="mx-2">
       <h2>About Me</h2>
       <p>
         I'm a <mark>Senior Software Engineer</mark> and <mark
@@ -116,7 +118,7 @@ function formatPublishDate(publishDate: string | number | Date): string {
         work in Wordpress and then Drupal), Python, and Java.
       </p>
     </main>
-    <aside>
+    <aside class="mx-2">
       <h2>Social Links</h2>
       <p>You can find me around the web:</p>
       <ul>
@@ -156,8 +158,8 @@ function formatPublishDate(publishDate: string | number | Date): string {
         </li>
       </ul>
     </aside>
-    <section id="microblog" set:html={}>
-      <h2>Latest Micro Blog</h2>
+    <section id="microblog" class="mx-2" set:html={}>
+      <h2>Latest Blog</h2>
       {
         posts.items.slice(0, 1).map((post: any) => (
           <>
@@ -170,7 +172,7 @@ function formatPublishDate(publishDate: string | number | Date): string {
         ))
       }
     </section>
-    <footer>
+    <footer class="mx-2">
       Powered by <a href="https://astro.build/"
         ><img
           src="img/astro.svg"
