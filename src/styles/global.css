@@ -27,6 +27,7 @@ h6 {
   font-family: "Alfa Slab One", cursive;
   font-size: 32px;
   text-decoration: underline wavy var(--yellow) 0.25rem;
+  -webkit-text-decoration: underline wavy var(--yellow) 0.25rem;
   color: var(--main-accent-color);
   text-underline-offset: 1rem;
   margin-bottom: 2rem;
@@ -65,6 +66,7 @@ a:visited {
 a:hover {
   color: var(--main-accent-color);
   text-decoration: underline wavy;
+  -webkit-text-decoration: underline wavy;
 }
 
 header {
