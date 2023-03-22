@@ -1,0 +1,130 @@
+:root {
+  --main-accent-color: #2bf0c2;
+  --border-color: var(--pink);
+  --mint-green: #2bf0c2;
+  --yellow: yellow;
+  --pink: hotpink;
+  font-size: 24px;
+}
+
+@font-face {
+  font-family: "Alfa Slab One";
+  src: local("Alfa Slab One"),
+    url("/fonts/AlfaSlabOne-Regular.ttf") format("truetype");
+}
+
+::selection {
+  background-color: var(--main-accent-color);
+  color: black;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Alfa Slab One", cursive;
+  font-size: 32px;
+  text-decoration: underline wavy var(--yellow) 0.25rem;
+  -webkit-text-decoration: underline wavy var(--yellow) 0.25rem;
+  color: var(--main-accent-color);
+  text-underline-offset: 1rem;
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.slab {
+  font-family: "Alfa Slab One", cursive;
+  letter-spacing: 2px;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(5, max-content);
+  grid-column-gap: 2rem;
+  grid-row-gap: 2rem;
+  line-height: 2rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+mark {
+  background-color: var(--pink);
+  padding: 0.25rem;
+}
+
+a,
+a:visited {
+  color: var(--main-accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--main-accent-color);
+  text-decoration: underline wavy;
+  -webkit-text-decoration: underline wavy;
+}
+
+header {
+  grid-area: 1 / 1 / 2 / 2;
+  margin-top: 2rem;
+  font-family: "Alfa Slab One", cursive;
+  font-size: 1rem;
+}
+
+main {
+  grid-area: 2 / 1 / 3 / 2;
+  padding-bottom: 1.5rem;
+}
+
+aside {
+  grid-area: 3 / 1 / 4 / 2;
+}
+
+#microblog {
+  grid-area: 4 / 1 / 5 / 2;
+}
+
+#microblog > article {
+  margin-top: 2rem;
+}
+
+footer {
+  grid-area: 5 / 1 / 6 / 2;
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+  border-top: 0.25rem solid var(--border-color);
+}
+
+@media (min-width: 480px) {
+  body {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: max-content;
+    grid-column-gap: 2rem;
+    grid-row-gap: 2rem;
+  }
+
+  header {
+    grid-area: 1 / 1 / 2 / 5;
+  }
+
+  main {
+    grid-area: 2 / 1 / 3 / 5;
+  }
+
+  aside {
+    grid-area: 3 / 1 / 3 / 3;
+  }
+
+  #microblog {
+    grid-area: 3 / 3 / 4 / 5;
+  }
+
+  footer {
+    grid-area: 4 / 1 / 5 / 5;
+  }
+}
