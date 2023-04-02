@@ -5,12 +5,10 @@ const response = await fetch("https://micro.blog/posts/gilcreque", {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${import.meta.env.MICROBLOG_API_KEY}`,
   },
 });
 
 const posts = await response.json();
-//console.log(posts);
 
 const dateOptions: object = {
   year: "numeric",
