@@ -27,5 +27,31 @@
     "titleBar.inactiveBackground": "#24efcd99",
     "titleBar.inactiveForeground": "#15202b99"
   },
-  "peacock.color": "#24efcd"
+  "peacock.color": "#24efcd",
+  "frontMatter.framework.id": "other",
+  "frontMatter.content.publicFolder": "",
+  "frontMatter.content.pageFolders": [
+    {
+      "title": "garden",
+      "path": "[[workspace]]/src/pages/garden"
+    }
+  ],
+  "frontMatter.taxonomy.tags": [],
+  "frontMatter.taxonomy.categories": [],
+  "[markdown]": {
+    "editor.fontSize": 14,
+    "editor.lineHeight": 26,
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 64,
+    "editor.lineNumbers": "off",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    },
+    "editor.minimap.enabled": false
+  },
+  "frontMatter.content.autoUpdateDate": true,
+  "frontMatter.preview.host": "http://localhost:3000",
+  "frontMatter.framework.startCommand": "npm start"
 }
