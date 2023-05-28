@@ -1,16 +1,9 @@
 import { defineConfig } from "astro/config";
 // https://astro.build/config
-import angular from "@analogjs/astro-angular";
 import tailwind from "@astrojs/tailwind";
+import analogjsangular from "@analogjs/astro-angular";
 
+// https://astro.build/config
 export default defineConfig({
-  integrations: [
-    tailwind(),
-    angular({
-      vite: {
-        tsconfig: "tsconfig.app.json",
-        workspaceRoot: "rootDir",
-      },
-    }),
-  ],
+  integrations: [tailwind(), analogjsangular()]
 });
