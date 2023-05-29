@@ -4,7 +4,19 @@
   --mint-green: #2bf0c2;
   --yellow: yellow;
   --pink: hotpink;
+  --blue: #21b2e3;
   font-size: 24px;
+  --astro-code-color-text: white;
+  --astro-code-color-background: rgb(28 25 23);
+  --astro-code-token-constant: var(--mint-green);
+  --astro-code-token-string: var(--pink);
+  --astro-code-token-comment: var(--pink);
+  --astro-code-token-keyword: var(--blue);
+  --astro-code-token-parameter: var(--blue);
+  --astro-code-token-function: var(--pink);
+  --astro-code-token-string-expression: var(--yellow);
+  --astro-code-token-punctuation: var(--blue);
+  --astro-code-token-link: var(--blue);
 }
 
 @font-face {
@@ -127,4 +139,10 @@ footer {
   footer {
     grid-area: 4 / 1 / 5 / 5;
   }
+}
+
+.astro-code {
+  padding: 1rem;
+  border-radius: 1rem;
+  margin: 1rem 0;
 }
