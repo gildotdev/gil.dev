@@ -38,8 +38,13 @@ h5,
 h6 {
   font-family: "Alfa Slab One", cursive;
   font-size: 32px;
-  text-decoration: underline wavy var(--yellow) 0.25rem;
-  -webkit-text-decoration: underline wavy var(--yellow) 0.25rem;
+  text-decoration-thickness: 0.25rem;
+  text-decoration-color: var(--yellow);
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  -webkit-text-decoration-line: underline;
+  -webkit-text-decoration-style: wavy;
+  -webkit-text-decoration-color: var(--yellow);
   color: var(--main-accent-color);
   text-underline-offset: 1rem;
   margin-bottom: 2rem;
