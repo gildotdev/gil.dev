@@ -45,5 +45,18 @@
         }
       ]
     }
-  ]
+  ],
+  "frontMatter.content.autoUpdateDate": true,
+  "frontMatter.content.pageFolders": [
+    {
+      "title": "notes",
+      "path": "[[workspace]]/src/content/notes"
+    }
+  ],
+  "frontMatter.content.publicFolder": "",
+  "frontMatter.framework.id": "other",
+  "frontMatter.framework.startCommand": "npm start",
+  "frontMatter.preview.host": "http://localhost:3000",
+  "frontMatter.taxonomy.categories": [],
+  "frontMatter.taxonomy.tags": []
 }

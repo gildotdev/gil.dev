@@ -1,0 +1,20 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import "../../styles/global.css";
+// 1. Generate a new path for every collection note
+export async function getStaticPaths() {
+  const notes = await getCollection("notes");
+  return notes.map((note) => ({
+    params: { slug: note.slug },
+    props: { note },
+  }));
+}
+// 2. When it's time to render, you can get the note directly from the prop
+const { note } = Astro.props;
+const { Content } = await note.render();
+---
+
+<MainLayout title={note.data.title}>
+  <Content />
+</MainLayout>

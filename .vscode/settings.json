@@ -1,43 +1,6 @@
 {
   "cSpell.enableFiletypes": ["astro"],
-  "workbench.colorCustomizations": {
-    "activityBar.activeBackground": "#54f2d8",
-    "activityBar.background": "#54f2d8",
-    "activityBar.foreground": "#15202b",
-    "activityBar.inactiveForeground": "#15202b99",
-    "activityBarBadge.background": "#dd6bf4",
-    "activityBarBadge.foreground": "#15202b",
-    "commandCenter.border": "#15202b99",
-    "editorGroup.border": "#54f2d8",
-    "panel.border": "#54f2d8",
-    "sash.hoverBorder": "#54f2d8",
-    "sideBar.border": "#54f2d8",
-    "statusBar.background": "#24efcd",
-    "statusBar.border": "#24efcd",
-    "statusBar.debuggingBackground": "#ef2446",
-    "statusBar.debuggingBorder": "#ef2446",
-    "statusBar.debuggingForeground": "#e7e7e7",
-    "statusBar.foreground": "#15202b",
-    "statusBarItem.hoverBackground": "#0fd1b0",
-    "statusBarItem.remoteBackground": "#24efcd",
-    "statusBarItem.remoteForeground": "#15202b",
-    "titleBar.activeBackground": "#24efcd",
-    "titleBar.activeForeground": "#15202b",
-    "titleBar.border": "#24efcd",
-    "titleBar.inactiveBackground": "#24efcd99",
-    "titleBar.inactiveForeground": "#15202b99"
-  },
   "peacock.color": "#24efcd",
-  "frontMatter.framework.id": "other",
-  "frontMatter.content.publicFolder": "",
-  "frontMatter.content.pageFolders": [
-    {
-      "title": "garden",
-      "path": "[[workspace]]/src/pages/garden"
-    }
-  ],
-  "frontMatter.taxonomy.tags": [],
-  "frontMatter.taxonomy.categories": [],
   "[markdown]": {
     "editor.fontSize": 14,
     "editor.lineHeight": 26,
@@ -50,8 +13,5 @@
       "other": "off"
     },
     "editor.minimap.enabled": false
-  },
-  "frontMatter.content.autoUpdateDate": true,
-  "frontMatter.preview.host": "http://localhost:3000",
-  "frontMatter.framework.startCommand": "npm start"
+  }
 }

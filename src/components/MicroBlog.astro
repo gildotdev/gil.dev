@@ -1,0 +1,35 @@
+---
+const response = await fetch("https://micro.blog/posts/gilcreque", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const posts = await response.json();
+
+const dateOptions: object = {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+};
+
+function formatPublishDate(publishDate: string | number | Date): string {
+  return new Date(publishDate).toLocaleDateString("en-US", dateOptions);
+}
+---
+
+<aside id="microblog" class="mx-2">
+  <h2>Latest Blog</h2>
+  {
+    posts.items.slice(0, 1).map((post: any) => (
+      <>
+        <article set:html={post.content_html}>
+          <time class="slab" datetime={post.date_published}>
+            {formatPublishDate(post.date_published)}
+          </time>
+        </article>
+      </>
+    ))
+  }
+</aside>
