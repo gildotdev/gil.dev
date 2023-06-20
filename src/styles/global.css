@@ -151,3 +151,15 @@ footer {
   border-radius: 1rem;
   margin: 1rem 0;
 }
+
+p {
+  @apply pb-5;
+}
+
+:not(pre) > code {
+  background-color:  var(--astro-code-color-background);
+  padding: .25rem;
+  border-radius: .5rem;
+  border-color: var(--yellow);
+  border-width: 1px;
+}
