@@ -1,0 +1,22 @@
+---
+const { tag, i } = Astro.props;
+---
+
+<style>
+    a {
+        background-color: var(--main-accent-color);
+        color: var(--astro-code-color-background) !important;
+        padding: 0.25rem;
+        border-radius: 0.5rem;
+        border-color: var(--astro-code-color-background);
+        border-width: 1px;
+    }
+
+    a:hover {
+        background-color: var(--astro-code-color-background);
+        color: var(--main-accent-color) !important;
+        border-color: var(--main-accent-color);
+        text-underline-offset: 1rem;
+    }
+</style>
+<a href={`/tags/${tag}`} class={`tag`}>{tag}</a>

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import "../styles/global.css";
 // 1. Generate a new path for every collection note
@@ -13,8 +14,23 @@ export async function getStaticPaths() {
 // 2. When it's time to render, you can get the note directly from the prop
 const { note } = Astro.props;
 const { Content } = await note.render();
+
+const {
+  data: { title, date, lastmod, tags },
+} = note;
 ---
 
-<MainLayout title={note.data.title}>
+<MainLayout title={title}>
   <Content />
+
+  {
+    tags.length > 0 && (
+      <p>
+        Tags:{" "}
+        {tags.map((tag: any, i: number) => (
+          <Tag tag={tag} i={i} />
+        ))}
+      </p>
+    )
+  }
 </MainLayout>

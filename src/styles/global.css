@@ -6,6 +6,7 @@
   --pink: hotpink;
   --blue: #21b2e3;
   font-size: 24px;
+  --yellowalpha: #ffff0088;
   --astro-code-color-text: white;
   --astro-code-color-background: rgb(28 25 23);
   --astro-code-token-constant: var(--mint-green);
@@ -160,6 +161,6 @@ p {
   background-color:  var(--astro-code-color-background);
   padding: .25rem;
   border-radius: .5rem;
-  border-color: var(--yellow);
+  border-color: var(--yellowalpha);
   border-width: 1px;
 }
