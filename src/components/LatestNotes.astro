@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import { formatPublishDate, timeAgo } from "../lib/utils";
+import "../styles/global.css";
+const notes = await getCollection("notes");
+---
+
+<aside id="notes" class="mx-2">
+  <h2>Latest Notes</h2>
+  {
+    notes
+      .sort((a, b) => new Date(b.data.lastmod) - new Date(a.data.lastmod))
+      .slice(0, 5)
+      .map((note) => (
+        <article>
+          <a href={`/${note.slug}`}>{note.data.title}</a>
+          <p>
+            <time class="slab text-sm" datetime={note.data.date}>
+              {formatPublishDate(note.data.date)}
+            </time>
+            {note.data.date !== note.data.lastmod && (
+              <time class="text-xs" datetime={note.data.lastmod}>
+                Last Updated {timeAgo(note.data.lastmod)}
+              </time>
+            )}
+          </p>
+        </article>
+      ))
+  }
+</aside>
