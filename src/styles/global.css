@@ -63,7 +63,7 @@ body {
   grid-template-rows: repeat(5, max-content);
   grid-column-gap: 2rem;
   grid-row-gap: 2rem;
-  line-height: 2rem;
+  line-height: 2rem !important;
 }
 
 p {
@@ -163,4 +163,5 @@ p {
   border-radius: .5rem;
   border-color: var(--yellowalpha);
   border-width: 1px;
+  white-space: nowrap;
 }
