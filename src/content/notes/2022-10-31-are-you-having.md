@@ -6,14 +6,18 @@ type: note
 url: /2022/10/31/are-you-having.html
 slug: problems-deploying-google-cloud-run-container
 description: Does your Google Cloud Run container run fine locally but it won't start when deployed and revisioned?
-lastmod: 2023-06-22T16:32:46.818Z
+lastmod: 2023-06-22T23:50:02.662Z
 tags:
-  - cloud run
-  - google
+  - cloud-run
+  - google-cloud
   - docker
 ---
-Does it run fine locally but it won't start when deployed and revisioned? Are you using an M1 Mac? You likely need to add this target flag at the end of your `docker build` command.
+Does it run fine locally but it won't start when deployed and revisioned? Are you using an M1 Mac? You likely need to add this target flag to your `docker build` command.
 
 `--platform linux/amd64`
+
+```bash
+docker build --platform linux/amd64
+```
 
 [https://stackoverflow.com/a/68766137/332586](https://stackoverflow.com/a/68766137/332586)

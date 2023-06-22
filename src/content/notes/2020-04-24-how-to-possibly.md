@@ -7,8 +7,9 @@ date: 2020-04-24T22:09:01-0400
 type: note
 tags:
   - web-dev
+  - node
 url: /2020/04/24/how-to-possibly.html
-lastmod: 2023-06-22T15:29:38.808Z
+lastmod: 2023-06-22T23:36:10.185Z
 slug: possibly-fix-npm-globally-installed-binary
 ---
 This line in my `~/.npmrc` file has been killing my sanity for longer than I want to admit. 

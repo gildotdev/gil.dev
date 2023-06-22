@@ -62,6 +62,34 @@
           "title": "lastmod",
           "name": "lastmod",
           "type": "datetime"
+        },
+        {
+          "title": "microblog",
+          "name": "microblog",
+          "type": "datetime"
+        },
+        {
+          "title": "post_id",
+          "name": "post_id",
+          "type": "number"
+        },
+        {
+          "title": "images",
+          "name": "images",
+          "type": "choice",
+          "choices": [
+            "https://cdn.uploads.micro.blog/7795/2020/0b7e9a8c7c.png"
+          ]
+        },
+        {
+          "title": "photos",
+          "name": "photos",
+          "type": "datetime"
+        },
+        {
+          "title": "photos_with_metadata",
+          "name": "photos_with_metadata",
+          "type": "datetime"
         }
       ]
     }

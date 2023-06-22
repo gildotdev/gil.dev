@@ -14,10 +14,11 @@ images:
 photos: null
 photos_with_metadata: null
 url: /2020/03/19/returning-observable-objects.html
-lastmod: 2023-06-22T23:10:01.025Z
+lastmod: 2023-06-22T23:32:51.871Z
 slug: returning-observable-objects-combinelatest
 ---
-<img src="uploads/2020/0b7e9a8c7c.png" width="600" height="300" alt="" />
+![Returning Observable objects from combineLatest()](../../assets/0b7e9a8c7c.png)
+
 
 In trying to use more Reactive patterns in Angular I have been using the `combineLatest()` RxJs method to combine several Observables into one Observable and using the `async` pipe to use the data in the template. This ensures that all of the data is available in the template by using `*ngIf`. One thing I did not like about using `combineLatest()` is that it returns an array of results back based on the array of Observables you handed to it. This made accessing this data in the template look messy and made it harder to understand what data you were accessing.
 

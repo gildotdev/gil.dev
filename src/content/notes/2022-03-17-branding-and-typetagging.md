@@ -7,8 +7,9 @@ date: 2022-03-17T12:43:39-0400
 type: note
 tags:
   - web-dev
+  - typescript
 url: /2022/03/17/branding-and-typetagging.html
-lastmod: 2023-06-22T15:29:38.823Z
+lastmod: 2023-06-22T23:39:21.957Z
 slug: branding-type-tagging
 ---
 I ran across this Tweet

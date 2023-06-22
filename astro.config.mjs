@@ -7,4 +7,7 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   integrations: [tailwind(), analogjsangular(), mdx()],
   markdown: { shikiConfig: { theme: "css-variables" } },
+  experimental: {
+    assets: true
+   }
 });
