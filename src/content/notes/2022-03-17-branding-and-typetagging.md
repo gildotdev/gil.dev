@@ -1,15 +1,14 @@
 ---
-layout: post
 title: Branding and Type-Tagging
 microblog: false
 guid: http://gilcreque.micro.blog/2022/03/17/branding-and-typetagging.html
 post_id: 1529090
 date: 2022-03-17T12:43:39-0400
-type: post
+type: note
 tags:
   - web-dev
 url: /2022/03/17/branding-and-typetagging.html
-lastmod: 2023-06-21T23:35:23.919Z
+lastmod: 2023-06-22T15:29:38.823Z
 slug: branding-type-tagging
 ---
 I ran across this Tweet

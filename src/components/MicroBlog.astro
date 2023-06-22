@@ -20,9 +20,9 @@ function formatPublishDate(publishDate: string | number | Date): string {
 ---
 
 <aside id="microblog" class="mx-2">
-  <h2>Latest Blog</h2>
+  <h2>Latest Post</h2>
   {
-    posts.items.slice(0, 1).map((post: any) => (
+    posts.items.slice(0, 2).map((post: any) => (
       <>
         <article set:html={post.content_html}>
           <time class="slab" datetime={post.date_published}>

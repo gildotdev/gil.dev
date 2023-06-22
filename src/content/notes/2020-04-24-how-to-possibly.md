@@ -1,15 +1,14 @@
 ---
-layout: post
 title: How to possibly fix your npm globally installed binary not being found
 microblog: false
 guid: http://gilcreque.micro.blog/2020/04/24/how-to-possibly.html
 post_id: 1079760
 date: 2020-04-24T22:09:01-0400
-type: post
+type: note
 tags:
   - web-dev
 url: /2020/04/24/how-to-possibly.html
-lastmod: 2023-06-21T23:35:23.905Z
+lastmod: 2023-06-22T15:29:38.808Z
 slug: possibly-fix-npm-globally-installed-binary
 ---
 This line in my `~/.npmrc` file has been killing my sanity for longer than I want to admit. 

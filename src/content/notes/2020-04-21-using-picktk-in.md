@@ -1,11 +1,10 @@
 ---
-layout: post
 title: Using Pick<T,K> in TypeScript
 microblog: false
 guid: http://gilcreque.micro.blog/2020/04/21/using-picktk-in.html
 post_id: 1077063
 date: 2020-04-21T16:54:00-0400
-type: post
+type: note
 tags:
   - web-dev
 images:
@@ -13,7 +12,7 @@ images:
 photos: null
 photos_with_metadata: null
 url: /2020/04/21/using-picktk-in.html
-lastmod: 2023-06-21T23:35:23.889Z
+lastmod: 2023-06-22T15:29:38.865Z
 slug: pick-typescript
 ---
 <img src="uploads/2020/67f6bb8830.png" width="600" height="300" alt="" />
