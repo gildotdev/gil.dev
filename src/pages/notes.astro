@@ -1,19 +1,27 @@
 ---
 import { getCollection } from "astro:content";
-import "../../styles/global.css";
 import MainLayout from "../layouts/MainLayout.astro";
+import { formatPublishDate, timeAgo } from "../lib/utils.ts";
+import "../styles/global.css";
 const notes = await getCollection("notes");
 ---
 
-<MainLayout title="Notes">
+<MainLayout title="All My Notes">
   <ul>
     {
       notes.map((note) => (
         <li>
-          <a href={`/notes/${note.slug}`}>{note.data.title}</a>
-          <time datetime={note.data.date.toISOString()}>
-            {note.data.date.toDateString()}
-          </time>
+          <a href={`/${note.slug}`}>{note.data.title}</a>
+          <p>
+            <time class="slab text-sm" datetime={note.data.date}>
+              {formatPublishDate(note.data.date)}
+            </time>
+            {note.data.date !== note.data.lastmod && (
+              <time class="text-xs" datetime={note.data.lastmod}>
+                Last Updated {timeAgo(note.data.lastmod)}
+              </time>
+            )}
+          </p>
         </li>
       ))
     }
