@@ -12,7 +12,7 @@ images:
 photos: null
 photos_with_metadata: null
 url: /2020/03/19/returning-observable-objects.html
-lastmod: 2023-06-22T15:29:39.818Z
+lastmod: 2023-06-22T15:35:03.027Z
 slug: returning-observable-objects-combinelatest
 ---
 <img src="uploads/2020/0b7e9a8c7c.png" width="600" height="300" alt="" />
@@ -34,7 +34,9 @@ So I set out this morning to get this cleaned up in our repository and found a p
 cousePageData$: Observable<{user: User; Course: Course;}>;
 const user$ = getCurrentUser(); // get the current user
 const course$ = getCourse(courseId); // get course by course id
-const cousePageData$ = combineLatest([user$, course$]).pipe(map(([user, course]) => ({ user, course })));
+const cousePageData$ =
+  combineLatest([user$, course$])
+  .pipe(map(([user, course]) => ({ user, course })));
 ```
 
 In the template this would result in object(`{user: userData, course: courseData }`) as a result of using the same async pipe and you can now access `user` and `course` using the property name on the object (`cousePageData.user` and `cousePageData.course`).
