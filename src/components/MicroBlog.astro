@@ -1,0 +1,27 @@
+---
+import { formatPublishDate } from "../lib/utils.ts";
+
+const response = await fetch("https://micro.blog/posts/gilcreque", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const posts = await response.json();
+---
+
+<aside id="microblog" class="mx-2">
+  <h2>Micro Blog</h2>
+  {
+    posts.items.slice(0, 2).map((post: any) => (
+      <>
+        <article set:html={post.content_html}>
+          <time class="slab" datetime={post.date_published}>
+            {formatPublishDate(post.date_published)}
+          </time>
+        </article>
+      </>
+    ))
+  }
+</aside>

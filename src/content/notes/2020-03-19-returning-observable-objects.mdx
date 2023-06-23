@@ -1,0 +1,47 @@
+---
+title: Returning Observable objects from combineLatest()
+microblog: false
+guid: http://gilcreque.micro.blog/2020/03/19/returning-observable-objects.html
+post_id: 1042663
+date: 2020-03-19T13:56:00-0400
+type: note
+tags:
+  - web-dev
+  - angular
+  - rxjs
+images:
+  - https://cdn.uploads.micro.blog/7795/2020/0b7e9a8c7c.png
+photos: null
+photos_with_metadata: null
+url: /2020/03/19/returning-observable-objects.html
+lastmod: 2023-06-22T23:32:51.871Z
+slug: returning-observable-objects-combinelatest
+---
+![Returning Observable objects from combineLatest()](../../assets/0b7e9a8c7c.png)
+
+
+In trying to use more Reactive patterns in Angular I have been using the `combineLatest()` RxJs method to combine several Observables into one Observable and using the `async` pipe to use the data in the template. This ensures that all of the data is available in the template by using `*ngIf`. One thing I did not like about using `combineLatest()` is that it returns an array of results back based on the array of Observables you handed to it. This made accessing this data in the template look messy and made it harder to understand what data you were accessing.
+
+``` typescript
+coursePageData$: Observable<[User, Course]>;
+const user$ = getCurrentUser(); // get the current user
+const course$ = getCourse(courseId); // get course by course id
+this.coursePageData$ = combineLatest([user$, course$]);
+```
+
+In the template this would result in array(`[ user, course ]`) as a result of using the `async` pipe  (`<div *ngIf="cousePageData$ | async as cousePageData>`) and you would have to access `user` and `course` using the index on the array (`cousePageData[0]` and `cousePageData[1]`). As you can see, this obfuscates what data is actually being accessed at this indexes.
+
+So I set out this morning to get this cleaned up in our repository and found a pretty easy solution in RxJs, using `pipe` and `map` to return the results of `combineLatest()` as an object.
+
+``` typescript
+cousePageData$: Observable<{user: User; Course: Course;}>;
+const user$ = getCurrentUser(); // get the current user
+const course$ = getCourse(courseId); // get course by course id
+const cousePageData$ =
+  combineLatest([user$, course$])
+  .pipe(map(([user, course]) => ({ user, course })));
+```
+
+In the template this would result in object(`{user: userData, course: courseData }`) as a result of using the same async pipe and you can now access `user` and `course` using the property name on the object (`cousePageData.user` and `cousePageData.course`).
+
+Yay for less obsfucation! Let me know if you have any other ideas regarding this!

@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import Tag from "../components/Tag.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+import { formatPublishDate, timeAgo } from "../lib/utils.ts";
+import "../styles/global.css";
+// 1. Generate a new path for every collection note
+export async function getStaticPaths() {
+  const notes = await getCollection("notes");
+  return notes.map((note) => ({
+    params: { slug: note.slug },
+    props: { note },
+  }));
+}
+// 2. When it's time to render, you can get the note directly from the prop
+const { note } = Astro.props;
+const { Content } = await note.render();
+
+const {
+  data: { title, date, lastmod, tags },
+} = note;
+---
+
+<MainLayout title={title}>
+  <article>
+    <time class="slab" datetime={date}>
+      {formatPublishDate(date)}
+    </time>
+    {
+      date !== lastmod && (
+        <time class="text-xs" datetime={lastmod}>
+          Last Updated {timeAgo(lastmod)}
+        </time>
+      )
+    }
+    <Content />
+    {
+      tags.length > 0 && (
+        <p>
+          Tags:{" "}
+          {tags.map((tag: any, i: number) => (
+            <Tag tag={tag} i={i} />
+          ))}
+        </p>
+      )
+    }
+  </article>
+</MainLayout>

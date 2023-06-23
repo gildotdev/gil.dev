@@ -1,0 +1,110 @@
+{
+  "$schema": "https://frontmatter.codes/frontmatter.schema.json",
+  "frontMatter.taxonomy.contentTypes": [
+    {
+      "name": "default",
+      "pageBundle": false,
+      "previewPath": null,
+      "fields": [
+        {
+          "title": "Title",
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "title": "Description",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "title": "Publishing date",
+          "name": "date",
+          "type": "datetime",
+          "default": "{{now}}",
+          "isPublishDate": true
+        },
+        {
+          "title": "Content preview",
+          "name": "preview",
+          "type": "image"
+        },
+        {
+          "title": "Is in draft",
+          "name": "draft",
+          "type": "draft"
+        },
+        {
+          "title": "Tags",
+          "name": "tags",
+          "type": "tags"
+        },
+        {
+          "title": "Categories",
+          "name": "categories",
+          "type": "categories"
+        },
+        {
+          "title": "guid",
+          "name": "guid",
+          "type": "string"
+        },
+        {
+          "title": "type",
+          "name": "type",
+          "type": "string"
+        },
+        {
+          "title": "url",
+          "name": "url",
+          "type": "string"
+        },
+        {
+          "title": "lastmod",
+          "name": "lastmod",
+          "type": "datetime"
+        },
+        {
+          "title": "microblog",
+          "name": "microblog",
+          "type": "datetime"
+        },
+        {
+          "title": "post_id",
+          "name": "post_id",
+          "type": "number"
+        },
+        {
+          "title": "images",
+          "name": "images",
+          "type": "choice",
+          "choices": [
+            "https://cdn.uploads.micro.blog/7795/2020/0b7e9a8c7c.png"
+          ]
+        },
+        {
+          "title": "photos",
+          "name": "photos",
+          "type": "datetime"
+        },
+        {
+          "title": "photos_with_metadata",
+          "name": "photos_with_metadata",
+          "type": "datetime"
+        }
+      ]
+    }
+  ],
+  "frontMatter.content.autoUpdateDate": true,
+  "frontMatter.content.pageFolders": [
+    {
+      "title": "notes",
+      "path": "[[workspace]]/src/content/notes"
+    }
+  ],
+  "frontMatter.content.publicFolder": "",
+  "frontMatter.framework.id": "other",
+  "frontMatter.framework.startCommand": "npm start",
+  "frontMatter.preview.host": "http://localhost:3000",
+  "frontMatter.taxonomy.categories": [],
+  "frontMatter.taxonomy.tags": []
+}

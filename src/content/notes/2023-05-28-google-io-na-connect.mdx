@@ -1,0 +1,36 @@
+---
+title: Google I/O Connect Miami and North America Connect 2023
+description: An extension of Google I/O held in Miami at the Mana Convention Center in Wynwood as well as a gathering of GDG, GDE, WTM, and GDSC programs in North America.
+draft: true
+tags:
+  - gdg
+  - google
+  - community
+lastmod: 2023-06-21T23:38:49.627Z
+date: 2023-05-29T00:24:53.682Z
+slug: google-io-connect-miami-north-america-connect-2023
+---
+
+
+```typescript
+@Component({
+  selector: 'my-app',
+  standalone: true,
+  template: `
+    {{ fullName() }} <button (click)="setName('John')">Click</button>
+  `,
+})
+export class App {
+  firstName = signal('Jane');
+  lastName = signal('Doe');
+  fullName = computed(() => `${this.firstName()} ${this.lastName()}`);
+
+  constructor() {
+    effect(() => console.log('Name changed:', this.fullName()));
+  }
+
+  setName(newName: string) {
+    this.firstName.set(newName);
+  }
+}
+```

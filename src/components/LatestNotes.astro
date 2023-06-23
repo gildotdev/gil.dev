@@ -1,0 +1,44 @@
+---
+import { getCollection } from "astro:content";
+import { formatPublishDate, timeAgo } from "../lib/utils";
+import "../styles/global.css";
+const notes = await getCollection("notes");
+---
+
+<aside id="notes" class="mx-2">
+  <h2>Digital Garden</h2>
+  <p>
+    <a href="/notes"
+      ><img
+        src="img/worm.svg"
+        width="24px"
+        height="24px"
+        class="inline"
+        alt="Worm"
+      />{" "}All Notes</a
+    >
+  </p>
+
+  <ul>
+    {
+      notes
+        .sort((a, b) => new Date(b.data.lastmod) - new Date(a.data.lastmod))
+        .slice(0, 5)
+        .map((note) => (
+          <li>
+            <a href={`/${note.slug}`}>{note.data.title}</a>
+            <p>
+              <time class="slab text-sm" datetime={note.data.date}>
+                {formatPublishDate(note.data.date)}
+              </time>
+              {note.data.date !== note.data.lastmod && (
+                <time class="text-xs" datetime={note.data.lastmod}>
+                  Last Updated {timeAgo(note.data.lastmod)}
+                </time>
+              )}
+            </p>
+          </li>
+        ))
+    }
+  </ul>
+</aside>
