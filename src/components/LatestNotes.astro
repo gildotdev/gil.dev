@@ -6,27 +6,36 @@ const notes = await getCollection("notes");
 ---
 
 <aside id="notes" class="mx-2">
-  <a href="/notes"><h2>All Notes</h2></a>
-
-  <h2>Latest Notes</h2>
-  {
-    notes
-      .sort((a, b) => new Date(b.data.lastmod) - new Date(a.data.lastmod))
-      .slice(0, 5)
-      .map((note) => (
-        <article>
-          <a href={`/${note.slug}`}>{note.data.title}</a>
-          <p>
-            <time class="slab text-sm" datetime={note.data.date}>
-              {formatPublishDate(note.data.date)}
-            </time>
-            {note.data.date !== note.data.lastmod && (
-              <time class="text-xs" datetime={note.data.lastmod}>
-                Last Updated {timeAgo(note.data.lastmod)}
+  <h2>Latest from My Digital Garden</h2>
+  <a href="/notes"
+    ><img
+      src="img/worm.svg"
+      width="24px"
+      height="24px"
+      class="inline"
+      alt="Worm"
+    />{" "}All Notes</a
+  >
+  <ul>
+    {
+      notes
+        .sort((a, b) => new Date(b.data.lastmod) - new Date(a.data.lastmod))
+        .slice(0, 5)
+        .map((note) => (
+          <li>
+            <a href={`/${note.slug}`}>{note.data.title}</a>
+            <p>
+              <time class="slab text-sm" datetime={note.data.date}>
+                {formatPublishDate(note.data.date)}
               </time>
-            )}
-          </p>
-        </article>
-      ))
-  }
+              {note.data.date !== note.data.lastmod && (
+                <time class="text-xs" datetime={note.data.lastmod}>
+                  Last Updated {timeAgo(note.data.lastmod)}
+                </time>
+              )}
+            </p>
+          </li>
+        ))
+    }
+  </ul>
 </aside>
