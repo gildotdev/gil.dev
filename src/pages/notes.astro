@@ -3,7 +3,9 @@ import { getCollection } from "astro:content";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate, timeAgo } from "../lib/utils.ts";
 import "../styles/global.css";
-const notes = await getCollection("notes");
+const notes = await getCollection("notes", ({ data }) => {
+  return data.draft !== true;
+});
 ---
 
 <MainLayout title="Digital Garden">

@@ -2,7 +2,9 @@
 import { getCollection } from "astro:content";
 import { formatPublishDate, timeAgo } from "../lib/utils";
 import "../styles/global.css";
-const notes = await getCollection("notes");
+const notes = await getCollection("notes", ({ data }) => {
+  return data.draft !== true;
+});
 ---
 
 <aside id="notes" class="mx-2">
