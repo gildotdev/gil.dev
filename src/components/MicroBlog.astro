@@ -12,7 +12,15 @@ const posts = await response.json();
 ---
 
 <aside id="microblog" class="mx-2">
-  <h2>Micro Blog</h2>
+  <h2>
+    <img
+      src="img/microblog.svg"
+      width="24px"
+      height="24px"
+      class="inline"
+      alt="Micro.blog Logo"
+    />{" "}Micro Blog
+  </h2>
   {
     posts.items.slice(0, 2).map((post: any) => (
       <>

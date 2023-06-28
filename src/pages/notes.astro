@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate, timeAgo } from "../lib/utils.ts";
 import "../styles/global.css";
@@ -24,6 +25,14 @@ const notes = await getCollection("notes", ({ data }) => {
               </time>
             )}
           </p>
+          {note.data.tags.length > 0 && (
+            <p>
+              Tags:{" "}
+              {note.data.tags.map((tag: any, i: number) => (
+                <Tag tag={tag} i={i} />
+              ))}
+            </p>
+          )}
         </li>
       ))
     }

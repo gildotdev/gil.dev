@@ -2,21 +2,37 @@
 import { getCollection } from "astro:content";
 import { formatPublishDate, timeAgo } from "../lib/utils";
 import "../styles/global.css";
+import Tag from "./Tag.astro";
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
 });
 ---
 
+<style>
+  li {
+    padding-top: 1rem;
+    border-top: 0.125rem var(--yellow) double;
+  }
+</style>
+
 <aside id="notes" class="mx-2">
-  <h2>Digital Garden</h2>
-  <p>
+  <h2>
+    <img
+      src="img/plant.svg"
+      width="24px"
+      height="24px"
+      class="inline"
+      alt="Plant Icon"
+    />{" "}Digital Garden
+  </h2>
+  <p class="slab">
     <a href="/notes"
       ><img
-        src="img/worm.svg"
+        src="img/sticky-note.svg"
         width="24px"
         height="24px"
         class="inline"
-        alt="Worm"
+        alt="Sticky Note Icon"
       />{" "}All Notes</a
     >
   </p>
@@ -28,17 +44,37 @@ const notes = await getCollection("notes", ({ data }) => {
         .slice(0, 5)
         .map((note) => (
           <li>
-            <a href={`/${note.slug}`}>{note.data.title}</a>
+            <a href={`/${note.slug}`}>
+              <img
+                src="img/worm.svg"
+                width="16px"
+                height="16px"
+                class="inline"
+                alt="Worm Icon"
+              />{" "}
+              {note.data.title}
+            </a>
             <p>
-              <time class="slab text-sm" datetime={note.data.date}>
+              <time datetime={note.data.date}>
                 {formatPublishDate(note.data.date)}
               </time>
               {note.data.date !== note.data.lastmod && (
-                <time class="text-xs" datetime={note.data.lastmod}>
+                <time
+                  class="text-xs text-stone-300"
+                  datetime={note.data.lastmod}
+                >
                   Last Updated {timeAgo(note.data.lastmod)}
                 </time>
               )}
             </p>
+            {note.data.tags.length > 0 && (
+              <p>
+                Tags:{" "}
+                {note.data.tags.map((tag: any, i: number) => (
+                  <Tag tag={tag} i={i} />
+                ))}
+              </p>
+            )}
           </li>
         ))
     }
