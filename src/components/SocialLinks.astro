@@ -1,56 +1,70 @@
 ---
-import LatestNotes from "./LatestNotes.astro";
 ---
 
-<section id="social-links">
-  <aside class="mx-2 mb-5">
-    <h2>
+<aside id="social-links" class="mx-2 mb-5">
+  <h2>
+    <img
+      src="img/link.svg"
+      width="24px"
+      height="24px"
+      class="inline"
+      alt="Link Icon"
+    />{" "}Social Links
+  </h2>
+  <p>You can find me around the web:</p>
+  <ul>
+    <li>
+      <a href="https://discord.gg/TbQEhP6HPr"
+        ><img
+          src="img/discord.svg"
+          width="24px"
+          height="24px"
+          class="inline"
+          alt="Discord Logo"
+        />
+        Build and Run</a
+      >, a free and public Discord for the tech and creative community
+    </li>
+    <li>
       <img
-        src="img/link.svg"
+        src="img/microblog.svg"
         width="24px"
         height="24px"
         class="inline"
-        alt="Link Icon"
-      />{" "}Social Links
-    </h2>
-    <p>You can find me around the web:</p>
-    <ul>
-      <li>
-        <a href="https://discord.gg/TbQEhP6HPr"
-          ><img
-            src="img/discord.svg"
-            width="24px"
-            height="24px"
-            class="inline"
-            alt="Discord Logo"
-          />
-          Build and Run</a
-        >, a free and public Discord for the tech and creative community
-      </li>
-      <li>
-        <img
-          src="img/microblog.svg"
-          width="24px"
-          height="24px"
-          class="inline"
-          alt="Micro.blog Logo"
-        /> I try to share posts through <a href="https://gilcreque.blog/"
-          >my micro.blog</a
-        >
-      </li>
-      <li>
-        <img
-          src="img/mastodon.svg"
-          width="24px"
-          height="24px"
-          class="inline"
-          alt="Mastodon Logo"
-        /> I also recently joined Mastodon and you can <a
-          rel="me"
-          href="https://hachyderm.io/@gilcreque">find me tooting over there</a
-        >
-      </li>
-    </ul>
-  </aside>
-  <LatestNotes />
-</section>
+        alt="Micro.blog Logo"
+      /> I try to share posts through <a href="https://gilcreque.blog/"
+        >my micro.blog</a
+      >
+    </li>
+    <li>
+      <img
+        src="img/mastodon.svg"
+        width="24px"
+        height="24px"
+        class="inline"
+        alt="Mastodon Logo"
+      /> I also recently joined Mastodon and you can <a
+        rel="me"
+        href="https://hachyderm.io/@gilcreque">find me tooting over there</a
+      >
+    </li>
+    <li>
+      <img
+        src="img/sticky-note.svg"
+        width="24px"
+        height="24px"
+        class="inline"
+        alt="Sticky Note Icon"
+      />{" "}Read
+      <a href="/notes">
+        {" "}all the notes
+      </a>{" "}from my digital garden{" "}<img
+        src="img/plant.svg"
+        width="24px"
+        height="24px"
+        class="inline"
+        alt="Plant Icon"
+      />
+    </li>
+  </ul>
+</aside>

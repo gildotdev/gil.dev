@@ -1,7 +1,7 @@
 ---
 const { title, isHome = false } = Astro.props;
 import Footer from "../components/Footer.astro";
-import MicroBlog from "../components/MicroBlog.astro";
+import LatestNotes from "../components/LatestNotes.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 ---
 
@@ -93,7 +93,7 @@ import SocialLinks from "../components/SocialLinks.astro";
       isHome ? (
         <>
           <SocialLinks />
-          <MicroBlog />
+          <LatestNotes />
         </>
       ) : null
     }

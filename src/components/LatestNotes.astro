@@ -11,6 +11,8 @@ const notes = await getCollection("notes", ({ data }) => {
 <style>
   li {
     padding-top: 1rem;
+  }
+  li:not(:first-child) {
     border-top: 0.125rem var(--yellow) double;
   }
 </style>
@@ -23,20 +25,8 @@ const notes = await getCollection("notes", ({ data }) => {
       height="24px"
       class="inline"
       alt="Plant Icon"
-    />{" "}Digital Garden
+    />{" "}Latest Notes
   </h2>
-  <p class="slab">
-    <a href="/notes"
-      ><img
-        src="img/sticky-note.svg"
-        width="24px"
-        height="24px"
-        class="inline"
-        alt="Sticky Note Icon"
-      />{" "}All Notes</a
-    >
-  </p>
-
   <ul>
     {
       notes
@@ -47,8 +37,8 @@ const notes = await getCollection("notes", ({ data }) => {
             <a href={`/${note.slug}`}>
               <img
                 src="img/worm.svg"
-                width="16px"
-                height="16px"
+                width="24px"
+                height="24px"
                 class="inline"
                 alt="Worm Icon"
               />{" "}
@@ -69,7 +59,13 @@ const notes = await getCollection("notes", ({ data }) => {
             </p>
             {note.data.tags.length > 0 && (
               <p>
-                Tags:{" "}
+                <img
+                  src="img/tags.svg"
+                  width="24px"
+                  height="24px"
+                  class="inline"
+                  alt="Tag Icon"
+                />{" "}
                 {note.data.tags.map((tag: any, i: number) => (
                   <Tag tag={tag} i={i} />
                 ))}
