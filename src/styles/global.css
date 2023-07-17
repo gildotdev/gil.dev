@@ -158,3 +158,28 @@ p {
   border-width: 1px;
   white-space: nowrap;
 }
+
+p:has(> span[data-filename])  
+ {
+  margin: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+span[data-filename] > code {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  padding-bottom: 0.25rem !important;
+}
+
+span[data-filename] > code::before {
+  content: url('img/file.svg');
+  padding-right: 0.5rem;
+}
+
+p:has(> span[data-filename]) + pre {
+  margin-top: 0 !important;
+  border-top-left-radius: 0 !important;
+}
