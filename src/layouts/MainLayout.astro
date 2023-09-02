@@ -1,17 +1,19 @@
 ---
 const { title, isHome = false } = Astro.props;
+import { ViewTransitions } from "astro:transitions";
 import Footer from "../components/Footer.astro";
 import LatestNotes from "../components/LatestNotes.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta charset="utf-8" />
     <title>Gil Creque - {title}</title>
+    <ViewTransitions />
     <meta name="description" content="Technologist and Developer" />
     <meta name="author" content="Gil Creque" />
 
@@ -79,7 +81,9 @@ import SocialLinks from "../components/SocialLinks.astro";
                 class="md:mb-8"
               />
             </a>
-            <h1>{title}</h1>
+            <h1 transition:name="notes-title" transition:animate="slide">
+              {title}
+            </h1>
           </>
         )
       }
@@ -99,8 +103,7 @@ import SocialLinks from "../components/SocialLinks.astro";
     }
 
     <Footer />
-  </body>
-</html>
-<!-- End Document
+  </body><!-- End Document
     ––––––––––––––––––––––––––––––––––––––––––––––––––
 -->
+</html>
