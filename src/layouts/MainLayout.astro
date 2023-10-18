@@ -54,9 +54,7 @@ import SocialLinks from "../components/SocialLinks.astro";
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-    <header
-      class="flex flex-col md:flex-row justify-center gap-1 items-center align-bottom"
-    >
+    <header class="flex flex-col md:flex-row px-2 w-screen max-w-3xl">
       {
         isHome ? (
           <>
@@ -81,14 +79,14 @@ import SocialLinks from "../components/SocialLinks.astro";
                 class="md:mb-8"
               />
             </a>
-            <h1 transition:name="notes-title" transition:animate="slide">
+            <h1 transition:animate="slide" class="grow text-center">
               {title}
             </h1>
           </>
         )
       }
     </header>
-    <main class="mx-2">
+    <main class="px-2 w-screen max-w-3xl">
       <slot />
       <!-- your content is injected here -->
     </main>
