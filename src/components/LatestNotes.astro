@@ -18,7 +18,7 @@ const notes = await getCollection("notes", ({ data }) => {
 </style>
 
 <aside id="notes" class="mx-2">
-  <h2>
+  <h2 transition:name="notes-title" transition:animate="slide">
     <img
       src="img/plant.svg"
       width="24px"

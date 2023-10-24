@@ -23,16 +23,18 @@ const {
 
 <MainLayout title={title}>
   <article>
-    <time class="slab" datetime={date}>
-      {formatPublishDate(date)}
-    </time>
-    {
-      date !== lastmod && (
-        <time class="text-xs" datetime={lastmod}>
-          Last Updated {timeAgo(lastmod)}
-        </time>
-      )
-    }
+    <div class="flex flex-col md:flex-row justify-start gap-1 align-bottom">
+      <time class="slab" datetime={date}>
+        {formatPublishDate(date)}
+      </time>
+      {
+        date !== lastmod && (
+          <time class="text-xs" datetime={lastmod}>
+            Last Updated {timeAgo(lastmod)}
+          </time>
+        )
+      }
+    </div>
     <Content />
     {
       tags.length > 0 && (
