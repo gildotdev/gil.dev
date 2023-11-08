@@ -78,13 +78,13 @@ mark {
 a,
 a:visited {
   color: var(--main-accent-color) !important;
-  text-decoration: none;
+  text-decoration: underline solid !important;
+  text-decoration-skip: edges;
 }
 
 a:hover {
   color: var(--main-accent-color);
-  text-decoration: underline wavy;
-  -webkit-text-decoration: underline wavy;
+  text-decoration: underline wavy !important;
 }
 
 header {
