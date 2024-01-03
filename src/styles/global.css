@@ -143,6 +143,8 @@ footer {
   padding: 1rem;
   border-radius: 1rem;
   margin: 1rem 0;
+  border-color: var(--yellowalpha);
+  border-width: 1px;
 }
 
 p {
@@ -153,9 +155,8 @@ p {
   background-color: var(--astro-code-color-background);
   padding: 0.25rem;
   border-radius: 0.5rem;
-  border-color: var(--yellowalpha);
-  border-width: 1px;
   display: inline-block;
+  line-height: 1rem !important;
 }
 
 p:has(> span[data-filename]) {
