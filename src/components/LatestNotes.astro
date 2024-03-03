@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { formatPublishDate, timeAgo } from "../lib/utils";
+import { formatPublishDate } from "../lib/utils";
 import "../styles/global.css";
 import Tag from "./Tag.astro";
 const notes = await getCollection("notes", ({ data }) => {
@@ -18,9 +18,9 @@ const notes = await getCollection("notes", ({ data }) => {
 </style>
 
 <aside id="notes" class="mx-2">
-  <h2 transition:name="notes-title" transition:animate="slide">
+  <h2>
     <img
-      src="img/plant.svg"
+      src="/img/plant.svg"
       width="24px"
       height="24px"
       class="inline"
@@ -30,13 +30,17 @@ const notes = await getCollection("notes", ({ data }) => {
   <ul>
     {
       notes
-        .sort((a, b) => new Date(b.data.lastmod) - new Date(a.data.lastmod))
+        .sort(
+          (a, b) =>
+            (new Date(b.data.lastmod) as any) -
+            (new Date(a.data.lastmod) as any)
+        )
         .slice(0, 5)
         .map((note) => (
           <li>
             <a href={`/${note.slug}`}>
               <img
-                src="img/worm.svg"
+                src="/img/worm.svg"
                 width="24px"
                 height="24px"
                 class="inline"
@@ -48,19 +52,11 @@ const notes = await getCollection("notes", ({ data }) => {
               <time datetime={note.data.date}>
                 {formatPublishDate(note.data.date)}
               </time>
-              {note.data.date !== note.data.lastmod && (
-                <time
-                  class="text-xs text-stone-300"
-                  datetime={note.data.lastmod}
-                >
-                  Last Updated {timeAgo(note.data.lastmod)}
-                </time>
-              )}
             </p>
             {note.data.tags.length > 0 && (
               <p>
                 <img
-                  src="img/tags.svg"
+                  src="/img/tags.svg"
                   width="24px"
                   height="24px"
                   class="inline"

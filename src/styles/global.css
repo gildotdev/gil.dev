@@ -174,7 +174,7 @@ span[data-filename] > code {
 }
 
 span[data-filename] > code::before {
-  content: url("img/file.svg");
+  content: url("/img/file.svg");
   padding-right: 0.5rem;
 }
 
