@@ -2,7 +2,7 @@
 import { getCollection } from "astro:content";
 import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
-import { formatPublishDate, timeAgo } from "../lib/utils.ts";
+import { formatPublishDate } from "../lib/utils.ts";
 import "../styles/global.css";
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
@@ -19,11 +19,6 @@ const notes = await getCollection("notes", ({ data }) => {
             <time class="slab text-sm" datetime={note.data.date}>
               {formatPublishDate(note.data.date)}
             </time>
-            {note.data.date !== note.data.lastmod && (
-              <time class="text-xs" datetime={note.data.lastmod}>
-                Last Updated {timeAgo(note.data.lastmod)}
-              </time>
-            )}
           </p>
           {note.data.tags.length > 0 && (
             <p>
