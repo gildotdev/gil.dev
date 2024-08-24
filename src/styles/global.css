@@ -182,3 +182,11 @@ p:has(> span[data-filename]) + pre {
   margin-top: 0 !important;
   border-top-left-radius: 0 !important;
 }
+
+li {
+  list-style-type: square;
+}
+
+li::marker {
+  color: hotpink;
+}

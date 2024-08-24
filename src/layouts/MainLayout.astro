@@ -1,18 +1,22 @@
 ---
-const { title, isHome = false, frontmatter } = Astro.props;
+const { title, isHome = false, frontmatter, description } = Astro.props;
+const defaultDescription = "Technologist and Developer";
 import Footer from "../components/Footer.astro";
 import LatestNotes from "../components/LatestNotes.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta charset="utf-8" />
-    <title>Gil Creque - {title}</title>
-    <meta name="description" content="Technologist and Developer" />
+    <title>Gil Creque - {title || frontmatter?.title}</title>
+    <meta
+      name="description"
+      content={description || frontmatter?.description || defaultDescription}
+    />
     <meta name="author" content="Gil Creque" />
 
     <!-- Google Site Verification
@@ -59,30 +63,23 @@ import SocialLinks from "../components/SocialLinks.astro";
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
     <header class="flex flex-col md:flex-row px-2 w-screen max-w-3xl">
+      <a href="/"
+        ><img
+          src="/img/avatar-pink-tv.jpeg"
+          alt="Photo of Gil Creque in a pink TV"
+          height="48px"
+          width="48px"
+          class="rounded-full md:mb-8"
+        /></a
+      >
       {
         isHome ? (
           <>
-            <img
-              src="/img/avatar-pink-tv.jpeg"
-              alt="Photo of Gil Creque in a pink TV"
-              height="48px"
-              width="48px"
-              class="rounded-full md:mb-8"
-            />
             <p class="slab mb-0 pb-0 md:mb-8">&nbsp;Hello, I'm&nbsp;</p>
             <h1>Gil Creque</h1>
           </>
         ) : (
           <>
-            <a href="/">
-              <img
-                src="/img/home.svg"
-                alt="Home"
-                height="48px"
-                width="48px"
-                class="md:mb-8"
-              />
-            </a>
             <h1 class="grow text-center">{title || frontmatter.title}</h1>
           </>
         )
