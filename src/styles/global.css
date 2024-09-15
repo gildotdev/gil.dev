@@ -190,3 +190,17 @@ li {
 li::marker {
   color: hotpink;
 }
+
+.article {
+  text-overflow: ellipsis;
+  overflow: clip;
+  max-height: 20rem;
+}
+
+.article img {
+  object-fit: cover !important;
+  width: 100% !important;
+  border-radius: 1.5rem !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
