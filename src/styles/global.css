@@ -93,10 +93,6 @@ main {
   padding-bottom: 1.5rem;
 }
 
-#microblog > article {
-  margin-top: 2rem;
-}
-
 footer {
   grid-area: 5 / 1 / 6 / 2;
   margin-bottom: 1rem;
@@ -120,8 +116,9 @@ footer {
     grid-area: 2 / 1 / 3 / 5;
   }
 
-  #social-links {
-    grid-area: 3 / 1 / 3 / 3;
+app-micro-blog {
+  grid-area: 3 / 1 / 3 / 3;
+  grid-template-columns: 2fr;
   }
 
   #notes {
