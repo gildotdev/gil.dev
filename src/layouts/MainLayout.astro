@@ -4,6 +4,9 @@ const defaultDescription = "Technologist and Developer";
 import Footer from "../components/Footer.astro";
 import LatestNotes from "../components/LatestNotes.astro";
 import SocialLinks from "../components/SocialLinks.astro";
+import WiggleWrap from "../components/WiggleWrap.astro";
+import avatar from "../assets/avatar-pink-tv.jpeg";
+import { ViewTransitions } from "astro:transitions";
 ---
 
 <!doctype html>
@@ -57,30 +60,48 @@ import SocialLinks from "../components/SocialLinks.astro";
       title="RSS Feed for gil.dev"
       href="/rss.xml"
     />
+    <ViewTransitions />
   </head>
   <body class="dark:bg-stone-800 dark:text-violet-50 max-w-3xl mx-auto">
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-    <header class="flex flex-col md:flex-row px-2 w-screen max-w-3xl">
-      <a href="/"
-        ><img
-          src="/img/avatar-pink-tv.jpeg"
-          alt="Photo of Gil Creque in a pink TV"
-          height="48px"
-          width="48px"
-          class="rounded-full md:mb-8"
-        /></a
-      >
+    <header
+      class="flex flex-col md:flex-row px-2 w-screen max-w-3xl items-center justify-center"
+    >
       {
         isHome ? (
           <>
-            <p class="slab mb-0 pb-0 md:mb-8">&nbsp;Hello, I'm&nbsp;</p>
-            <h1>Gil Creque</h1>
+            <img
+              id="avatar"
+              transition:name="avatar"
+              src={avatar.src}
+              alt="Photo of Gil Creque in a pink TV"
+              height="400px"
+              width="400px"
+              class="rounded-full"
+            />
+            <p class="slab mb-0 pb-0">&nbsp;Hello, I'm&nbsp;</p>
+            <h1>
+              <WiggleWrap>Gil Creque</WiggleWrap>
+            </h1>
           </>
         ) : (
           <>
-            <h1 class="grow text-center">{title || frontmatter.title}</h1>
+            <a href="/">
+              <img
+                id="avatar"
+                transition:name="avatar"
+                src={avatar.src}
+                alt="Photo of Gil Creque in a pink TV"
+                height="100px"
+                width="100px"
+                class="rounded-full"
+              />
+            </a>
+            <h1 class="grow text-center">
+              <WiggleWrap>{title || frontmatter.title}</WiggleWrap>
+            </h1>
           </>
         )
       }

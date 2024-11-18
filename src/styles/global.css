@@ -39,17 +39,12 @@ h5,
 h6 {
   font-family: "Alfa Slab One", cursive;
   font-size: 32px;
-  text-decoration-thickness: 0.25rem;
-  text-decoration-color: var(--yellow);
-  text-decoration-line: underline;
-  text-decoration-style: wavy;
-  -webkit-text-decoration-line: underline;
-  -webkit-text-decoration-style: wavy;
-  -webkit-text-decoration-color: var(--yellow);
-  color: var(--main-accent-color);
-  text-underline-offset: 1rem;
+  color: var(--yellow);
   margin-bottom: 2rem;
   letter-spacing: 2px;
+  paint-order: stroke fill;
+  -webkit-text-stroke: 0.25em var(--astro-code-color-background);
+  text-shadow: 0.2em 0.2em 0.2em var(--astro-code-color-background);
 }
 
 .slab {
@@ -184,9 +179,14 @@ p:has(> span[data-filename]) + pre {
 }
 
 li {
-  list-style-type: square;
+  list-style-type: circle;
 }
 
 li::marker {
   color: hotpink;
+}
+
+a > #avatar:hover {
+  transform: rotate(360deg);
+  box-shadow: 0.1em 0.1em 0.5em 0.1em var(--yellow);
 }

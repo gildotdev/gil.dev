@@ -16,5 +16,24 @@
   },
   "cSpell.words": [
     "runtimeconfig"
-  ]
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#54f2d8",
+    "activityBar.background": "#54f2d8",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#dd6bf4",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#54f2d8",
+    "statusBar.background": "#24efcd",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#0fd1b0",
+    "statusBarItem.remoteBackground": "#24efcd",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#24efcd",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#24efcd99",
+    "titleBar.inactiveForeground": "#15202b99"
+  }
 }

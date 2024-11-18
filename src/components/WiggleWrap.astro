@@ -1,0 +1,59 @@
+---
+// const text: string = String(Astro.props.text || Astro.slots.default || "");
+const { text } = Astro.props;
+
+// Initialize content variable
+let content = text;
+
+// Check if the text prop is not provided and a default slot exists
+if (!content && Astro.slots.default) {
+  content = await Astro.slots.render("default");
+  content = content.replace(/<\/?[^>]+(>|$)/g, "");
+}
+const characters = [...String(content)];
+
+const characterAngles: {
+  char: string;
+  initialAngle: number;
+  duration: number;
+  delay: number;
+}[] = characters.map((char) => {
+  const initialAngle = Math.random() * 10 - 5; // Random angle between -5 and 5 degrees
+  const duration = Math.random() + 0.5; // Random duration between 1 and 3 seconds
+  const delay = Math.random(); // Random delay between 0 and 1 seconds
+  return { char, initialAngle, duration, delay };
+});
+---
+
+<style>
+  @keyframes rotate {
+    0% {
+      transform: rotate(calc(var(--initial-angle) * 1deg));
+    }
+    50% {
+      transform: rotate(calc(var(--initial-angle) * -1deg));
+    }
+    100% {
+      transform: rotate(calc(var(--initial-angle) * 1deg));
+    }
+  }
+
+  .rotating-char {
+    display: inline-block;
+    animation: rotate var(--duration) infinite;
+    animation-timing-function: ease-in-out;
+    animation-delay: var(--delay);
+    min-width: 0.5em;
+  }
+</style>
+
+{
+  characterAngles.map(({ char, initialAngle, duration, delay }) => (
+    <span
+      class="rotating-char"
+      style={`--initial-angle: ${initialAngle}; --duration: ${duration}s; --delay: ${delay}s;`}
+    >
+      {char}
+    </span>
+  ))
+}
