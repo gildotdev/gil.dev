@@ -1,0 +1,132 @@
+---
+title: Concatenate Source Code for LLMs
+date: 2024-12-18T00:00:00-0500
+type: note
+tags:
+  - llm
+  - gemini
+  - chatgpt
+  - app 
+lastmod: 2024-12-18T00:00:00-0500
+slug: concatenate-source-code-for-llms
+---
+
+So my friend, Shannon, shared [this cool video with me from John Lindquist of egghead.io](https://egghead.io/use-gemini-2-0-to-create-agent-instructions-to-refactor-an-entire-codebase~qipyw). It shows how he uses a script to concatenate this codebase's source files into a large text file with some annotations marking what file the code is from. He then take that large text file and feeds it into [Google AI Studio/Gemini](https://aistudio.google.com/prompts/new_chat) and uses it to find ways to refactor his codebase. He goes on to demo how he uses those suggestions with yet another tool to actually perform the refactor on his behalf.
+
+Serendipitously someone else I know had just launched a [Mac app](https://apps.apple.com/us/app/codedump/id6739455044?mt=12) to concatenate source code files for this very reason. You can [check it out on the App Store](https://apps.apple.com/us/app/codedump/id6739455044?mt=12).
+
+<video src="/video/CodeDump.mp4" width="360px" height="640px" loop autoplay muted>
+</video>
+
+That was super interesting to me so i set out to do the same thing with different codebases I had access to. First up was a dotnet project from GitHub. I wanted to know if there were any glaring security issues with the Discord bot and its various services in the repo. First thing I did was download a zip file of the entire codebase and extracted it. I then went to ChatGPT and asked (using 4o):
+
+> `Create a script that globs all csharp files together into one large text file. Add the file path before the code content.`
+ 
+It went to work and returned the following:
+
+---
+
+> Here’s a script written in Python that globs all .cs (C#) files in a directory (and its subdirectories), combines their contents into one large text file, and adds the file path as a header before each file’s content.
+> Save this script as something like `combine_csharp_files.py`.
+
+```python
+import os
+import glob
+
+def combine_csharp_files(input_directory, output_file):
+    """
+    Globs all C# (.cs) files from input_directory and its subdirectories,
+    and combines them into a single text file with file paths as headers.
+    
+    Args:
+        input_directory (str): The directory to search for C# files.
+        output_file (str): The path to the output combined file.
+    """
+    # Ensure the output file is empty or create it
+    with open(output_file, 'w', encoding='utf-8') as out_file:
+        # Glob for all .cs files recursively
+        csharp_files = glob.glob(os.path.join(input_directory, '**', '*.cs'), recursive=True)
+        
+        if not csharp_files:
+            print("No C# files found.")
+            return
+        
+        print(f"Found {len(csharp_files)} C# files. Writing to {output_file}...")
+        
+        # Write each file's path and content to the output file
+        for file_path in csharp_files:
+            try:
+                # Write file path as header
+                out_file.write(f"// === File: {file_path} ===\n")
+                
+                # Read file content
+                with open(file_path, 'r', encoding='utf-8') as cs_file:
+                    content = cs_file.read()
+                
+                # Write content and add a separator
+                out_file.write(content + '\n\n')
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}")
+        
+    print(f"Combined file created successfully: {output_file}")
+
+if __name__ == '__main__':
+    # Input and output configuration
+    input_directory = input("Enter the directory to search for C# files: ").strip()
+    output_file = input("Enter the output file path (e.g., combined_output.txt): ").strip()
+    
+    # Run the function
+    combine_csharp_files(input_directory, output_file)
+```
+
+> How It Works:
+> 
+> 1. Recursive Search: The script uses glob.glob with the > recursive=True option to search for all .cs files within the > directory and its subdirectories.
+> 2. File Path as Header: Before each file’s content, the script > writes a comment line with the file path like: `// === File: > path/to/your/file.cs ===`
+> 3. Output File: All content is written into a single output > file (`combined_output.txt` or any name you provide).
+> 4. Error Handling: If any file fails to open (e.g., due to > permission issues), it logs the error and continues.
+> 
+> How to Run:
+> 
+> 1.	Save the script to a file, e.g., combine_csharp_files.py.
+> 2.	Run it in your terminal or command line: `python > combine_csharp_files.py`
+> 3.	Provide the input directory (where your .cs files are) and > the output file name.
+> 
+>   Example:
+>   Input Directory:  `/my_project/`
+> 
+>   Files:
+>     `/my_project/file1.cs`
+>     `/my_project/subdir/file2.cs`
+> 
+>   Output File (`combined_output.txt`):
+
+```csharp
+// === File: /my_project/file1.cs ===
+using System;
+
+class Example1
+{
+    public static void Main()
+    {
+        Console.WriteLine("Hello World!");
+    }
+}
+
+// === File: /my_project/subdir/file2.cs ===
+namespace MyProject.Subdir
+{
+    class Example2
+    {
+        public void Print()
+        {
+            Console.WriteLine("Another file.");
+        }
+    }
+}
+```
+
+> Let me know if you need further tweaks! 🚀
+
+---
+
