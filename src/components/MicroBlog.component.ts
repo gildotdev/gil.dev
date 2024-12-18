@@ -1,6 +1,6 @@
 import { JsonPipe, NgFor, NgIf } from "@angular/common";
-import { HttpClient, provideHttpClient } from "@angular/common/http";
-import { Component, OnInit, inject } from "@angular/core";
+import { HttpClient, provideHttpClient, withFetch } from "@angular/common/http";
+import { Component, inject, type OnInit } from "@angular/core";
 import { lastValueFrom, map } from "rxjs";
 import { formatPublishDate } from "../lib/utils.ts";
 
@@ -21,17 +21,23 @@ import { formatPublishDate } from "../lib/utils.ts";
         Micro Blog
       </h2>
 
-      @if (posts) { @for (post of posts; track post.date_published) {
+      @if (posts) { @for (post of posts; track post.properties.uid) {
       <!-- <pre>
         {{ post | json }}
-      </pre
-      > -->
+          {{ post.properties.content}}
+      </pre> -->
 
       <article>
         <time class="slab">
-          <a [href]="post.url">{{ formatPublishDate(post.date_published) }}</a>
+          <a [href]="'blog/' + post.properties.uid">{{
+            formatPublishDate(post.properties.published)
+          }}</a>
         </time>
-        <div [innerHtml]="post.content_html" class="article"></div>
+        <!-- <div set:html="{post.properties.content.compiledContent()}"></div> -->
+
+        <!-- <analog-markdown [content]="post.properties.content"></analog-markdown> -->
+
+        <div [innerHtml]="post.properties.content" class="article"></div>
       </article>
       } }
     </aside>
@@ -39,7 +45,8 @@ import { formatPublishDate } from "../lib/utils.ts";
 })
 export default class MicroBlogComponent implements OnInit {
   static clientProviders = [provideHttpClient()];
-  static renderProviders = [provideHttpClient()];
+  static renderProviders = [provideHttpClient(withFetch())];
+  private readonly apiKey = import.meta.env['VITE_MICROBLOG_TOKEN'];
 
   http = inject(HttpClient);
   formatPublishDate = formatPublishDate;
@@ -48,17 +55,22 @@ export default class MicroBlogComponent implements OnInit {
 
   ngOnInit() {
     lastValueFrom(
-      this.http.get("https://micro.blog/posts/gildotdev").pipe(
-        map((response: any) => {
-          return response.items;
+      this.http
+        .get("https://micro.blog/micropub?q=source&offset=0&limit=15", {
+          headers: { Authorization: `Bearer ${this.apiKey}` },
         })
-      )
+        .pipe(
+          map((response: any) => {
+            return response.items;
+          })
+        )
     ).then((data) => {
       data = data
-        .filter((post: any) => {
-          return post._microblog.is_conversation === false;
-        })
+        // .filter((post: any) => {
+        //   return post._microblog.is_conversation === false;
+        // })
         .slice(0, 5);
+        console.log(data);
 
       this.posts = data;
     });

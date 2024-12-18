@@ -5,7 +5,14 @@ import "../styles/global.css";
 import Tag from "./Tag.astro";
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
-});
+}).then((notes) =>
+  notes
+    .sort(
+      (a: any, b: any) =>
+        (new Date(b.data.lastmod) as any) - (new Date(a.data.lastmod) as any)
+    )
+    .slice(0, 5)
+);
 ---
 
 <style>
@@ -29,46 +36,39 @@ const notes = await getCollection("notes", ({ data }) => {
   </h2>
   <ul>
     {
-      notes
-        .sort(
-          (a, b) =>
-            (new Date(b.data.lastmod) as any) -
-            (new Date(a.data.lastmod) as any)
-        )
-        .slice(0, 5)
-        .map((note) => (
-          <li>
-            <a href={`/${note.slug}`}>
+      notes.map((note) => (
+        <li>
+          <a href={`/${note.slug}`}>
+            <img
+              src="/img/worm.svg"
+              width="24px"
+              height="24px"
+              class="inline"
+              alt="Worm Icon"
+            />{" "}
+            {note.data.title}
+          </a>
+          <p>
+            <time datetime={note.data.date}>
+              {formatPublishDate(note.data.date)}
+            </time>
+          </p>
+          {note.data.tags.length > 0 && (
+            <p>
               <img
-                src="/img/worm.svg"
+                src="/img/tags.svg"
                 width="24px"
                 height="24px"
                 class="inline"
-                alt="Worm Icon"
+                alt="Tag Icon"
               />{" "}
-              {note.data.title}
-            </a>
-            <p>
-              <time datetime={note.data.date}>
-                {formatPublishDate(note.data.date)}
-              </time>
+              {note.data.tags.map((tag: any, i: number) => (
+                <Tag tag={tag} i={i} />
+              ))}
             </p>
-            {note.data.tags.length > 0 && (
-              <p>
-                <img
-                  src="/img/tags.svg"
-                  width="24px"
-                  height="24px"
-                  class="inline"
-                  alt="Tag Icon"
-                />{" "}
-                {note.data.tags.map((tag: any, i: number) => (
-                  <Tag tag={tag} i={i} />
-                ))}
-              </p>
-            )}
-          </li>
-        ))
+          )}
+        </li>
+      ))
     }
   </ul>
 </aside>

@@ -42,9 +42,9 @@ h6 {
   text-decoration-thickness: 0.25rem;
   text-decoration-color: var(--yellow);
   text-decoration-line: underline;
-  text-decoration-style: wavy;
+  text-decoration-style: dotted;
   -webkit-text-decoration-line: underline;
-  -webkit-text-decoration-style: wavy;
+  -webkit-text-decoration-style: dotted;
   -webkit-text-decoration-color: var(--yellow);
   color: var(--main-accent-color);
   text-underline-offset: 1rem;
@@ -84,7 +84,7 @@ a:visited {
 
 a:hover {
   color: var(--main-accent-color);
-  text-decoration: underline wavy !important;
+  text-decoration: underline dotted !important;
 }
 
 header {
@@ -193,7 +193,7 @@ li::marker {
 
 .article {
   text-overflow: ellipsis;
-  overflow: clip;
+  overflow: scroll;
   max-height: 20rem;
 }
 
