@@ -8,76 +8,76 @@ import WiggleWrap from "./WiggleWrap.astro";
   }
 </style>
 
-<aside id="social-links" class="mx-2 mb-5">
-  <h2>
-    <img
-      src="img/link.svg"
-      width="24px"
-      height="24px"
-      class="inline"
-      alt="Link Icon"
-    />{" "}<WiggleWrap>Social Links</WiggleWrap>
-  </h2>
-  <p>You can find me around the web:</p>
-  <ul>
-    <li>
+<aside id="social-links">
+  <ul class="flex flex-wrap items-center justify-start">
+    <li class="me-4">
+      <a href="/rss.xml"
+        ><img
+          src="img/rss.svg"
+          width="24px"
+          height="24px"
+          class="inline"
+          alt="RSS Feed"
+        />
+      </a>
+    </li>
+    <li class="me-4">
+      <a href="https://www.linkedin.com/in/gildotdev/"
+        ><img
+          src="img/linkedin.svg"
+          width="24px"
+          height="24px"
+          class="inline"
+          alt="LinkedIn Profile"
+        />
+      </a>
+    </li>
+    <li class="me-4">
       <a href="https://space-coast.dev/discord"
         ><img
           src="img/discord.svg"
           width="24px"
           height="24px"
           class="inline"
-          alt="Discord Logo"
+          alt="Build&&Run / Space Coast Devs, a free and public Discord for the tech and creative community"
         />
-        Build&&Run / Space Coast Devs</a
-      >, a free and public Discord for the tech and creative community
+      </a>
     </li>
-    <li>
-      <img
-        src="img/microblog.svg"
-        width="24px"
-        height="24px"
-        class="inline"
-        alt="Micro.blog Logo"
-      /> I try to share posts through <a href="https://gilcreque.blog/"
-        >my micro.blog</a
+    <li class="me-4">
+      <a href="https://gilcreque.blog/">
+        <img
+          src="img/microblog.svg"
+          width="24px"
+          height="24px"
+          class="inline"
+          alt="I try to share posts through my micro.blog"
+        />
+      </a>
+    </li>
+    <li class="me-4">
+      <a rel="me" href="https://hachyderm.io/@gilcreque">
+        <img
+          src="img/mastodon.svg"
+          width="24px"
+          height="24px"
+          class="inline"
+          alt="I joined Mastodon and you can find me tooting over there"
+        /></a
       >
     </li>
-    <li>
-      <img
-        src="img/mastodon.svg"
-        width="24px"
-        height="24px"
-        class="inline"
-        alt="Mastodon Logo"
-      /> I joined Mastodon and you can <a
-        rel="me"
-        href="https://hachyderm.io/@gilcreque">find me tooting over there</a
+    <li class="me-4">
+      <a rel="me" href="https://bsky.app/profile/gil.dev">
+        <img
+          src="img/bluesky.svg"
+          width="24px"
+          height="24px"
+          class="inline"
+          alt="I also recently joined Bluesky and you can find me posting there too"
+        /></a
       >
-    </li>
-    <li>
-      <img
-        src="img/bluesky.svg"
-        width="24px"
-        height="24px"
-        class="inline"
-        alt="Bluesky Logo"
-      /> I also recently joined Bluesky and you can <a
-        rel="me"
-        href="https://bsky.app/profile/gil.dev">find me posting there too</a
-      >
-    </li>
-    <li>
-      <img
-        src="img/plant.svg"
-        width="24px"
-        height="24px"
-        class="inline"
-        alt="Plant Icon"
-      />{" "}Read
-      <a href="/notes">
-        {" "}all the notes
-      </a>{" "}from my digital garden{" "}
     </li>
   </ul>
+  <p>
+    &copy; {new Date().getFullYear()} Gil Creque. All rights reserved.
+  </p>
 </aside>

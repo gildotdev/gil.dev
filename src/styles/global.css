@@ -99,8 +99,8 @@ main {
 
 footer {
   grid-area: 5 / 1 / 6 / 2;
-  margin-bottom: 2rem;
-  padding-top: 2rem;
+  margin-bottom: 1rem;
+    padding-top: 1rem;
   border-top: 0.25rem solid var(--border-color);
 }
 
@@ -196,4 +196,9 @@ details > summary {
   cursor: pointer;
   width: fit-content;
   @apply m-3 ml-0;
+}
+
+.emoji-color {
+  color: transparent;
+  text-shadow: 0 0 0 hotpink;
 }
