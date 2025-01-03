@@ -8,4 +8,5 @@ export default defineConfig({
   integrations: [tailwind(), analogjsangular(), mdx()],
   markdown: { shikiConfig: { theme: "css-variables" } },
   assetsInclude: ["**/*.vtt"],
+  server: { port: 1716, host: true },
 });
