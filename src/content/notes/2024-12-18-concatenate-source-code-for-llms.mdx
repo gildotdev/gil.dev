@@ -21,13 +21,14 @@ Serendipitously someone else I know had just launched a [Mac app](https://apps.a
 That was super interesting to me so i set out to do the same thing with different codebases I had access to. First up was a dotnet project from GitHub. I wanted to know if there were any glaring security issues with the Discord bot and its various services in the repo. First thing I did was download a zip file of the entire codebase and extracted it. I then went to ChatGPT and asked (using 4o):
 
 > `Create a script that globs all csharp files together into one large text file. Add the file path before the code content.`
- 
-It went to work and returned the following:
 
----
+<details>
+<summary>It went to work and returned the following:</summary>
 
 > Here’s a script written in Python that globs all .cs (C#) files in a directory (and its subdirectories), combines their contents into one large text file, and adds the file path as a header before each file’s content.
 > Save this script as something like `combine_csharp_files.py`.
+
+<span data-filename>`combine_csharp_files.py`</span>
 
 ```python
 import os
@@ -116,7 +117,7 @@ class Example1
 // === File: /my_project/subdir/file2.cs ===
 namespace MyProject.Subdir
 {
-    class Example2
+    class **Example2**
     {
         public void Print()
         {
@@ -128,5 +129,5 @@ namespace MyProject.Subdir
 
 > Let me know if you need further tweaks! 🚀
 
----
+</details>
 

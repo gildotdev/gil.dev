@@ -189,3 +189,11 @@ a > #avatar:hover {
   transform: rotate(360deg);
   box-shadow: 0.1em 0.1em 0.5em 0.1em var(--yellow);
 }
+
+details > summary {
+  color: var(--mint-green);
+  text-decoration: underline;
+  cursor: pointer;
+  width: fit-content;
+  @apply m-3 ml-0;
+}
