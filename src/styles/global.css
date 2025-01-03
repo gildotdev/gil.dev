@@ -42,8 +42,7 @@ h6 {
   color: var(--yellow);
   margin-bottom: 2rem;
   letter-spacing: 2px;
-  paint-order: stroke fill;
-  -webkit-text-stroke: 0.25em var(--astro-code-color-background);
+  paint-order: stroke fill;  
   text-shadow: 0.2em 0.2em 0.2em var(--astro-code-color-background);
 }
 
