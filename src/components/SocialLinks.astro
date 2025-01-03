@@ -1,6 +1,12 @@
 ---
-
+import WiggleWrap from "./WiggleWrap.astro";
 ---
+
+<style>
+  li {
+    list-style-type: none;
+  }
+</style>
 
 <aside id="social-links" class="mx-2 mb-5">
   <h2>
@@ -10,7 +16,7 @@
       height="24px"
       class="inline"
       alt="Link Icon"
-    />{" "}Social Links
+    />{" "}<WiggleWrap>Social Links</WiggleWrap>
   </h2>
   <p>You can find me around the web:</p>
   <ul>
@@ -44,28 +50,34 @@
         height="24px"
         class="inline"
         alt="Mastodon Logo"
-      /> I also recently joined Mastodon and you can <a
+      /> I joined Mastodon and you can <a
         rel="me"
         href="https://hachyderm.io/@gilcreque">find me tooting over there</a
       >
     </li>
     <li>
       <img
-        src="img/sticky-note.svg"
+        src="img/bluesky.svg"
         width="24px"
         height="24px"
         class="inline"
-        alt="Sticky Note Icon"
-      />{" "}Read
-      <a href="/notes">
-        {" "}all the notes
-      </a>{" "}from my digital garden{" "}<img
+        alt="Bluesky Logo"
+      /> I also recently joined Bluesky and you can <a
+        rel="me"
+        href="https://bsky.app/profile/gil.dev">find me posting there too</a
+      >
+    </li>
+    <li>
+      <img
         src="img/plant.svg"
         width="24px"
         height="24px"
         class="inline"
         alt="Plant Icon"
-      />
+      />{" "}Read
+      <a href="/notes">
+        {" "}all the notes
+      </a>{" "}from my digital garden{" "}
     </li>
   </ul>
 </aside>

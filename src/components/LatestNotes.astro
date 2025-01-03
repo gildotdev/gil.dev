@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import { formatPublishDate } from "../lib/utils";
 import "../styles/global.css";
 import Tag from "./Tag.astro";
+import WiggleWrap from "./WiggleWrap.astro";
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
 });
@@ -10,10 +11,7 @@ const notes = await getCollection("notes", ({ data }) => {
 
 <style>
   li {
-    padding-top: 1rem;
-  }
-  li:not(:first-child) {
-    border-top: 0.125rem var(--yellow) double;
+    list-style-type: none;
   }
 </style>
 
@@ -25,7 +23,7 @@ const notes = await getCollection("notes", ({ data }) => {
       height="24px"
       class="inline"
       alt="Plant Icon"
-    />{" "}Latest Notes
+    />{" "}<WiggleWrap>Latest Notes</WiggleWrap>
   </h2>
   <ul>
     {
@@ -35,7 +33,7 @@ const notes = await getCollection("notes", ({ data }) => {
             (new Date(b.data.lastmod) as any) -
             (new Date(a.data.lastmod) as any)
         )
-        .slice(0, 5)
+        .slice(0, 20)
         .map((note) => (
           <li>
             <a href={`/${note.slug}`}>
@@ -48,25 +46,6 @@ const notes = await getCollection("notes", ({ data }) => {
               />{" "}
               {note.data.title}
             </a>
-            <p>
-              <time datetime={note.data.date}>
-                {formatPublishDate(note.data.date)}
-              </time>
-            </p>
-            {note.data.tags.length > 0 && (
-              <p>
-                <img
-                  src="/img/tags.svg"
-                  width="24px"
-                  height="24px"
-                  class="inline"
-                  alt="Tag Icon"
-                />{" "}
-                {note.data.tags.map((tag: any, i: number) => (
-                  <Tag tag={tag} i={i} />
-                ))}
-              </p>
-            )}
           </li>
         ))
     }
