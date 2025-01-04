@@ -1,0 +1,41 @@
+---
+import { marked } from "marked";
+import Tag from "../components/Tag.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+import { formatPublishDate } from "../lib/utils.ts";
+import "../styles/global.css";
+
+const response = await fetch(`https://micro.blog/micropub?q=source`, {
+  method: "GET",
+  headers: { Authorization: `Bearer ${process.env.MICROBLOG_TOKEN}` },
+});
+
+let posts = await response.json();
+
+posts = posts.items.map((post: any) => {
+  post = {
+    uid: post.properties.uid[0],
+    content: marked(post.properties.content[0]),
+    published: post.properties.published[0],
+    title: post.properties.name,
+  };
+  return post;
+});
+---
+
+<MainLayout title="Posts">
+  <ul>
+    {
+      posts.map((post: any) => (
+        <li>
+          <a href={`/blog/${post.uid}`}>
+            {post.title != "" && <span class="slab">{post?.title}</span>}
+            <time class="slab" datetime={post?.published}>
+              {formatPublishDate(post?.published)}
+            </time>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</MainLayout>
