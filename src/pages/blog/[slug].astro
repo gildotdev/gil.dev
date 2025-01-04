@@ -1,0 +1,76 @@
+---
+import { marked } from "marked";
+import Tag from "../../components/Tag.astro";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { formatPublishDate } from "../../lib/utils.ts";
+import "../../styles/global.css";
+
+const response = await fetch(`https://micro.blog/micropub?q=source`, {
+  method: "GET",
+  headers: { Authorization: `Bearer ${process.env.MICROBLOG_TOKEN}` },
+});
+
+// console.log(response);
+
+const posts = await response.json();
+console.log(posts);
+
+// 2. When it's time to render, you can get the note directly from the prop
+
+// console.log("uid", post.properties.uid[0]);
+// console.log("slug", Astro.params["slug"]);
+
+const post = posts?.items?.find(
+  (post: any) => post.properties.uid[0] == Astro.params["slug"]
+);
+
+console.log(post);
+
+// 1. Generate a new path for every collection note
+export async function getStaticPaths() {
+  const response = await fetch(
+    "https://micro.blog/micropub?q=source&offset=0",
+    {
+      method: "GET",
+      headers: { Authorization: `Bearer ${process.env.MICROBLOG_TOKEN}` },
+    }
+  );
+
+  let posts = await response.json();
+  posts = posts.items.map((post: any) => {
+    post.properties.content[0] = marked(post.properties.content[0]);
+    return post;
+  });
+
+  // console.log(posts);
+
+  const slugs = posts.map((post: any) => ({
+    params: { slug: post.properties.uid[0] },
+  }));
+
+  // console.log(slugs);
+
+  return slugs;
+}
+---
+
+<MainLayout title={formatPublishDate(post.properties.published[0])}>
+  <article>
+    <div class="flex flex-col md:flex-row justify-start gap-1 align-bottom">
+      <time class="slab" datetime={post.properties.published[0]}>
+        {formatPublishDate(post.properties.published[0])}
+      </time>
+    </div>
+    <Fragment set:html={post.properties.content[0]} />
+    {
+      post?.category?.length > 0 && (
+        <p>
+          Category:{" "}
+          {post?.category.map((tag: any, i: number) => (
+            <Tag tag={tag} i={i} />
+          ))}
+        </p>
+      )
+    }
+  </article>
+</MainLayout>
