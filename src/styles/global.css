@@ -200,7 +200,7 @@ details > summary {
   text-shadow: 0 0 0 hotpink;
 }
 
-article img, article video {
+article img, article video, article iframe {
   object-fit: cover;
   width: 100%;
   border-radius: 1.5rem;
