@@ -44,6 +44,7 @@ h6 {
   letter-spacing: 2px;
   paint-order: stroke fill;  
   text-shadow: 0.2em 0.2em 0.2em var(--astro-code-color-background);
+  text-wrap: balance;
 }
 
 .slab {
