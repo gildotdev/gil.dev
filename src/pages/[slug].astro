@@ -29,21 +29,23 @@ const {
       </time>
     </div>
     <Content />
-    {
-      tags.length > 0 && (
-        <p>
-          <img
-            src="/img/tags.svg"
-            width="24px"
-            height="24px"
-            class="inline"
-            alt="Tag Icon"
-          />{" "}
-          {note.data.tags.map((tag: any, i: number) => (
-            <Tag tag={tag} i={i} />
-          ))}
-        </p>
-      )
-    }
+    <footer>
+      {
+        tags.length > 0 && (
+          <p>
+            <img
+              src="/img/tags.svg"
+              width="24px"
+              height="24px"
+              class="inline"
+              alt="Tag Icon"
+            />{" "}
+            {note.data.tags.map((tag: any, i: number) => (
+              <Tag tag={tag} i={i} />
+            ))}
+          </p>
+        )
+      }
+    </footer>
   </article>
 </MainLayout>

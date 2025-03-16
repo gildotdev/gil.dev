@@ -208,3 +208,14 @@ article img, article video, article iframe {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
+
+article footer {
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+}
+
+article footer img {
+  object-fit: none;
+  width: fit-content;
+}

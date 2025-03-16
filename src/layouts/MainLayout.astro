@@ -10,7 +10,10 @@ import LatestPosts from "../components/LatestPosts.astro";
 ---
 
 <!doctype html>
-<html lang="en">
+<html
+  lang="en"
+  class="bg-gradient-to-r from-indigo-950 to-emerald-950 text-violet-50"
+>
   <head>
     <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -62,7 +65,7 @@ import LatestPosts from "../components/LatestPosts.astro";
     />
     <ViewTransitions />
   </head>
-  <body class="dark:bg-stone-800 dark:text-violet-50 max-w-3xl mx-auto">
+  <body class="max-w-3xl mx-auto">
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
@@ -77,8 +80,8 @@ import LatestPosts from "../components/LatestPosts.astro";
               transition:name="avatar"
               src={avatar.src}
               alt="Photo of Gil Creque in a pink TV"
-              height="400px"
-              width="400px"
+              height="200px"
+              width="200px"
               class="rounded-full"
             />
             <p class="slab mb-0 pb-0">&nbsp;Hello, I'm&nbsp;</p>
