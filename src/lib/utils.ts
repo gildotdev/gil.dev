@@ -1,3 +1,5 @@
+import { JSDOM } from "jsdom";
+
 const dateOptions: object = {
   year: "numeric",
   month: "long",
@@ -6,6 +8,42 @@ const dateOptions: object = {
 
 export function formatPublishDate(publishDate: string | number | Date): string {
   return new Date(publishDate).toLocaleDateString("en-US", dateOptions);
+}
+
+export async function truncateHTML(html: string | Promise<string>, uid: string): Promise<string> {
+  // Convert the HTML string to a string if it's a promise
+  html = typeof html === "string" ? html : await html;
+
+  // Parse the HTML string into a DOM structure
+  const doc = new JSDOM(html).window.document;
+
+  // Select all media elements (images and videos)
+  const allMedia = doc.querySelectorAll("img, video");
+
+  // Check if there is more than one media element
+  if (allMedia.length > 1) {
+    const parentNode = allMedia[0].parentNode;
+
+    // Remove all media after the first one
+    for (let i = 1; i < allMedia.length; i++) {
+      allMedia[i].remove();
+    }
+
+    // Create the "More..." link
+    const moreLink = doc.createElement("a");
+    moreLink.href = `/blog/${uid}`; // Set your URL here
+    moreLink.textContent = "More...";
+    moreLink.style.display = "block";
+    moreLink.style.marginTop = "20px";
+
+    // Insert the link after the first media
+    parentNode && parentNode.insertBefore(moreLink, allMedia[0].nextSibling);
+  }
+
+  // Serialize the updated DOM back into a string
+  html = doc.body.innerHTML;
+
+  return html;
 }
 
 // export function timeAgo(time: string | number | Date) {
