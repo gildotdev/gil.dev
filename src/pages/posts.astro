@@ -7,7 +7,9 @@ import "../styles/global.css";
 
 const response = await fetch(`https://micro.blog/micropub?q=source`, {
   method: "GET",
-  headers: { Authorization: `Bearer ${process.env.MICROBLOG_TOKEN}` },
+  headers: {
+    Authorization: `Bearer ${import.meta.env.SECRET_MICROBLOG_TOKEN}`,
+  },
 });
 
 let posts = await response.json();
