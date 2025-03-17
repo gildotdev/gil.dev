@@ -15,6 +15,7 @@
     "@astrojs/rss": "^4.0.7",
     "@astrojs/tailwind": "^5.1.0",
     "astro": "^4.15.4",
+    "astro-masonry": "^1.2.2",
     "jsdom": "^25.0.1",
     "marked": "^15.0.5",
     "rxjs": "^7.8.1",

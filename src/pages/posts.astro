@@ -1,9 +1,9 @@
 ---
 import { marked } from "marked";
-import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate, truncateHTML } from "../lib/utils";
 import "../styles/global.css";
+import { Masonry } from "astro-masonry";
 
 const response = await fetch(`https://micro.blog/micropub?q=source`, {
   method: "GET",
@@ -29,17 +29,25 @@ posts = posts.items.map((post: any) => {
 ---
 
 <MainLayout title="Posts">
-  <div class="grid grid-cols-2 gap-6">
+  <Masonry
+    breakpointCols={{
+      default: 3,
+      1100: 3,
+      700: 2,
+      500: 1,
+    }}
+    class="gap-6"
+  >
     {
       posts.map((post: any) => (
-        <article class="h-auto max-w-full p-6 border border-gray-900 rounded-xl shadow-2xl hover:bg-black hover:bg-opacity-50">
+        <article class="mb-6 p-6 border border-gray-900 rounded-xl shadow-2xl hover:bg-black hover:bg-opacity-50">
           {post.title != "" && <span class="slab">{post?.title}</span>}
           <Fragment set:html={post.content} />
-          <time class="slab text-[10px]" datetime={post?.published}>
+          <time class="slab text-[12px]" datetime={post?.published}>
             {formatPublishDate(post?.published)}
           </time>
         </article>
       ))
     }
-  </div>
+  </Masonry>
 </MainLayout>
