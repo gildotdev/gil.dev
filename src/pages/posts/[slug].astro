@@ -4,6 +4,7 @@ import Tag from "../../components/Tag.astro";
 import { formatPublishDate } from "../../lib/utils.ts";
 import "../../styles/global.css";
 import PostLayout from "../../layouts/PostLayout.astro";
+import Button from "../../components/Button.astro";
 
 const response = await fetch(`https://micro.blog/micropub?q=source`, {
   method: "GET",
@@ -60,6 +61,7 @@ export async function getStaticPaths() {
 <PostLayout
   title={post?.title || formatPublishDate(post.published)}
   canonicalURL={post.canonicalURL}
+  isPost={true}
 >
   <article>
     <div class="flex flex-col md:flex-row justify-start gap-1 align-bottom">
@@ -82,5 +84,8 @@ export async function getStaticPaths() {
         </p>
       )
     }
+    <Button>
+      <a href="/posts">Back to Blog Posts</a>
+    </Button>
   </article>
 </PostLayout>

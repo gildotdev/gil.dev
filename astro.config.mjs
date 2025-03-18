@@ -9,4 +9,7 @@ export default defineConfig({
   assetsInclude: ["**/*.vtt"],
   server: { port: 1716, host: true },
   integrations: [tailwind(), mdx()],
+  redirects: {
+    "/posts": "/posts/1",
+  },
 });

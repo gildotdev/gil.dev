@@ -1,0 +1,78 @@
+---
+import { marked } from "marked";  
+import PostLayout from "../../layouts/PostLayout.astro";
+import { formatPublishDate, truncateHTML } from "../../lib/utils";
+import "../../styles/global.css";
+import { Masonry } from "astro-masonry";
+
+export async function getStaticPaths({ paginate }: any) {
+  const response = await fetch(`https://micro.blog/micropub?q=source`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${import.meta.env.SECRET_MICROBLOG_TOKEN}`,
+    },
+  });
+
+  let posts = await response.json();
+
+  posts = posts.items.map((post: any) => {
+    post = {
+      uid: post.properties.uid[0],
+      content: truncateHTML(
+        marked(post.properties.content[0]),
+        post.properties.uid[0]
+      ),
+      published: post.properties.published[0],
+      title: post.properties.name,
+    };
+    return post;
+  });
+
+  return paginate(posts, { pageSize: 12 });
+}
+// All paginated data is passed on the "page" prop
+const { page } = Astro.props;
+---
+<style>
+a {
+  color: #f5f3ff !important;
+  text-decoration: none !important;
+}
+
+a:hover {
+  text-decoration: none !important;
+}
+
+</style>
+
+<PostLayout title="Posts">
+  <Masonry
+    breakpointCols={{
+      default: 4,
+      1100: 3,
+      700: 2,
+      500: 1,
+    }}
+    class="gap-6"
+  >
+    {
+      page.data.map((post: any) => (
+      <a href=`/posts/${post.uid}`>
+        <article id=`${post.uid}` class="mb-6 p-6 border border-gray-900 rounded-xl shadow-2xl hover:bg-black hover:bg-opacity-50">
+          {post.title != "" && <span class="slab">{post?.title}</span>}
+          <Fragment set:html={post.content} />
+          <time class="slab text-[12px]" datetime={post?.published}>
+            {formatPublishDate(post?.published)}
+          </time>
+        </article>
+      </a>
+      ))
+    }
+  </Masonry>
+  <section class="inline-flex rounded-md shadow-xs">
+    {page.url.first ? <a class="px-4 py-2 text-sm font-medium" href={page.url.first}>First</a> : null}
+    {page.url.prev ?  <a class="px-4 py-2 text-sm font-medium" href={page.url.prev}>Previous</a> : null}
+    {page.url.next ?  <a class="px-4 py-2 text-sm font-medium" href={page.url.next}>Next</a> : null}
+    {page.url.last ?  <a class="px-4 py-2 text-sm font-medium" href={page.url.last}>Last</a> : null}
+  </section>
+</PostLayout>

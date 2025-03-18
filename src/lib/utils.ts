@@ -31,7 +31,7 @@ export async function truncateHTML(html: string | Promise<string>, uid: string):
 
     // Create the "More..." link
     const moreLink = doc.createElement("a");
-    moreLink.href = `/blog/${uid}`; // Set your URL here
+    moreLink.href = `/posts/${uid}`; // Set your URL here
     moreLink.textContent = "More...";
     moreLink.style.display = "block";
     moreLink.style.marginTop = "20px";

@@ -209,6 +209,11 @@ article img, article video, article iframe {
   margin-bottom: 1.5rem;
 }
 
+article video, article iframe {
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+
 article footer {
   margin: 0px;
   padding: 0px;
