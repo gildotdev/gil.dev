@@ -1,6 +1,6 @@
 import mdx from "@astrojs/mdx";
-import tailwind from "@astrojs/tailwind";
 import { defineConfig } from "astro/config";
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
@@ -8,7 +8,10 @@ export default defineConfig({
   markdown: { shikiConfig: { theme: "css-variables" } },
   assetsInclude: ["**/*.vtt"],
   server: { port: 1716, host: true },
-  integrations: [tailwind(), mdx()],
+  integrations: [mdx()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   redirects: {
     "/posts": "/posts/1",
   },
