@@ -183,6 +183,20 @@ li::marker {
   color: hotpink;
 }
 
+ul ul {
+  margin-left: 2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+ul ul li {
+  list-style-type: disc;
+}
+
+ul ul ul li {
+  list-style-type: square;
+}
+
 a > #avatar:hover {
   transform: rotate(360deg);
   box-shadow: 0.1em 0.1em 0.5em 0.1em var(--yellow);
