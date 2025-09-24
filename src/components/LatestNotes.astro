@@ -36,7 +36,7 @@ const notes = await getCollection("notes", ({ data }) => {
         .slice(0, 20)
         .map((note) => (
           <li>
-            <a href={`/${note.slug}`}>
+            <a href={`/${note.data.slug || note.id}`}>
               <img
                 src="/img/worm.svg"
                 width="24px"
