@@ -14,7 +14,7 @@ const notes = await getCollection("notes", ({ data }) => {
     {
       notes.map((note) => (
         <li>
-          <a href={`/${note.slug}`}>{note.data.title}</a>
+          <a href={`/${note.data.slug || note.id}`}>{note.data.title}</a>
           <p>
             <time class="slab text-sm" datetime={note.data.date}>
               {formatPublishDate(note.data.date)}
