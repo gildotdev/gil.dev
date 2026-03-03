@@ -1,0 +1,10 @@
+{
+  "id": "gil-publisher",
+  "name": "Gil Publisher",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Publish notes from this vault to the gil.dev Astro site.",
+  "author": "Gil Creque",
+  "authorUrl": "https://gil.dev",
+  "isDesktopOnly": true
+}

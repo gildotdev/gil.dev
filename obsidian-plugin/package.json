@@ -1,0 +1,22 @@
+{
+  "name": "gil-publisher",
+  "version": "1.0.0",
+  "description": "Obsidian plugin to publish notes to the gil.dev Astro site",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "install-plugin": "node scripts/install.mjs"
+  },
+  "keywords": [],
+  "author": "Gil Creque",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.21.5",
+    "obsidian": "latest",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0"
+  }
+}
