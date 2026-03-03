@@ -2,6 +2,7 @@ import mdx from "@astrojs/mdx";
 import { defineConfig } from "astro/config";
 import tailwindcss from '@tailwindcss/vite';
 import netlify from '@astrojs/netlify';
+import remarkWikilinks from './src/lib/remark-wikilinks.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -9,7 +10,10 @@ export default defineConfig({
     liveContentCollections: true,
   },
   output: "static",
-  markdown: { shikiConfig: { theme: "css-variables" } },
+  markdown: {
+    remarkPlugins: [remarkWikilinks],
+    shikiConfig: { theme: "css-variables" },
+  },
   assetsInclude: ["**/*.vtt"],
   server: { port: 1716, host: true },
   integrations: [mdx()],
