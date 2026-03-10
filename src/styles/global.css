@@ -47,6 +47,7 @@ h6 {
   paint-order: stroke fill;  
   text-shadow: 0.2em 0.2em 0.2em var(--astro-code-color-background);
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 .slab {
@@ -65,6 +66,7 @@ body {
 
 p {
   margin-bottom: 1rem;
+  overflow-wrap: break-word;
 }
 
 mark {
@@ -77,6 +79,7 @@ a:visited {
   color: var(--main-accent-color) !important;
   text-decoration: underline solid !important;
   text-decoration-skip: edges;
+  overflow-wrap: break-word;
 }
 
 a:hover {
