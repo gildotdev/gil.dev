@@ -77,7 +77,7 @@ import { ViewTransitions } from "astro:transitions";
 
     <header
       class:list={[
-        "flex flex-col md:flex-row px-2 w-screen items-center justify-center",
+        "flex flex-col md:flex-row px-2 w-full items-center justify-center",
         isPost ? "max-w-3xl" : "max-w-7xl",
       ]}
     >
@@ -103,7 +103,7 @@ import { ViewTransitions } from "astro:transitions";
         <WiggleWrap>{title || frontmatter.title}</WiggleWrap>
       </h1>
     </header>
-    <main class:list={["px-2 w-screen", isPost ? "max-w-3xl" : "max-w-7xl"]}>
+    <main class:list={["px-2 w-full", isPost ? "max-w-3xl" : "max-w-7xl"]}>
       <slot />
       <!-- your content is injected here -->
     </main>
