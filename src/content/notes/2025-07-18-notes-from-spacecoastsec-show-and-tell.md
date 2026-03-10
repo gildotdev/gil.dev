@@ -8,6 +8,10 @@ tags:
   - tools
 lastmod: 2025-07-18T00:00:00-0500
 slug: notes-from-spacecoastsec-show-and-tell-july-2025
+topics:
+  - cybersecurity
+  - community
+status: seed
 ---
 Some notes I took on devices and software tools shared at the Space Coast Sec Show and Tell
 

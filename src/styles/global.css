@@ -138,8 +138,12 @@ footer {
     grid-area: 3 / 3 / 4 / 5;
   }
 
-  footer {
+  #knowledge-garden {
     grid-area: 4 / 1 / 5 / 5;
+  }
+
+  footer {
+    grid-area: 5 / 1 / 6 / 5;
   }
 }
 

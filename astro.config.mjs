@@ -14,5 +14,6 @@ export default defineConfig({
   },
   redirects: {
     "/posts": "/posts/1",
+    "/blog": "/posts/1",
   },
 });

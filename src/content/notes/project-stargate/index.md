@@ -9,6 +9,11 @@ tags:
   - texas
 lastmod: 2025-08-11T00:00:00-0500
 slug: project-stargate
+topics:
+  - data-centers
+  - ai
+  - infrastructure
+status: growing
 ---
 
 Project Stargate is a large-scale initiative focused on building next-generation data centers, leveraging advanced AI technologies and cloud infrastructure. The project involves collaboration between major industry players, including OpenAI and Oracle, and is based in Texas. Its goal is to create highly efficient, scalable, and secure data center solutions to support the growing demands of artificial intelligence and cloud computing workloads.

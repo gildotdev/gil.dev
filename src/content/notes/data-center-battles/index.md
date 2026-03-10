@@ -6,6 +6,10 @@ tags:
   - data-centers
 lastmod: 2025-08-11T00:00:00-0500
 slug: data-center-battles
+topics:
+  - data-centers
+  - infrastructure
+status: seed
 ---
 
 - [Dale Earnhardt's widow and son battle over a $30 billion data center on his North Carolina land](https://www.nbcnews.com/news/us-news/dale-earnhardt-widow-son-battle-data-center-mooresville-north-carolina-rcna223895)

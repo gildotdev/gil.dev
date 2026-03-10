@@ -4,9 +4,21 @@ import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate } from "../lib/utils.ts";
 import "../styles/global.css";
+
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
 });
+
+const allTopics = await getCollection("topics");
+const topicTitles = Object.fromEntries(
+  allTopics.map((t) => [t.id, t.data.title])
+);
+
+const statusEmoji: Record<string, string> = {
+  seed: "🌱",
+  growing: "🌿",
+  evergreen: "🌳",
+};
 ---
 
 <MainLayout title="Notes">
@@ -14,12 +26,29 @@ const notes = await getCollection("notes", ({ data }) => {
     {
       notes.map((note) => (
         <li>
-          <a href={`/${note.data.slug || note.id}`}>{note.data.title}</a>
+          <a href={`/${note.data.slug || note.id}`}>
+            {note.data.status && (
+              <span title={note.data.status}>
+                {statusEmoji[note.data.status]}{" "}
+              </span>
+            )}
+            {note.data.title}
+          </a>
           <p>
             <time class="slab text-sm" datetime={note.data.date}>
               {formatPublishDate(note.data.date)}
             </time>
           </p>
+          {note.data.topics && note.data.topics.length > 0 && (
+            <p>
+              Topics:{" "}
+              {note.data.topics.map((topic: string) => (
+                <a href={`/topics/${topic}`} class="mr-2 text-sm">
+                  {topicTitles[topic] ?? topic}
+                </a>
+              ))}
+            </p>
+          )}
           {note.data.tags.length > 0 && (
             <p>
               Tags:{" "}

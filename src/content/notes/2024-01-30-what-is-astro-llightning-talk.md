@@ -8,6 +8,10 @@ tags:
 lastmod: 2024-03-24T11:59:00Z
 date: 2024-01-30T11:59:00Z
 slug: what-is-astro-lightning-talk
+topics:
+  - astro
+  - community
+status: seed
 ---
 
 GDG Central Florida and GDG Space Coast held an online event where the community gave lightning talks. Here are the slide I used for my talk on [Astro](https://astro.build/).

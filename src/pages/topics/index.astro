@@ -1,0 +1,46 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import "../../styles/global.css";
+
+const topics = await getCollection("topics");
+const notes = await getCollection("notes", ({ data }) => {
+  return data.draft !== true;
+});
+
+// Count notes per topic
+const notesCountByTopic = topics.reduce((acc, topic) => {
+  acc[topic.id] = notes.filter((note) =>
+    (note.data.topics ?? []).includes(topic.id)
+  ).length;
+  return acc;
+}, {} as Record<string, number>);
+
+// Sort topics alphabetically by title
+const sortedTopics = topics.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
+---
+
+<MainLayout title="Topics">
+  <p>
+    A knowledge garden of topics I'm exploring. Each topic brings together
+    related notes and resources.
+  </p>
+  <ul>
+    {
+      sortedTopics.map((topic) => (
+        <li>
+          <a href={`/topics/${topic.id}`}>{topic.data.title}</a>
+          <p class="text-sm mt-1 mb-2">{topic.data.description}</p>
+          {notesCountByTopic[topic.id] > 0 && (
+            <p class="text-sm">
+              <span class="slab">{notesCountByTopic[topic.id]}</span>{" "}
+              {notesCountByTopic[topic.id] === 1 ? "note" : "notes"}
+            </p>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</MainLayout>

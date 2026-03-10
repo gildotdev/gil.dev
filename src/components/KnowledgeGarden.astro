@@ -1,0 +1,72 @@
+---
+import { getCollection } from "astro:content";
+import WiggleWrap from "./WiggleWrap.astro";
+import "../styles/global.css";
+
+const topics = await getCollection("topics");
+const notes = await getCollection("notes", ({ data }) => {
+  return data.draft !== true;
+});
+
+// Count notes per topic
+const notesCountByTopic = topics.reduce((acc, topic) => {
+  acc[topic.id] = notes.filter((note) =>
+    (note.data.topics ?? []).includes(topic.id)
+  ).length;
+  return acc;
+}, {} as Record<string, number>);
+
+const sortedTopics = topics.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
+---
+
+<style>
+  li {
+    list-style-type: none;
+  }
+  .topic-card {
+    border: 1px solid var(--yellowalpha);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s;
+  }
+  .topic-card:hover {
+    border-color: var(--main-accent-color);
+  }
+</style>
+
+<aside id="knowledge-garden" class="mx-2">
+  <h2>
+    <img
+      src="/img/plant.svg"
+      width="24px"
+      height="24px"
+      class="inline"
+      alt="Plant Icon"
+    />{" "}<WiggleWrap>Knowledge Garden</WiggleWrap>
+  </h2>
+  <ul class="grid grid-cols-2 gap-3 pl-0">
+    {
+      sortedTopics.map((topic) => (
+        <li>
+          <a href={`/topics/${topic.id}`} class="no-underline block">
+            <div class="topic-card">
+              <p class="font-bold mb-1 mt-0 pb-0">{topic.data.title}</p>
+              <p class="text-sm mb-0 pb-0 opacity-75">{topic.data.description}</p>
+              {notesCountByTopic[topic.id] > 0 && (
+                <p class="text-xs mt-1 mb-0 pb-0 slab">
+                  {notesCountByTopic[topic.id]}{" "}
+                  {notesCountByTopic[topic.id] === 1 ? "note" : "notes"}
+                </p>
+              )}
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-4">
+    <a href="/topics">View all topics →</a>
+  </p>
+</aside>

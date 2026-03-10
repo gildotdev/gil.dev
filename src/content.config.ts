@@ -9,6 +9,7 @@ const notes = defineCollection({ loader: glob({ pattern: "**/*.md*", base: "./sr
 
 schema: z.object({
       title: z.string(),
+      description: z.string().optional(),
       microblog: z.boolean().optional(),
       guid: z.string().url().optional(),
       post_id: z.number().optional(),
@@ -21,9 +22,26 @@ schema: z.object({
       url: z.string().optional(),
       lastmod: z.date().or(z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}$/)),
       slug: z.string(),
+      draft: z.boolean().optional(),
+      topics: z.array(z.string()).optional().default([]),
+      status: z.enum(['seed', 'growing', 'evergreen']).optional(),
   }),
 
 });
 
+const topics = defineCollection({
+  loader: glob({ pattern: "**/*.md*", base: "./src/content/topics" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    intro: z.string().optional(),
+    relatedTopics: z.array(z.string()).optional().default([]),
+    externalLinks: z.array(z.object({
+      title: z.string(),
+      url: z.string().url(),
+    })).optional().default([]),
+  }),
+});
+
 // 4. Export a single `collections` object to register your collection(s)
-export const collections = { notes };
+export const collections = { notes, topics };
