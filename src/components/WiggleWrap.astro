@@ -10,19 +10,18 @@ if (!content && Astro.slots.default) {
   content = await Astro.slots.render("default");
   content = content.replace(/<\/?[^>]+(>|$)/g, "");
 }
-const characters = [...String(content)];
 
-const characterAngles: {
-  char: string;
-  initialAngle: number;
-  duration: number;
-  delay: number;
-}[] = characters.map((char) => {
-  const initialAngle = Math.random() * 10 - 5; // Random angle between -5 and 5 degrees
-  const duration = Math.random() + 0.5; // Random duration between 1 and 3 seconds
-  const delay = Math.random(); // Random delay between 0 and 1 seconds
-  return { char, initialAngle, duration, delay };
-});
+// Split into words (discard the whitespace tokens — spacing is handled via CSS)
+const words = String(content).split(/\s+/).filter(Boolean);
+
+const wordGroups = words.map((word) => ({
+  chars: [...word].map((char) => ({
+    char,
+    initialAngle: Math.random() * 10 - 5,
+    duration: Math.random() + 0.5,
+    delay: Math.random(),
+  })),
+}));
 ---
 
 <style>
@@ -45,15 +44,26 @@ const characterAngles: {
     animation-delay: var(--delay);
     min-width: 0.5em;
   }
+
+  /* Each word is a non-breaking unit; margin-right provides inter-word spacing */
+  .word-group {
+    display: inline-block;
+    white-space: nowrap;
+    margin-right: 0.3em;
+  }
 </style>
 
 {
-  characterAngles.map(({ char, initialAngle, duration, delay }) => (
-    <span
-      class="rotating-char"
-      style={`--initial-angle: ${initialAngle}; --duration: ${duration}s; --delay: ${delay}s;`}
-    >
-      {char}
+  wordGroups.map(({ chars }) => (
+    <span class="word-group">
+      {chars.map(({ char, initialAngle, duration, delay }) => (
+        <span
+          class="rotating-char"
+          style={`--initial-angle: ${initialAngle}; --duration: ${duration}s; --delay: ${delay}s;`}
+        >
+          {char}
+        </span>
+      ))}
     </span>
   ))
 }

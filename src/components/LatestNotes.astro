@@ -2,11 +2,17 @@
 import { getCollection } from "astro:content";
 import { formatPublishDate } from "../lib/utils";
 import "../styles/global.css";
-import Tag from "./Tag.astro";
 import WiggleWrap from "./WiggleWrap.astro";
+
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
 });
+
+const statusEmoji: Record<string, string> = {
+  seed: "🌱",
+  growing: "🌿",
+  evergreen: "🌳",
+};
 ---
 
 <style>
@@ -30,24 +36,34 @@ const notes = await getCollection("notes", ({ data }) => {
       notes
         .sort(
           (a, b) =>
-            (new Date(b.data.lastmod) as any) -
-            (new Date(a.data.lastmod) as any)
+            new Date(b.data.lastmod).getTime() -
+            new Date(a.data.lastmod).getTime()
         )
-        .slice(0, 20)
+        .slice(0, 5)
         .map((note) => (
-          <li>
+          <li class="mb-3">
             <a href={`/${note.data.slug || note.id}`}>
-              <img
-                src="/img/worm.svg"
-                width="24px"
-                height="24px"
-                class="inline"
-                alt="Worm Icon"
-              />{" "}
+              {note.data.status ? (
+                <span title={note.data.status}>{statusEmoji[note.data.status]} </span>
+              ) : (
+                <img
+                  src="/img/worm.svg"
+                  width="18px"
+                  height="18px"
+                  class="inline"
+                  alt="Worm Icon"
+                />
+              )}{" "}
               {note.data.title}
             </a>
+            <p class="text-sm slab mt-1 mb-0 pb-0 opacity-75">
+              {formatPublishDate(note.data.date)}
+            </p>
           </li>
         ))
     }
   </ul>
+  <p class="mt-2">
+    <a href="/notes">View all notes →</a>
+  </p>
 </aside>

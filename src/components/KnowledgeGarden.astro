@@ -34,6 +34,10 @@ const sortedTopics = topics.sort((a, b) =>
   .topic-card:hover {
     border-color: var(--main-accent-color);
   }
+  .topic-card p {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
 </style>
 
 <aside id="knowledge-garden" class="mx-2">
@@ -46,14 +50,14 @@ const sortedTopics = topics.sort((a, b) =>
       alt="Plant Icon"
     />{" "}<WiggleWrap>Knowledge Garden</WiggleWrap>
   </h2>
-  <ul class="grid grid-cols-2 gap-3 pl-0">
+  <ul class="grid grid-cols-2 md:grid-cols-3 gap-3 pl-0">
     {
       sortedTopics.map((topic) => (
         <li>
           <a href={`/topics/${topic.id}`} class="no-underline block">
             <div class="topic-card">
               <p class="font-bold mb-1 mt-0 pb-0">{topic.data.title}</p>
-              <p class="text-sm mb-0 pb-0 opacity-75">{topic.data.description}</p>
+              <p class="hidden sm:block text-sm mb-0 pb-0 opacity-75">{topic.data.description}</p>
               {notesCountByTopic[topic.id] > 0 && (
                 <p class="text-xs mt-1 mb-0 pb-0 slab">
                   {notesCountByTopic[topic.id]}{" "}
