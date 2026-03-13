@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import slugify from "slugify";
 import type { App, TFile } from "obsidian";
 import type { PluginSettings } from "./settings";
 import {
@@ -179,11 +180,9 @@ function frontmatterSlugOrDerived(app: App, file: TFile): string {
   const fm = cache?.frontmatter ?? {};
   if (typeof fm.slug === "string" && fm.slug) return fm.slug;
   const stem = path.basename(file.path, path.extname(file.path));
-  return stem
-    .replace(/^\d{4}-\d{2}-\d{2}-/, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  const withoutDate = stem.replace(/^\d{4}-\d{2}-\d{2}-/, "");
+  const slug = slugify(withoutDate, { lower: true, strict: true, trim: true });
+  return slug.slice(0, 64).replace(/-+$/, "");
 }
 
 function frontmatterTitle(app: App, file: TFile): string | null {

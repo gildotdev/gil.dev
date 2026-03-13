@@ -5,6 +5,7 @@ import {
   type PluginSettings,
 } from "./settings";
 import { buildSlugMap, buildPublishedPaths, publishAll, publishFile } from "./publisher";
+import { syncFromRepo } from "./syncer";
 
 export default class GilPublisherPlugin extends Plugin {
   settings!: PluginSettings;
@@ -72,6 +73,39 @@ export default class GilPublisherPlugin extends Plugin {
             new Notice(`Gil Publisher: Error publishing "${file.basename}": ${String(err)}`, 8000);
             console.error("[GilPublisher]", err);
           });
+      },
+    });
+
+    // Command: sync notes from repo back to vault
+    this.addCommand({
+      id: "sync-from-repo",
+      name: "Sync notes from Astro repo",
+      callback: async () => {
+        if (!this.settings.targetRepoPath) {
+          new Notice(
+            "Gil Publisher: Set the Astro repo path in plugin settings first.",
+            5000
+          );
+          return;
+        }
+
+        new Notice("Gil Publisher: Syncing from repo…");
+        const result = await syncFromRepo(this.app, this.settings, (msg) => {
+          console.log("[GilPublisher]", msg);
+        });
+
+        const summary =
+          `Synced ${result.synced.length} note(s)` +
+          (result.skipped.length ? `, skipped ${result.skipped.length}` : "") +
+          (result.errors.length ? `, ${result.errors.length} error(s)` : "") +
+          (result.imagesSynced ? `, ${result.imagesSynced} image(s)` : "") +
+          ".";
+
+        new Notice(`Gil Publisher: ${summary}`, 8000);
+
+        if (result.errors.length) {
+          console.error("[GilPublisher] Sync errors:", result.errors);
+        }
       },
     });
 

@@ -1,4 +1,5 @@
 import path from "path";
+import slugify from "slugify";
 
 /**
  * Represents the normalized frontmatter fields we inject/guarantee
@@ -118,11 +119,9 @@ export function normalizeFrontmatter(
 function fileNameToSlug(fileName: string): string {
   // Strip directory, extension, and optional YYYY-MM-DD- prefix
   const base = path.basename(fileName, path.extname(fileName));
-  return base
-    .replace(/^\d{4}-\d{2}-\d{2}-/, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  const withoutDate = base.replace(/^\d{4}-\d{2}-\d{2}-/, "");
+  const slug = slugify(withoutDate, { lower: true, strict: true, trim: true });
+  return slug.slice(0, 64).replace(/-+$/, "");
 }
 
 function slugToTitle(slug: string): string {
