@@ -25,18 +25,66 @@ const sortedTopics = topics.sort((a, b) =>
   li {
     list-style-type: none;
   }
+
+  a {
+    text-decoration: none !important;
+  }
+
+  li:nth-child(4n + 1) { --card-accent: var(--mint-green); }
+  li:nth-child(4n + 2) { --card-accent: var(--yellow); }
+  li:nth-child(4n + 3) { --card-accent: var(--pink); }
+  li:nth-child(4n + 4) { --card-accent: var(--blue); }
+
   .topic-card {
     border: 1px solid var(--yellowalpha);
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    transition: border-color 0.2s;
+    border-top: 3px solid var(--card-accent, var(--mint-green));
+    border-radius: 0.5rem;
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
   }
+
   .topic-card:hover {
-    border-color: var(--main-accent-color);
+    border-color: var(--card-accent, var(--mint-green));
+    box-shadow: 0 6px 24px -4px color-mix(in srgb, var(--card-accent) 50%, transparent);
+    transform: translateY(-2px);
   }
-  .topic-card p {
-    overflow-wrap: normal;
-    word-break: normal;
+
+  .topic-title {
+    font-family: "Alfa Slab One", cursive;
+    color: var(--card-accent, var(--mint-green));
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    line-height: 1.3;
+    margin: 0;
+    padding: 0;
+  }
+
+  .topic-desc {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  .note-badge {
+    align-self: flex-start;
+    margin-top: auto;
+    background: var(--card-accent, var(--mint-green));
+    color: black;
+    border-radius: 99px;
+    padding: 0.1em 0.6em;
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
   }
 </style>
 
@@ -54,15 +102,15 @@ const sortedTopics = topics.sort((a, b) =>
     {
       sortedTopics.map((topic) => (
         <li>
-          <a href={`/topics/${topic.id}`} class="no-underline block">
+          <a href={`/topics/${topic.id}`} class="block h-full">
             <div class="topic-card">
-              <p class="font-bold mb-1 mt-0 pb-0">{topic.data.title}</p>
-              <p class="hidden sm:block text-sm mb-0 pb-0 opacity-75">{topic.data.description}</p>
+              <p class="topic-title">{topic.data.title}</p>
+              <p class="topic-desc">{topic.data.description}</p>
               {notesCountByTopic[topic.id] > 0 && (
-                <p class="text-xs mt-1 mb-0 pb-0 slab">
+                <span class="note-badge">
                   {notesCountByTopic[topic.id]}{" "}
                   {notesCountByTopic[topic.id] === 1 ? "note" : "notes"}
-                </p>
+                </span>
               )}
             </div>
           </a>
