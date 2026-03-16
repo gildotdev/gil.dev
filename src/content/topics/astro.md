@@ -4,7 +4,6 @@ description: The web framework for content-driven websites. Notes on building, d
 intro: Astro is the framework powering this very site. It excels at content-heavy sites with its island architecture, zero JS by default, and first-class markdown support.
 relatedTopics:
   - dev-tools
-  - community
 externalLinks:
   - title: Astro Documentation
     url: https://docs.astro.build

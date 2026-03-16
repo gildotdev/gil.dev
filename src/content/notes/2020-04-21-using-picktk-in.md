@@ -3,7 +3,7 @@ title: Using Pick<T,K> in TypeScript
 microblog: false
 guid: http://gilcreque.micro.blog/2020/04/21/using-picktk-in.html
 post_id: 1077063
-date: 2020-04-21T16:54:00-0400
+created: 2020-04-21T16:54:00-0400
 type: note
 tags:
   - web-dev
@@ -13,7 +13,7 @@ images:
 photos: null
 photos_with_metadata: null
 url: /2020/04/21/using-picktk-in.html
-lastmod: 2023-06-22T23:35:04.751Z
+updated: 2023-06-22T23:35:04.751Z
 slug: pick-typescript
 ---
 ![Using Pick<T,K> in TypeScript](../../assets/67f6bb8830.png)

@@ -6,8 +6,8 @@ tags:
   - google
   - firebase
   - astro
-lastmod: 2023-07-17T21:59:00.594Z
-date: 2023-07-17T13:00:00Z
+updated: 2023-07-17T21:59:00.594Z
+created: 2023-07-17T13:00:00Z
 slug: hosting-astro-on-firebase
 topics:
   - astro

@@ -24,12 +24,12 @@ const relatedNotes = allNotes
   .filter((note) => (note.data.topics ?? []).includes(topic.id))
   .sort(
     (a, b) =>
-      new Date(b.data.lastmod).getTime() - new Date(a.data.lastmod).getTime()
+      new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime(),
   );
 
 const allTopics = await getCollection("topics");
 const relatedTopics = allTopics.filter((t) =>
-  (topic.data.relatedTopics ?? []).includes(t.id)
+  (topic.data.relatedTopics ?? []).includes(t.id),
 );
 
 const statusEmoji: Record<string, string> = {
@@ -61,7 +61,7 @@ const statusEmoji: Record<string, string> = {
                   {note.data.title}
                 </a>
                 <span class="slab text-sm ml-2">
-                  {formatPublishDate(note.data.date)}
+                  {formatPublishDate(note.data.created)}
                 </span>
               </li>
             ))}

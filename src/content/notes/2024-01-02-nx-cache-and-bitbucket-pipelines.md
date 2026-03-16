@@ -5,8 +5,8 @@ draft: false
 tags:
   - nx
   - bitbucket
-lastmod: 2024-01-03T14:00:00Z
-date: 2024-01-03T14:00:00Z
+updated: 2024-01-03T14:00:00Z
+created: 2024-01-03T14:00:00Z
 slug: nx-cache-and-bitbucket-pipelines
 topics:
   - dev-tools

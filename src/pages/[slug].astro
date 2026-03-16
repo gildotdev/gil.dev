@@ -17,12 +17,12 @@ const { note } = Astro.props;
 const { Content } = await render(note);
 
 const {
-  data: { title, date, lastmod, tags, topics, status },
+  data: { title, created, updated, tags, topics, status },
 } = note;
 
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
-  allTopics.map((t) => [t.id, t.data.title])
+  allTopics.map((t) => [t.id, t.data.title]),
 );
 
 const statusEmoji: Record<string, string> = {
@@ -39,26 +39,30 @@ const statusLabel: Record<string, string> = {
 
 <MainLayout title={title} description={note.data.description}>
   <article>
-    <div class="flex flex-col md:flex-row justify-start gap-3 align-bottom mb-2">
-      <time class="slab" datetime={date}>
-        {formatPublishDate(date)}
+    <div class="mb-1">
+      <time class="slab" datetime={created}>
+        {formatPublishDate(created)}
       </time>
-      {status && (
-        <span title={statusLabel[status]} class="text-sm slab">
-          {statusEmoji[status]} {status}
-        </span>
-      )}
     </div>
-    {topics && topics.length > 0 && (
-      <p class="text-sm mb-4">
-        Topic{topics.length > 1 ? "s" : ""}:{" "}
-        {topics.map((topic: string) => (
-          <a href={`/topics/${topic}`} class="mr-2">
-            {topicTitles[topic] ?? topic}
-          </a>
-        ))}
-      </p>
-    )}
+    {
+      status && (
+        <p class="text-sm slab mb-2" title={statusLabel[status]}>
+          {statusEmoji[status]} {status}
+        </p>
+      )
+    }
+    {
+      topics && topics.length > 0 && (
+        <p class="text-sm mb-4">
+          Topic{topics.length > 1 ? "s" : ""}:{" "}
+          {topics.map((topic: string) => (
+            <a href={`/topics/${topic}`} class="mr-2">
+              {topicTitles[topic] ?? topic}
+            </a>
+          ))}
+        </p>
+      )
+    }
     <Content />
     <footer>
       {

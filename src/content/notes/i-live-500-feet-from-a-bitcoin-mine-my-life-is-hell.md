@@ -1,12 +1,12 @@
 
 ---
 title: I Live 500 Feet From A Bitcoin Mine. My Life Is Hell.
-date: 2025-08-11T00:00:00-0500
+created: 2025-08-11T00:00:00-0500
 type: note
 tags:
   - data-centers
   - video
-lastmod: 2025-08-11T00:00:00-0500
+updated: 2026-03-16T00:00:00-0500
 slug: i-live-500-feet-from-a-bitcoin-mine-my-life-is-hell
 ---
 

@@ -11,7 +11,7 @@ const notes = await getCollection("notes", ({ data }) => {
 
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
-  allTopics.map((t) => [t.id, t.data.title])
+  allTopics.map((t) => [t.id, t.data.title]),
 );
 
 const statusEmoji: Record<string, string> = {
@@ -35,8 +35,8 @@ const statusEmoji: Record<string, string> = {
             {note.data.title}
           </a>
           <p>
-            <time class="slab text-sm" datetime={note.data.date}>
-              {formatPublishDate(note.data.date)}
+            <time class="slab text-sm" datetime={note.data.created}>
+              {formatPublishDate(note.data.created)}
             </time>
           </p>
           {note.data.topics && note.data.topics.length > 0 && (

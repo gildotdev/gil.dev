@@ -4,6 +4,7 @@ description: Google's opinionated web framework. Notes on patterns, RxJS, and en
 intro: Angular is a comprehensive framework for building large-scale web applications. It comes with strong opinions on architecture, tooling, and patterns — which makes it a great fit for teams building at scale.
 relatedTopics:
   - dev-tools
+  - astro
 externalLinks:
   - title: Angular Documentation
     url: https://angular.dev

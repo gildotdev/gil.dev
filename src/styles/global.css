@@ -73,6 +73,24 @@ p {
   overflow-wrap: anywhere;
 }
 
+ul,
+ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+li {
+  margin-bottom: 0.25rem;
+}
+
 mark {
   background-color: var(--pink);
   padding: 0.25rem;

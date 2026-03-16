@@ -5,8 +5,8 @@ draft: false
 tags:
   - astro
   - slides
-lastmod: 2024-03-24T11:59:00Z
-date: 2024-01-30T11:59:00Z
+updated: 2024-03-24T11:59:00Z
+created: 2024-01-30T11:59:00Z
 slug: what-is-astro-lightning-talk
 topics:
   - astro

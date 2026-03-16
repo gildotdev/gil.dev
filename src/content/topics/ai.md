@@ -3,7 +3,6 @@ title: AI
 description: Artificial intelligence, large language models, and AI infrastructure.
 intro: From large language models to AI-powered developer tools, artificial intelligence is reshaping how we build software and process information.
 relatedTopics:
-  - data-centers
   - dev-tools
   - infrastructure
 externalLinks:
