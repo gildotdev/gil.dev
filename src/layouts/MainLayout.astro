@@ -122,11 +122,46 @@ import "../styles/global.css";
     </header>
 
     {
-      isHome ? null : (
-        <main class={`px-2 w-full max-w-3xl`}>
-          <slot />
-          <!-- your content is injected here -->
-        </main>)
+      isHome && (
+        <nav class="md:hidden flex flex-row justify-between px-6 py-4 w-full">
+          <a
+            href="/blog"
+            class="home-nav-btn flex flex-col items-center gap-1 text-xs w-16"
+          >
+            <img
+              src="/img/microblog.svg"
+              width="28px"
+              height="28px"
+              alt="Blog Icon"
+            />
+            Posts
+          </a>
+          <a
+            href="/notes"
+            class="home-nav-btn flex flex-col items-center gap-1 text-xs w-16"
+          >
+            <img
+              src="/img/plant.svg"
+              width="28px"
+              height="28px"
+              alt="Notes Icon"
+            />
+            Notes
+          </a>
+          <a
+            href="/topics"
+            class="home-nav-btn flex flex-col items-center gap-1 text-xs w-16"
+          >
+            <img
+              src="/img/worm.svg"
+              width="28px"
+              height="28px"
+              alt="Topics Icon"
+            />
+            Topics
+          </a>
+        </nav>
+      )
     }
 
     {
