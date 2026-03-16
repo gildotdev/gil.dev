@@ -165,6 +165,14 @@ import "../styles/global.css";
     }
 
     {
+      isHome ? null : (
+        <main class="px-2 w-full max-w-3xl">
+          <slot />
+        </main>
+      )
+    }
+
+    {
       isHome ? (
         <section id="home-content">
           <div id="posts-notes-row">
