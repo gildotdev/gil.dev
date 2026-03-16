@@ -116,11 +116,6 @@ footer {
   min-width: 0;
 }
 
-/* Empty homepage main — no padding needed */
-.home-main {
-  padding-bottom: 0;
-}
-
 /* ── Hero ── */
 .hero-avatar-wrap {
   position: relative;
@@ -146,41 +141,17 @@ footer {
 }
 
 .hero-greeting {
-  font-size: 0.55rem;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--mint-green);
   margin: 0;
   padding: 0;
   line-height: 1.5;
+  white-space: nowrap;
 }
 
-
-.hero-pills {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  margin-top: 0.6rem;
-}
-
-.hero-pill {
-  font-size: 0.5rem;
-  padding: 0.22rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(232, 230, 223, 0.65) !important;
-  text-decoration: none !important;
-  transition: border-color 0.18s, color 0.18s, background 0.18s;
-  background: transparent;
-  letter-spacing: 0.04em;
-  font-family: "Alfa Slab One", cursive;
-}
-
-.hero-pill:hover {
-  border-color: var(--mint-green) !important;
-  color: var(--mint-green) !important;
-  background: rgba(43, 240, 194, 0.06);
-  text-decoration: none !important;
+.hero-tagline {
+  margin-top: -0.5rem;
+  margin-bottom: 0;
 }
 
 /* ── Posts section header ── */
