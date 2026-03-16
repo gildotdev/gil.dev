@@ -9,15 +9,18 @@ const notes = await getCollection("notes", ({ data }) => {
 });
 
 // Count notes per topic
-const notesCountByTopic = topics.reduce((acc, topic) => {
-  acc[topic.id] = notes.filter((note) =>
-    (note.data.topics ?? []).includes(topic.id)
-  ).length;
-  return acc;
-}, {} as Record<string, number>);
+const notesCountByTopic = topics.reduce(
+  (acc, topic) => {
+    acc[topic.id] = notes.filter((note) =>
+      (note.data.topics ?? []).includes(topic.id),
+    ).length;
+    return acc;
+  },
+  {} as Record<string, number>,
+);
 
 const sortedTopics = topics.sort((a, b) =>
-  a.data.title.localeCompare(b.data.title)
+  a.data.title.localeCompare(b.data.title),
 );
 ---
 
@@ -30,13 +33,21 @@ const sortedTopics = topics.sort((a, b) =>
     text-decoration: none !important;
   }
 
-  li:nth-child(4n + 1) { --card-accent: var(--mint-green); }
-  li:nth-child(4n + 2) { --card-accent: var(--yellow); }
-  li:nth-child(4n + 3) { --card-accent: var(--pink); }
-  li:nth-child(4n + 4) { --card-accent: var(--blue); }
+  li:nth-child(4n + 1) {
+    --card-accent: var(--mint-green);
+  }
+  li:nth-child(4n + 2) {
+    --card-accent: var(--yellow);
+  }
+  li:nth-child(4n + 3) {
+    --card-accent: var(--pink);
+  }
+  li:nth-child(4n + 4) {
+    --card-accent: var(--blue);
+  }
 
   .topic-card {
-    border: 1px solid var(--yellowalpha);
+    border: 1px solid color-mix(in srgb, var(--card-accent) 35%, transparent);
     border-top: 3px solid var(--card-accent, var(--mint-green));
     border-radius: 0.5rem;
     padding: 1rem;
@@ -45,12 +56,16 @@ const sortedTopics = topics.sort((a, b) =>
     flex-direction: column;
     gap: 0.4rem;
     background: rgba(255, 255, 255, 0.03);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      transform 0.15s;
   }
 
   .topic-card:hover {
     border-color: var(--card-accent, var(--mint-green));
-    box-shadow: 0 6px 24px -4px color-mix(in srgb, var(--card-accent) 50%, transparent);
+    box-shadow: 0 6px 24px -4px
+      color-mix(in srgb, var(--card-accent) 50%, transparent);
     transform: translateY(-2px);
   }
 
@@ -91,11 +106,11 @@ const sortedTopics = topics.sort((a, b) =>
 <aside id="knowledge-garden" class="mx-2">
   <h2>
     <img
-      src="/img/plant.svg"
+      src="/img/sticky-note.svg"
       width="24px"
       height="24px"
-      class="inline"
-      alt="Plant Icon"
+      class="inline mr-1"
+      alt="Topics Icon"
     />{" "}<WiggleWrap>Knowledge Garden</WiggleWrap>
   </h2>
   <ul class="grid grid-cols-2 md:grid-cols-3 gap-3 pl-0">

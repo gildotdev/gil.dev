@@ -8,6 +8,7 @@ import avatar from "../assets/avatar-pink-tv.jpeg";
 import { ViewTransitions } from "astro:transitions";
 import LatestPosts from "../components/LatestPosts.astro";
 import KnowledgeGarden from "../components/KnowledgeGarden.astro";
+import "../styles/global.css";
 ---
 
 <!doctype html>
@@ -37,12 +38,6 @@ import KnowledgeGarden from "../components/KnowledgeGarden.astro";
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-
-    <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-
     <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <link
@@ -71,23 +66,29 @@ import KnowledgeGarden from "../components/KnowledgeGarden.astro";
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
     <header
-      class="flex flex-row px-2 w-full max-w-3xl items-center justify-center gap-4"
+      class={`flex flex-row px-2 w-full max-w-3xl items-center gap-5${isHome ? " hero-header" : " justify-center"}`}
     >
       {
         isHome ? (
           <>
-            <img
-              id="avatar"
-              transition:name="avatar"
-              src={avatar.src}
-              alt="Photo of Gil Creque in a pink TV"
-              class="rounded-full shrink-0 w-16 h-16 md:w-[200px] md:h-[200px]"
-            />
-            <div class="flex flex-col items-center">
-              <p class="slab mb-0 pb-0">&nbsp;Hello, I'm&nbsp;</p>
-              <h1 class="mb-0">
-                <WiggleWrap>Gil Creque</WiggleWrap>
-              </h1>
+            <div class="hero-avatar-wrap">
+              <div class="hero-ring" />
+              <img
+                id="avatar"
+                transition:name="avatar"
+                src={avatar.src}
+                alt="Photo of Gil Creque in a pink TV"
+                class="rounded-full w-16 h-16"
+                style="border: 2px solid var(--mint-green);"
+              />
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="hero-greeting">Hello, I'm</span>
+              <h1 class="inline mb-1">Gil</h1>
+              <p class="hero-tagline">
+                Software Engineer, Cyber Security Coach, Tech Community
+                Organizer
+              </p>
             </div>
           </>
         ) : (
@@ -120,22 +121,6 @@ import KnowledgeGarden from "../components/KnowledgeGarden.astro";
     <main class={`px-2 w-full max-w-3xl${isHome ? " home-main" : ""}`}>
       <slot />
       <!-- your content is injected here -->
-      {isHome && (
-        <nav id="home-mobile-nav">
-          <a href="/blog" class="home-nav-btn">
-            <img src="/img/microblog.svg" width="28px" height="28px" alt="" />
-            Posts
-          </a>
-          <a href="/notes" class="home-nav-btn">
-            <img src="/img/plant.svg" width="28px" height="28px" alt="" />
-            Notes
-          </a>
-          <a href="/topics" class="home-nav-btn">
-            <img src="/img/worm.svg" width="28px" height="28px" alt="" />
-            Topics
-          </a>
-        </nav>
-      )}
     </main>
 
     {
