@@ -2,52 +2,79 @@
 import { getCollection } from "astro:content";
 import { formatPublishDate } from "../lib/utils";
 import "../styles/global.css";
-import Tag from "./Tag.astro";
-import WiggleWrap from "./WiggleWrap.astro";
+
 const notes = await getCollection("notes", ({ data }) => {
   return data.draft !== true;
 });
+
+const statusEmoji: Record<string, string> = {
+  seed: "🌱",
+  growing: "🌿",
+  evergreen: "🌳",
+};
+
+const sorted = notes
+  .sort(
+    (a, b) =>
+      new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime(),
+  )
+  .slice(0, 5);
 ---
 
 <style>
   li {
     list-style-type: none;
   }
+
+  a {
+    text-decoration: none !important;
+  }
 </style>
 
 <aside id="notes" class="mx-2">
-  <h2>
-    <img
-      src="/img/plant.svg"
-      width="24px"
-      height="24px"
-      class="inline"
-      alt="Plant Icon"
-    />{" "}<WiggleWrap>Latest Notes</WiggleWrap>
-  </h2>
-  <ul>
-    {
-      notes
-        .sort(
-          (a, b) =>
-            (new Date(b.data.lastmod) as any) -
-            (new Date(a.data.lastmod) as any)
-        )
-        .slice(0, 20)
-        .map((note) => (
-          <li>
-            <a href={`/${note.data.slug || note.id}`}>
-              <img
-                src="/img/worm.svg"
-                width="24px"
-                height="24px"
-                class="inline"
-                alt="Worm Icon"
-              />{" "}
-              {note.data.title}
+  <div class="notes-section-header">
+    <h2 class="notes-panel-title">
+      <img
+        src="/img/plant.svg"
+        width="24px"
+        height="24px"
+        class="inline mr-1"
+        alt="Plant Icon"
+      />{" "}Latest Notes
+    </h2>
+  </div>
+  <div class="notes-panel">
+    <ul class="pl-0">
+      {
+        sorted.map((note) => (
+          <li class="note-panel-item">
+            <a href={`/${note.data.slug || note.id}`} class="note-panel-link">
+              <p class="note-panel-note-title">
+                {note.data.status ? (
+                  <span title={note.data.status}>
+                    {statusEmoji[note.data.status]}{" "}
+                  </span>
+                ) : (
+                  <img
+                    src="/img/worm.svg"
+                    width="14px"
+                    height="14px"
+                    class="inline"
+                    alt=""
+                  />
+                )}
+                {note.data.title}
+              </p>
             </a>
+            <p class="note-panel-date">
+              {formatPublishDate(note.data.updated)}
+            </p>
           </li>
         ))
-    }
-  </ul>
+      }
+    </ul>
+    <p class="mt-4 mb-0 pb-0">
+      <a href="/notes">View all notes →</a>
+    </p>
+  </div>
 </aside>

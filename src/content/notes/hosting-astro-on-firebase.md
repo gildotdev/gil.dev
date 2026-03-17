@@ -6,9 +6,12 @@ tags:
   - google
   - firebase
   - astro
-lastmod: 2023-07-17T21:59:00.594Z
-date: 2023-07-17T13:00:00Z
+updated: 2023-07-17T21:59:00.594Z
+created: 2023-07-17T13:00:00Z
 slug: hosting-astro-on-firebase
+topics:
+  - astro
+status: evergreen
 ---
 
 Firebase announced at Google I/O 2023 that [they were launching support for hosting Astro projects](https://firebase.blog/posts/2023/05/whats-new-at-google-io/#deploy-astro-nuxt-sveltekit-with-firebase-hosting). This is great news for Astro developers as Firebase is a great platform for hosting static sites at it's free tier is generous. 

@@ -1,0 +1,103 @@
+---
+import { getCollection, render } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import Tag from "../../components/Tag.astro";
+import { formatPublishDate } from "../../lib/utils.ts";
+import "../../styles/global.css";
+
+export async function getStaticPaths() {
+  const topics = await getCollection("topics");
+  return topics.map((topic) => ({
+    params: { slug: topic.id },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+const { Content } = await render(topic);
+
+const allNotes = await getCollection("notes", ({ data }) => {
+  return data.draft !== true;
+});
+
+const relatedNotes = allNotes
+  .filter((note) => (note.data.topics ?? []).includes(topic.id))
+  .sort(
+    (a, b) =>
+      new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime(),
+  );
+
+const allTopics = await getCollection("topics");
+const relatedTopics = allTopics.filter((t) =>
+  (topic.data.relatedTopics ?? []).includes(t.id),
+);
+
+const statusEmoji: Record<string, string> = {
+  seed: "🌱",
+  growing: "🌿",
+  evergreen: "🌳",
+};
+---
+
+<MainLayout title={topic.data.title} description={topic.data.description}>
+  <article>
+    <p>{topic.data.description}</p>
+    {topic.data.intro && <p>{topic.data.intro}</p>}
+    <Content />
+
+    {
+      relatedNotes.length > 0 && (
+        <section>
+          <h2>Notes</h2>
+          <ul>
+            {relatedNotes.map((note) => (
+              <li>
+                <a href={`/${note.data.slug || note.id}`}>
+                  {note.data.status && (
+                    <span title={note.data.status}>
+                      {statusEmoji[note.data.status]}{" "}
+                    </span>
+                  )}
+                  {note.data.title}
+                </a>
+                <span class="slab text-sm ml-2">
+                  {formatPublishDate(note.data.created)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      topic.data.externalLinks && topic.data.externalLinks.length > 0 && (
+        <section>
+          <h2>External Links</h2>
+          <ul>
+            {topic.data.externalLinks.map((link) => (
+              <li>
+                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                  {link.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      relatedTopics.length > 0 && (
+        <section>
+          <h2>Related Topics</h2>
+          <p>
+            {relatedTopics.map((t) => (
+              <Tag tag={t.data.title} href={`/topics/${t.id}`} i={0} />
+            ))}
+          </p>
+        </section>
+      )
+    }
+  </article>
+</MainLayout>

@@ -5,9 +5,13 @@ draft: false
 tags:
   - nx
   - bitbucket
-lastmod: 2024-01-03T14:00:00Z
-date: 2024-01-03T14:00:00Z
+updated: 2024-01-03T14:00:00Z
+created: 2024-01-03T14:00:00Z
 slug: nx-cache-and-bitbucket-pipelines
+topics:
+  - dev-tools
+  - angular
+status: evergreen
 ---
 
 We recently added Nx to our Angular application. Nx is a set of extensible dev tools for monorepos. We were trying to deploy our application to Firebase Hosting using Bitbucket Pipelines. The build was failing because the NX cache was not being cleared. We were able to fix this by adding the following environment variable to our Bitbucket Pipelines configuration:

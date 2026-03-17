@@ -1,14 +1,17 @@
 ---
 title: Project Stargate
-date: 2025-08-11T00:00:00-0500
+created: 2025-08-11T00:00:00-0500
 type: note
 tags:
   - data-centers
   - openai
   - oracle
   - texas
-lastmod: 2025-08-11T00:00:00-0500
+updated: 2026-03-16T00:00:00-0500
 slug: project-stargate
+topics:
+  - ai
+status: growing
 ---
 
 Project Stargate is a large-scale initiative focused on building next-generation data centers, leveraging advanced AI technologies and cloud infrastructure. The project involves collaboration between major industry players, including OpenAI and Oracle, and is based in Texas. Its goal is to create highly efficient, scalable, and secure data center solutions to support the growing demands of artificial intelligence and cloud computing workloads.

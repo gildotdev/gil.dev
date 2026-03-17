@@ -1,0 +1,142 @@
+---
+import { getCollection } from "astro:content";
+import WiggleWrap from "./WiggleWrap.astro";
+import "../styles/global.css";
+
+const topics = await getCollection("topics");
+const notes = await getCollection("notes", ({ data }) => {
+  return data.draft !== true;
+});
+
+// Count notes per topic
+const notesCountByTopic = topics.reduce(
+  (acc, topic) => {
+    acc[topic.id] = notes.filter((note) =>
+      (note.data.topics ?? []).includes(topic.id),
+    ).length;
+    return acc;
+  },
+  {} as Record<string, number>,
+);
+
+const sortedTopics = topics.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+---
+
+<style>
+  li {
+    list-style-type: none;
+  }
+
+  a {
+    text-decoration: none !important;
+  }
+
+  li:nth-child(4n + 1) {
+    --card-accent: var(--mint-green);
+  }
+  li:nth-child(4n + 2) {
+    --card-accent: var(--yellow);
+  }
+  li:nth-child(4n + 3) {
+    --card-accent: var(--pink);
+  }
+  li:nth-child(4n + 4) {
+    --card-accent: var(--blue);
+  }
+
+  .topic-card {
+    border: 1px solid color-mix(in srgb, var(--card-accent) 35%, transparent);
+    border-top: 3px solid var(--card-accent, var(--mint-green));
+    border-radius: 0.5rem;
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      transform 0.15s;
+  }
+
+  .topic-card:hover {
+    border-color: var(--card-accent, var(--mint-green));
+    box-shadow: 0 6px 24px -4px
+      color-mix(in srgb, var(--card-accent) 50%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .topic-title {
+    font-family: "Alfa Slab One", cursive;
+    color: var(--card-accent, var(--mint-green));
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    line-height: 1.3;
+    margin: 0;
+    padding: 0;
+  }
+
+  .topic-desc {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  .note-badge {
+    align-self: flex-start;
+    margin-top: auto;
+    background: var(--card-accent, var(--mint-green));
+    color: black;
+    border-radius: 99px;
+    padding: 0.1em 0.6em;
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+</style>
+
+<aside id="knowledge-garden" class="mx-2">
+  <h2>
+    <img
+      src="/img/sticky-note.svg"
+      width="24px"
+      height="24px"
+      class="inline mr-1"
+      alt="Topics Icon"
+    />{" "}<WiggleWrap>Digital Garden</WiggleWrap>
+  </h2>
+  <ul
+    class="p-0 grid grid-cols-2 md:grid-cols-3 gap-3"
+    style="padding: 0px !important;"
+  >
+    {
+      sortedTopics.map((topic) => (
+        <li>
+          <a href={`/topics/${topic.id}`} class="block h-full">
+            <div class="topic-card">
+              <p class="topic-title">{topic.data.title}</p>
+              <p class="topic-desc">{topic.data.description}</p>
+              {notesCountByTopic[topic.id] > 0 && (
+                <span class="note-badge">
+                  {notesCountByTopic[topic.id]}{" "}
+                  {notesCountByTopic[topic.id] === 1 ? "note" : "notes"}
+                </span>
+              )}
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-4">
+    <a href="/topics">View all topics →</a>
+  </p>
+</aside>

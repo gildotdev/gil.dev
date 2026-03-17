@@ -30,7 +30,7 @@ import WiggleWrap from "./WiggleWrap.astro";
       />
       <a href="/colophon">Colophon </a>
     </li>
-    <li>
+    <li class="hidden md:block">
       <a href="/notes"
         ><img
           src="/img/plant.svg"
@@ -42,20 +42,44 @@ import WiggleWrap from "./WiggleWrap.astro";
         Notes</a
       >
     </li>
-    <li>
-      <a href="/posts"
+    <li class="hidden md:block">
+      <a href="/topics"
+        ><img
+          src="/img/sticky-note.svg"
+          width="24px"
+          height="24px"
+          class="inline mr-1"
+          alt="Topics Icon"
+        />
+        Topics</a
+      >
+    </li>
+    <li class="hidden md:block">
+      <a href="/blog"
         ><img
           src="/img/microblog.svg"
           width="24px"
           height="24px"
           class="inline mr-1"
-          alt="Micro.blog Icon"
+          alt="Blog Icon"
         />
-        Posts</a
+        Blog</a
       >
     </li>
     <li>
-      <span class="emoji-color mr-1">🌯</span><a href="/chipotle">Chipotle</a>
+      <a href="/tags"
+        ><img
+          src="/img/tags.svg"
+          width="24px"
+          height="24px"
+          class="inline mr-1"
+          alt="Tags Icon"
+        />
+        Tags</a
+      >
+    </li>
+    <li>
+      <span class="mr-1">🌯</span><a href="/chipotle">Chipotle</a>
     </li>
   </ul>
 </aside>

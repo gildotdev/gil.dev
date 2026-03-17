@@ -2,6 +2,7 @@
 
 html {
   overflow-x: hidden;
+  background-color: #0d1527;
 }
 
 :root {
@@ -50,8 +51,7 @@ h6 {
   letter-spacing: 2px;
   paint-order: stroke fill;  
   text-shadow: 0.2em 0.2em 0.2em var(--astro-code-color-background);
-  text-wrap: balance;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .slab {
@@ -62,15 +62,33 @@ h6 {
 body {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(5, max-content);
   grid-column-gap: 2rem;
   grid-row-gap: 2rem;
   line-height: 2rem !important;
+  overflow-x: hidden;
 }
 
 p {
   margin-bottom: 1rem;
   overflow-wrap: anywhere;
+}
+
+ul,
+ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+li {
+  margin-bottom: 0.25rem;
 }
 
 mark {
@@ -92,7 +110,6 @@ a:hover {
 }
 
 header {
-  grid-area: 1 / 1 / 2 / 2;
   margin-top: 2rem;
   font-family: "Alfa Slab One", cursive;
   font-size: 1rem;
@@ -100,17 +117,239 @@ header {
 }
 
 main {
-  grid-area: 2 / 1 / 3 / 2;
   padding-bottom: 1.5rem;
   min-width: 0;
 }
 
 footer {
-  grid-area: 5 / 1 / 6 / 2;
   margin-bottom: 1rem;
-    padding-top: 1rem;
+  padding-top: 1rem;
   border-top: 0.25rem solid var(--border-color);
   min-width: 0;
+}
+
+/* Homepage sections wrapper – hidden on mobile, shown on desktop */
+#home-content {
+  display: none;
+  min-width: 0;
+}
+
+/* ── Hero ── */
+.hero-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.hero-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(43, 240, 194, 0.4);
+  animation: hero-spin 18s linear infinite;
+  pointer-events: none;
+}
+
+.hero-ring--hover {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hero-avatar-wrap:hover .hero-ring--hover {
+  opacity: 1;
+}
+
+@keyframes hero-spin {
+  to { transform: rotate(360deg); }
+}
+
+.hero-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero-greeting {
+  text-transform: uppercase;
+  color: var(--mint-green);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.hero-tagline {
+  margin-top: -0.5rem;
+  margin-bottom: 0;
+}
+
+/* ── Posts section header ── */
+.posts-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.posts-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Post cards ── */
+.post-card-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.15s;
+}
+
+.post-card-item:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.post-card-item:last-child {
+  border-bottom: none;
+}
+
+.post-card-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.75rem 0;
+  text-decoration: none !important;
+  transition: padding-left 0.15s;
+}
+
+.post-card-link:hover {
+  padding-left: 0.4rem;
+  text-decoration: none !important;
+}
+
+.post-card-date {
+  display: block;
+  font-size: 11px;
+  color: rgba(232, 230, 223, 0.45);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  padding: 0;
+}
+
+.post-card-title {
+  font-family: "Alfa Slab One", cursive;
+  font-size: 16px;
+  color: #e8e6df;
+  line-height: 1.3;
+  margin: 0 0 0.25rem;
+  padding: 0;
+  letter-spacing: 1px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-card-excerpt {
+  color: white;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.post-card-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  object-fit: cover;
+}
+
+/* ── Notes panel ── */
+.notes-section-header {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem 0.75rem 0 0;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+}
+
+.notes-panel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
+  border-radius: 0 0 0.75rem 0.75rem;
+  padding: 1.25rem;
+}
+
+.notes-panel-title {
+  font-family: "Alfa Slab One", cursive;
+  letter-spacing: 0.06em;
+  color: var(--pink);
+  margin: 0;
+  padding: 0;
+}
+
+.note-panel-item {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.note-panel-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.note-panel-item:first-child {
+  padding-top: 0;
+}
+
+.note-panel-link {
+  text-decoration: none !important;
+  display: block;
+}
+
+.note-panel-link:hover .note-panel-note-title {
+  color: var(--pink) !important;
+}
+
+.note-panel-note-title {
+  color: #e8e6df;
+  line-height: 1.35;
+  margin: 0;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.note-panel-date {
+  font-size: 11px;
+  color: rgba(232, 230, 223, 0.45);
+  margin: 0.15rem 0 0;
+  padding: 0;
+}
+
+/* Posts + Notes side-by-side row — stacked on mobile */
+#posts-notes-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Knowledge Garden separator */
+#knowledge-garden {
+  border-top: 0.15rem solid var(--yellowalpha);
+  padding-top: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 @media (min-width: 480px) {
@@ -122,24 +361,42 @@ footer {
   }
 
   header {
-    grid-area: 1 / 1 / 2 / 5;
+    grid-column: 1 / -1;
   }
 
   main {
-    grid-area: 2 / 1 / 3 / 5;
+    grid-column: 1 / -1;
   }
 
-#posts {
-  grid-area: 3 / 1 / 3 / 3;
-  grid-template-columns: 2fr;
-  }
-
-  #notes {
-    grid-area: 3 / 3 / 4 / 5;
+  #home-content {
+    display: block;
+    grid-column: 1 / -1;
   }
 
   footer {
-    grid-area: 4 / 1 / 5 / 5;
+    grid-column: 1 / -1;
+  }
+
+  /* Posts + Notes side by side on desktop */
+  #posts-notes-row {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  #posts-notes-row > #posts {
+    flex: 3;
+    min-width: 0;
+  }
+
+  #posts-notes-row > #notes {
+    flex: 2;
+    min-width: 0;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .notes-panel {
+    position: static;
   }
 }
 
@@ -210,11 +467,6 @@ ul ul ul li {
   list-style-type: square;
 }
 
-a > #avatar:hover {
-  transform: rotate(360deg);
-  box-shadow: 0.1em 0.1em 0.5em 0.1em var(--yellow);
-}
-
 details > summary {
   color: var(--mint-green);
   text-decoration: underline;
@@ -224,8 +476,8 @@ details > summary {
 }
 
 .emoji-color {
-  color: transparent;
-  text-shadow: 0 0 0 hotpink;
+  display: inline-block;
+  filter: sepia(1) saturate(90) hue-rotate(300deg);
 }
 
 article img, article video, article iframe {

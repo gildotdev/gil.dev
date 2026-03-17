@@ -17,17 +17,59 @@ const { note } = Astro.props;
 const { Content } = await render(note);
 
 const {
-  data: { title, date, lastmod, tags },
+  data: { title, created, updated, tags, topics, status },
 } = note;
+
+const allTopics = await getCollection("topics");
+const topicTitles = Object.fromEntries(
+  allTopics.map((t) => [t.id, t.data.title]),
+);
+
+const statusEmoji: Record<string, string> = {
+  seed: "🌱",
+  growing: "🌿",
+  evergreen: "🌳",
+};
+const statusLabel: Record<string, string> = {
+  seed: "Seed — early idea, lightly developed",
+  growing: "Growing — being actively developed",
+  evergreen: "Evergreen — mature and stable",
+};
 ---
 
-<MainLayout title={title}>
+<MainLayout title={title} description={note.data.description}>
   <article>
-    <div class="flex flex-col md:flex-row justify-start gap-1 align-bottom">
-      <time class="slab" datetime={date}>
-        {formatPublishDate(date)}
+    <div class="mb-1">
+      <time class="slab" datetime={created}>
+        {formatPublishDate(created)}
       </time>
     </div>
+    {
+      status && (
+        <div class="text-sm slab mb-2" title={statusLabel[status]}>
+          {statusEmoji[status]} {status}
+        </div>
+      )
+    }
+    {
+      topics && topics.length > 0 && (
+        <div>
+          <img
+            src="/img/sticky-note.svg"
+            style="width:24px;height:24px;flex-shrink:0;border-radius: 0px; margin:0px;"
+            class="inline"
+            alt="Topics Icon"
+          />{" "}
+          {topics.map((topic: string) => (
+            <Tag
+              tag={topicTitles[topic] ?? topic}
+              href={`/topics/${topic}`}
+              i={0}
+            />
+          ))}
+        </div>
+      )
+    }
     <Content />
     <footer>
       {

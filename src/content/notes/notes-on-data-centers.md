@@ -1,11 +1,12 @@
 ---
 title: Notes on Data Centers
-date: 2025-08-11T00:00:00-0500
+created: 2025-08-11T00:00:00-0500
 type: note
 tags:
   - data-centers
-lastmod: 2025-08-11T00:00:00-0500
+updated: 2025-08-11T00:00:00-0500
 slug: notes-on-data-centers
+status: growing
 ---
 
 I have been reading up on data centers lately due to some mega projects in the race for AI dominance.

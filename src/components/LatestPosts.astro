@@ -1,62 +1,104 @@
 ---
-import { marked } from "marked";
-import { formatPublishDate, truncateHTML } from "../lib/utils";
+import { formatPublishDate } from "../lib/utils";
 import "../styles/global.css";
 import WiggleWrap from "./WiggleWrap.astro";
-import Tag from "./Tag.astro";
 
-const response = await fetch(
-  "https://micro.blog/micropub?q=source&offset=0&limit=3",
-  {
-    method: "GET",
-    headers: { Authorization: `Bearer ${import.meta.env.SECRET_MICROBLOG_TOKEN}` },
+let posts: any[] = [];
+
+try {
+  const response = await fetch(
+    "https://micro.blog/micropub?q=source&offset=0&limit=5",
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${import.meta.env.SECRET_MICROBLOG_TOKEN}`,
+      },
+    },
+  );
+
+  if (response.ok) {
+    const data = await response.json();
+    posts = data.items.map((post: any) => {
+      const raw: string = post.properties.content?.[0] ?? "";
+      // Extract first image — try markdown syntax then HTML <img>
+      const thumbnail =
+        raw.match(/!\[.*?\]\((.*?)\)/)?.[1] ??
+        raw.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1] ??
+        null;
+      // Build plain-text excerpt: strip both HTML and markdown
+      const excerpt = raw
+        .replace(/!\[.*?\]\(.*?\)/g, "") // markdown images
+        .replace(/<img[^>]*\/?>/gi, "") // HTML img tags
+        .replace(/<a[^>]*>([\s\S]*?)<\/a>/gi, "$1") // HTML links → keep text
+        .replace(/<[^>]+>/g, "") // remaining HTML tags
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // markdown links → keep text
+        .replace(/[#*`_~>]/g, "") // markdown syntax
+        .replace(/\n+/g, " ")
+        .trim()
+        .slice(0, 200);
+      return {
+        uid: post.properties.uid[0],
+        excerpt,
+        published: post.properties.published[0],
+        title:
+          post.properties.name && post.properties.name[0] !== ""
+            ? post.properties.name[0]
+            : null,
+        thumbnail,
+        canonicalURL: post.properties.url[0],
+      };
+    });
   }
-);
-
-let posts = await response.json();
-posts = posts.items.map((post: any) => {
-  post = {
-    uid: post.properties.uid[0],
-    content: truncateHTML(marked(post.properties.content[0]), post.properties.uid[0]),
-    published: post.properties.published[0],
-    category: post.properties.category,
-    title: post.properties.name != "" ? post.properties.name : null,
-    canonicalURL: post.properties.url[0],
-  };
-  return post;
-});
+} catch {
+  // Posts unavailable — fail silently so the homepage still renders
+}
 ---
+
+<style>
+  a {
+    text-decoration: none !important;
+  }
+</style>
+
 <aside id="posts" class="mx-2">
-  <h2>
-    <img
-      src="/img/microblog.svg"
-      width="24px"
-      height="24px"
-      class="inline"
-      alt="Micro.blog Icon"
-    />{" "}<WiggleWrap>Latest Posts</WiggleWrap>
-  </h2>
+  <div class="posts-section-header">
+    <h2 class="posts-section-title">
+      <img
+        src="/img/microblog.svg"
+        width="24px"
+        height="24px"
+        class="inline"
+        alt="Micro.blog Icon"
+      />{" "}<WiggleWrap>Latest Posts</WiggleWrap>
+    </h2>
+    <a href="/posts" class="view-all">View all posts →</a>
+  </div>
+
   {
-    posts.map((post: any) => (
-      <article id=`${post.uid}` class="mb-4">
-        <div class="flex flex-col md:flex-row justify-start gap-1 align-bottom">
-          <a href=`/posts/${post.uid}`>
-            {post.title && <h3>{post.title}</h3>}
-            <time class="slab" datetime={post.published}>
-              {formatPublishDate(post.published)}
-            </time>
+    posts.length === 0 ? (
+      <p class="opacity-75">Posts unavailable right now.</p>
+    ) : (
+      posts.map((post: any) => (
+        <article id={`${post.uid}`} class="post-card-item">
+          <a href={`/posts/${post.uid}`} class="post-card-link">
+            <div class="post-card-body">
+              <time class="post-card-date" datetime={post.published}>
+                {formatPublishDate(post.published)}
+              </time>
+              {post.title && <p class="post-card-title">{post.title}</p>}
+              {post.excerpt && <p class="post-card-excerpt">{post.excerpt}</p>}
+            </div>
+            {post.thumbnail && (
+              <img
+                src={post.thumbnail}
+                class="post-card-thumb"
+                alt=""
+                loading="lazy"
+              />
+            )}
           </a>
-        </div>
-        <Fragment set:html={post.content} />
-        {post?.category?.length > 0 && (
-          <p>
-            Category:{" "}
-            {post?.category.map((tag: any, i: number) => (
-              <Tag tag={tag} i={i} />
-            ))}
-          </p>
-        )}
-      </article>
-    ))
+        </article>
+      ))
+    )
   }
 </aside>

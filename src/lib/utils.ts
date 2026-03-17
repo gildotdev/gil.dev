@@ -10,10 +10,7 @@ export function formatPublishDate(publishDate: string | number | Date): string {
   return new Date(publishDate).toLocaleDateString("en-US", dateOptions);
 }
 
-export async function truncateHTML(html: string | Promise<string>, uid: string): Promise<string> {
-  // Convert the HTML string to a string if it's a promise
-  html = typeof html === "string" ? html : await html;
-
+export function truncateHTML(html: string, uid: string): string {
   // Parse the HTML string into a DOM structure
   const doc = new JSDOM(html).window.document;
 
