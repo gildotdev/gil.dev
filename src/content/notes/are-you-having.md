@@ -11,6 +11,9 @@ tags:
   - cloud-run
   - google-cloud
   - docker
+status: seed
+topic:
+  - dev-tools
 ---
 Does it run fine locally but it won't start when deployed and revisioned? Are you using an M1 Mac? You likely need to add this target flag to your `docker build` command.
 

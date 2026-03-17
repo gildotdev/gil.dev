@@ -11,6 +11,9 @@ tags:
 url: /2020/04/24/how-to-possibly.html
 updated: 2023-06-22T23:36:10.185Z
 slug: possibly-fix-npm-globally-installed-binary
+status: seed
+topics :
+  - dev-tools
 ---
 This line in my `~/.npmrc` file has been killing my sanity for longer than I want to admit. 
 

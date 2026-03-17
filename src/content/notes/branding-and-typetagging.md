@@ -11,6 +11,7 @@ tags:
 url: /2022/03/17/branding-and-typetagging.html
 updated: 2023-06-22T23:39:21.957Z
 slug: branding-type-tagging
+status: seed
 ---
 I ran across this Tweet
 

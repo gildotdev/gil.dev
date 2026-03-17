@@ -15,6 +15,7 @@ photos_with_metadata: null
 url: /2020/04/21/using-picktk-in.html
 updated: 2023-06-22T23:35:04.751Z
 slug: pick-typescript
+status: seed
 ---
 ![Using Pick<T,K> in TypeScript](../../assets/67f6bb8830.png)
 
