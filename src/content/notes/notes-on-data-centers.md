@@ -6,9 +6,6 @@ tags:
   - data-centers
 updated: 2025-08-11T00:00:00-0500
 slug: notes-on-data-centers
-topics:
-  - data-centers
-  - infrastructure
 status: growing
 ---
 

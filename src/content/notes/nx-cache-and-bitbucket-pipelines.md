@@ -10,7 +10,6 @@ created: 2024-01-03T14:00:00Z
 slug: nx-cache-and-bitbucket-pipelines
 topics:
   - dev-tools
-  - infrastructure
   - angular
 status: evergreen
 ---

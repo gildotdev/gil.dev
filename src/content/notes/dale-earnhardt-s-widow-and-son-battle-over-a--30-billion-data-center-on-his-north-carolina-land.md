@@ -6,8 +6,6 @@ tags:
   - data-centers
 updated: 2026-03-16T00:00:00-0500
 slug: dale-earnhardt-s-widow-and-son-battle-over-a--30-billion-data-center-on-his-north-carolina-land
-topics:
-  - data-centers
 status: seed
 ---
 

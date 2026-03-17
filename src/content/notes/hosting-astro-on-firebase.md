@@ -11,7 +11,6 @@ created: 2023-07-17T13:00:00Z
 slug: hosting-astro-on-firebase
 topics:
   - astro
-  - infrastructure
 status: evergreen
 ---
 

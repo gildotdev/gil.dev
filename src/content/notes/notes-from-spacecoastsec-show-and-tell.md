@@ -9,7 +9,7 @@ tags:
 updated: 2025-07-18T00:00:00-0500
 slug: notes-from-spacecoastsec-show-and-tell-july-2025
 topics:
-  - cybersecurity
+  - cyber-security
   - community
 status: seed
 ---
