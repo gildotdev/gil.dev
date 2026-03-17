@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import Tag from "../../components/Tag.astro";
+import "../../styles/global.css";
+
+const notes = await getCollection("notes", ({ data }) => data.draft !== true);
+
+const tagCounts = notes.reduce((acc, note) => {
+  for (const tag of note.data.tags ?? []) {
+    acc[tag] = (acc[tag] ?? 0) + 1;
+  }
+  return acc;
+}, {} as Record<string, number>);
+
+const sortedTags = Object.entries(tagCounts).sort(([a], [b]) =>
+  a.localeCompare(b),
+);
+---
+
+<MainLayout title="Tags">
+  <p>All tags used across notes, sorted alphabetically.</p>
+  <p>
+    {
+      sortedTags.map(([tag, count]) => (
+        <Tag tag={`${tag} (${count})`} href={`/tags/${tag}`} i={0} />
+      ))
+    }
+  </p>
+</MainLayout>

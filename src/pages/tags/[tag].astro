@@ -1,0 +1,58 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { formatPublishDate } from "../../lib/utils.ts";
+import "../../styles/global.css";
+
+export async function getStaticPaths() {
+  const notes = await getCollection("notes", ({ data }) => data.draft !== true);
+
+  const allTags = [...new Set(notes.flatMap((note) => note.data.tags ?? []))];
+
+  return allTags.map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      notes: notes
+        .filter((note) => (note.data.tags ?? []).includes(tag))
+        .sort(
+          (a, b) =>
+            new Date(b.data.updated ?? b.data.created).getTime() -
+            new Date(a.data.updated ?? a.data.created).getTime(),
+        ),
+    },
+  }));
+}
+
+const { tag, notes } = Astro.props;
+
+const statusEmoji: Record<string, string> = {
+  seed: "🌱",
+  growing: "🌿",
+  evergreen: "🌳",
+};
+---
+
+<MainLayout title={`#${tag}`} description={`Notes tagged with ${tag}`}>
+  <article>
+    <ul>
+      {
+        notes.map((note) => (
+          <li>
+            <a href={`/${note.data.slug || note.id}`}>
+              {note.data.status && (
+                <span title={note.data.status}>
+                  {statusEmoji[note.data.status]}{" "}
+                </span>
+              )}
+              {note.data.title}
+            </a>
+            <span class="slab text-sm ml-2">
+              {formatPublishDate(note.data.created)}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </article>
+</MainLayout>
