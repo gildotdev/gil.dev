@@ -1,5 +1,5 @@
 ---
-const { tag, i } = Astro.props;
+const { tag, i, href = "" } = Astro.props;
 ---
 
 <style>
@@ -21,4 +21,4 @@ const { tag, i } = Astro.props;
     text-decoration: none !important;
   }
 </style>
-<a href="" class={`tag`}>{tag}</a>
+<a href={href} class={`tag`}>{tag}</a>

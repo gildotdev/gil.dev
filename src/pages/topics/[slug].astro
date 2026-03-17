@@ -91,18 +91,11 @@ const statusEmoji: Record<string, string> = {
       relatedTopics.length > 0 && (
         <section>
           <h2>Related Topics</h2>
-          <ul class="flex flex-wrap gap-2 list-none pl-0">
+          <p>
             {relatedTopics.map((t) => (
-              <li class="list-none">
-                <a
-                  href={`/topics/${t.id}`}
-                  class="inline-block px-3 py-1 rounded-full border border-current"
-                >
-                  {t.data.title}
-                </a>
-              </li>
+              <Tag tag={t.data.title} href={`/topics/${t.id}`} i={0} />
             ))}
-          </ul>
+          </p>
         </section>
       )
     }

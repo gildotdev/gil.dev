@@ -53,12 +53,19 @@ const statusLabel: Record<string, string> = {
     }
     {
       topics && topics.length > 0 && (
-        <p class="text-sm mb-4">
-          Topic{topics.length > 1 ? "s" : ""}:{" "}
+        <p>
+          <img
+            src="/img/sticky-note.svg"
+            style="width:24px;height:24px;flex-shrink:0"
+            class="inline"
+            alt="Topics Icon"
+          />{" "}
           {topics.map((topic: string) => (
-            <a href={`/topics/${topic}`} class="mr-2">
-              {topicTitles[topic] ?? topic}
-            </a>
+            <Tag
+              tag={topicTitles[topic] ?? topic}
+              href={`/topics/${topic}`}
+              i={0}
+            />
           ))}
         </p>
       )

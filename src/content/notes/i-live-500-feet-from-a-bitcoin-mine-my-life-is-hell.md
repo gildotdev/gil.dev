@@ -11,6 +11,3 @@ slug: i-live-500-feet-from-a-bitcoin-mine-my-life-is-hell
 ---
 
 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/m7_WDzPyoqU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-
-[data-center-battles](data-center-battles)
