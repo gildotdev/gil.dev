@@ -46,17 +46,17 @@ const statusLabel: Record<string, string> = {
     </div>
     {
       status && (
-        <p class="text-sm slab mb-2" title={statusLabel[status]}>
+        <div class="text-sm slab mb-2" title={statusLabel[status]}>
           {statusEmoji[status]} {status}
-        </p>
+        </div>
       )
     }
     {
       topics && topics.length > 0 && (
-        <p>
+        <div>
           <img
             src="/img/sticky-note.svg"
-            style="width:24px;height:24px;flex-shrink:0"
+            style="width:24px;height:24px;flex-shrink:0;border-radius: 0px; margin:0px;"
             class="inline"
             alt="Topics Icon"
           />{" "}
@@ -67,7 +67,7 @@ const statusLabel: Record<string, string> = {
               i={0}
             />
           ))}
-        </p>
+        </div>
       )
     }
     <Content />
