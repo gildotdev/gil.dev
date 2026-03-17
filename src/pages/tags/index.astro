@@ -20,11 +20,11 @@ const sortedTags = Object.entries(tagCounts).sort(([a], [b]) =>
 
 <MainLayout title="Tags">
   <p>All tags used across notes, sorted alphabetically.</p>
-  <p>
+  <div class="flex flex-wrap gap-1">
     {
       sortedTags.map(([tag, count]) => (
         <Tag tag={`${tag} (${count})`} href={`/tags/${tag}`} i={0} />
       ))
     }
-  </p>
+  </div>
 </MainLayout>
