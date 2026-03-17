@@ -113,7 +113,10 @@ const sortedTopics = topics.sort((a, b) =>
       alt="Topics Icon"
     />{" "}<WiggleWrap>Digital Garden</WiggleWrap>
   </h2>
-  <ul class="grid grid-cols-2 md:grid-cols-3 gap-3 pl-0">
+  <ul
+    class="p-0 grid grid-cols-2 md:grid-cols-3 gap-3"
+    style="padding: 0px !important;"
+  >
     {
       sortedTopics.map((topic) => (
         <li>
