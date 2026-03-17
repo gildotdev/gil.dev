@@ -150,6 +150,15 @@ footer {
   pointer-events: none;
 }
 
+.hero-ring--hover {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hero-avatar-wrap:hover .hero-ring--hover {
+  opacity: 1;
+}
+
 @keyframes hero-spin {
   to { transform: rotate(360deg); }
 }
@@ -456,11 +465,6 @@ ul ul li {
 
 ul ul ul li {
   list-style-type: square;
-}
-
-a > #avatar:hover {
-  transform: rotate(360deg);
-  box-shadow: 0.1em 0.1em 0.5em 0.1em var(--yellow);
 }
 
 details > summary {

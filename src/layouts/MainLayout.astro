@@ -95,7 +95,8 @@ import "../styles/global.css";
           </>
         ) : (
           <>
-            <a href="/">
+            <a href="/" class="hero-avatar-wrap mr-3 focus:outline-none">
+              <div class="hero-ring hero-ring--hover" />
               <img
                 id="avatar"
                 transition:name="avatar"
@@ -104,6 +105,7 @@ import "../styles/global.css";
                 height="100px"
                 width="100px"
                 class="rounded-full"
+                style="border: 2px solid var(--mint-green);"
               />
             </a>
             <h1 class="grow text-center">
