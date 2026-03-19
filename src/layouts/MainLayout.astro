@@ -1,6 +1,8 @@
 ---
-const { title, isHome = false, frontmatter, description } = Astro.props;
+const { title, isHome = false, frontmatter, description, ogImage } = Astro.props;
 const defaultDescription = "Technologist and Developer";
+const pageTitle = title || frontmatter?.title;
+const pageDescription = description || frontmatter?.description || defaultDescription;
 import Footer from "../components/Footer.astro";
 import LatestNotes from "../components/LatestNotes.astro";
 import WiggleWrap from "../components/WiggleWrap.astro";
@@ -20,12 +22,23 @@ import "../styles/global.css";
     <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta charset="utf-8" />
-    <title>Gil Creque - {title || frontmatter?.title}</title>
+    <title>Gil Creque - {pageTitle}</title>
     <meta
       name="description"
-      content={description || frontmatter?.description || defaultDescription}
+      content={pageDescription}
     />
     <meta name="author" content="Gil Creque" />
+
+    <!-- Open Graph / Social Media
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`Gil Creque - ${pageTitle}`} />
+    <meta property="og:description" content={pageDescription} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={`Gil Creque - ${pageTitle}`} />
+    <meta name="twitter:description" content={pageDescription} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
 
     <!-- Google Site Verification
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -116,7 +129,7 @@ import "../styles/global.css";
                 class="inline"
                 alt="Worm Icon"
               />{" "}
-              <WiggleWrap>{title || frontmatter.title}</WiggleWrap>
+              <WiggleWrap>{pageTitle}</WiggleWrap>
             </h1>
           </>
         )

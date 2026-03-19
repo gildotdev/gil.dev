@@ -17,7 +17,7 @@ const { note } = Astro.props;
 const { Content } = await render(note);
 
 const {
-  data: { title, created, updated, tags, topics, status },
+  data: { title, created, updated, tags, topics, status, images },
 } = note;
 
 const allTopics = await getCollection("topics");
@@ -37,7 +37,7 @@ const statusLabel: Record<string, string> = {
 };
 ---
 
-<MainLayout title={title} description={note.data.description}>
+<MainLayout title={title} description={note.data.description} ogImage={images?.[0] ?? undefined}>
   <article>
     <div class="mb-1">
       <time class="slab" datetime={created}>

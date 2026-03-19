@@ -10,7 +10,21 @@ export function formatPublishDate(publishDate: string | number | Date): string {
   return new Date(publishDate).toLocaleDateString("en-US", dateOptions);
 }
 
-export function truncateHTML(html: string, slug: string): string {
+export function extractFirstImage(html: string): string | null {
+  const doc = new JSDOM(html).window.document;
+  const img = doc.querySelector("img");
+  if (!img) return null;
+  const src = img.getAttribute("src");
+  if (!src) return null;
+  try {
+    new URL(src);
+    return src;
+  } catch {
+    return null;
+  }
+}
+
+export function truncateHTML(html: string, uid: string): string {
   // Parse the HTML string into a DOM structure
   const doc = new JSDOM(html).window.document;
 
