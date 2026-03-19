@@ -21,7 +21,7 @@ const {
   data: { title, created, updated, tags, topics, status, images },
 } = note;
 
-const noteHtml = marked(note.body ?? "") as string;
+const noteHtml = marked.parse(note.body ?? "") as string;
 const pageDescription = note.data.description || generateDescription(noteHtml);
 
 const allTopics = await getCollection("topics");

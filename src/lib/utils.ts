@@ -33,7 +33,7 @@ export function generateDescription(html: string, maxLength = 155): string {
   return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "…";
 }
 
-export function truncateHTML(html: string, uid: string): string {
+export function truncateHTML(html: string, slug: string): string {
   // Parse the HTML string into a DOM structure
   const doc = new JSDOM(html).window.document;
 
