@@ -27,7 +27,10 @@ function mapItem(item: any): { id: string; data: MicroblogPost } {
 }
 
 async function fetchAllPosts(): Promise<any[]> {
-  const token = import.meta.env.SECRET_MICROBLOG_TOKEN;
+  // Use process.env first (reliably available in Node.js at Netlify build time).
+  // Fall back to import.meta.env for the Astro dev server.
+  const token =
+    process.env.SECRET_MICROBLOG_TOKEN ?? import.meta.env.SECRET_MICROBLOG_TOKEN;
   if (!token) return [];
 
   const response = await fetch('https://micro.blog/micropub?q=source', {
@@ -47,7 +50,7 @@ async function fetchAllPosts(): Promise<any[]> {
   return data.items ?? [];
 }
 
-export function micropubLoader(): LiveLoader<MicroblogPost> {
+export function micropubLoader(): LiveLoader<MicroblogPost, { id: string }> {
   // Memoize the fetch within a single loader lifecycle to avoid fetching
   // the full list repeatedly when loadEntry is called for multiple posts.
   let cachedItemsPromise: Promise<any[]> | null = null;
