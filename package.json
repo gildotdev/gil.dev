@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.6",
+    "@astrojs/netlify": "^6.6.3",
     "@astrojs/rss": "^4.0.12",
     "astro": "^5.13.11",
     "astro-masonry": "^1.2.2",

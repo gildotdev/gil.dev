@@ -10,7 +10,7 @@ export function formatPublishDate(publishDate: string | number | Date): string {
   return new Date(publishDate).toLocaleDateString("en-US", dateOptions);
 }
 
-export function truncateHTML(html: string, uid: string): string {
+export function truncateHTML(html: string, slug: string): string {
   // Parse the HTML string into a DOM structure
   const doc = new JSDOM(html).window.document;
 
@@ -28,7 +28,7 @@ export function truncateHTML(html: string, uid: string): string {
 
     // Create the "More..." link
     const moreLink = doc.createElement("a");
-    moreLink.href = `/posts/${uid}`; // Set your URL here
+    moreLink.href = `/posts/${slug}`;
     moreLink.textContent = "More...";
     moreLink.style.display = "block";
     moreLink.style.marginTop = "20px";

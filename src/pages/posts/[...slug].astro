@@ -1,0 +1,51 @@
+---
+export const prerender = false;
+
+import { marked } from "marked";
+import Tag from "../../components/Tag.astro";
+import { formatPublishDate } from "../../lib/utils.ts";
+import "../../styles/global.css";
+import PostLayout from "../../layouts/PostLayout.astro";
+import Button from "../../components/Button.astro";
+import { getLiveEntry } from "astro:content";
+import type { MicroblogPost } from "../../lib/micropubLoader";
+
+// Astro.params.slug is the full path e.g. "2026/03/19/i-did-my-somewhat-annual"
+const { slug } = Astro.params;
+const result = await getLiveEntry("posts", slug!);
+const post = result.entry?.data as MicroblogPost | undefined;
+
+if (!post) {
+  return Astro.redirect("/posts/1");
+}
+
+const content = marked(post.rawContent, { async: false });
+---
+
+<PostLayout
+  title={post.title || formatPublishDate(post.published)}
+  canonicalURL={post.canonicalURL}
+  isPost={true}
+>
+  <article>
+    <div class="flex flex-col md:flex-row justify-start gap-1 align-bottom">
+      {post.title && (
+        <time class="slab" datetime={post.published}>
+          {formatPublishDate(post.published)}
+        </time>
+      )}
+    </div>
+    <Fragment set:html={content} />
+    {post.category?.length > 0 && (
+      <p>
+        Category:{" "}
+        {post.category.map((tag: string, i: number) => (
+          <Tag tag={tag} i={i} />
+        ))}
+      </p>
+    )}
+    <Button>
+      <a href="/posts">Back to Blog Posts</a>
+    </Button>
+  </article>
+</PostLayout>
