@@ -1,5 +1,5 @@
 ---
-import { getCollection } from "astro:content";
+import { getLiveCollection } from "astro:content";
 import { formatPublishDate } from "../lib/utils";
 import "../styles/global.css";
 import WiggleWrap from "./WiggleWrap.astro";
@@ -7,7 +7,8 @@ import WiggleWrap from "./WiggleWrap.astro";
 let posts: any[] = [];
 
 try {
-  const allPosts = await getCollection("posts");
+  const result = await getLiveCollection("posts");
+  const allPosts = result.entries ?? [];
 
   posts = allPosts
     .sort(

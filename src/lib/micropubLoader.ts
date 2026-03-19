@@ -1,61 +1,83 @@
-import type { Loader } from 'astro/loaders';
+import type { LiveLoader } from 'astro/loaders';
 
-const CACHE_TTL_MS = 60 * 60 * 1000; // 60 minutes
+const CACHE_MAX_AGE_SECONDS = 60 * 60; // 60 minutes
 
-export function micropubLoader(): Loader {
+export interface MicroblogPost {
+  uid: string;
+  rawContent: string;
+  published: string;
+  title: string | null | undefined;
+  canonicalURL: string;
+  category: string[];
+}
+
+function mapItem(item: any): { id: string; data: MicroblogPost } {
+  const uid: string = item.properties.uid[0];
+  return {
+    id: uid,
+    data: {
+      uid,
+      rawContent: item.properties.content?.[0] ?? '',
+      published: item.properties.published[0],
+      title: item.properties.name?.[0] || null,
+      canonicalURL: item.properties.url[0],
+      category: item.properties.category ?? [],
+    },
+  };
+}
+
+async function fetchAllPosts(): Promise<any[]> {
+  const token = import.meta.env.SECRET_MICROBLOG_TOKEN;
+  if (!token) return [];
+
+  const response = await fetch('https://micro.blog/micropub?q=source', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `micropub-loader: failed to fetch posts: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const data = await response.json();
+  return data.items ?? [];
+}
+
+export function micropubLoader(): LiveLoader<MicroblogPost> {
+  // Memoize the fetch within a single loader lifecycle to avoid fetching
+  // the full list repeatedly when loadEntry is called for multiple posts.
+  let cachedItemsPromise: Promise<any[]> | null = null;
+
+  const getItems = (): Promise<any[]> => {
+    if (!cachedItemsPromise) {
+      cachedItemsPromise = fetchAllPosts();
+    }
+    return cachedItemsPromise;
+  };
+
   return {
     name: 'micropub-loader',
-    load: async ({ store, meta, logger }) => {
-      const lastFetched = meta.get('lastFetched');
-      const now = Date.now();
-
-      if (lastFetched && now - parseInt(lastFetched) < CACHE_TTL_MS) {
-        logger.info('micropub-loader: cache is still valid, skipping fetch');
-        return;
-      }
-
-      const token = import.meta.env.SECRET_MICROBLOG_TOKEN;
-      if (!token) {
-        logger.warn('micropub-loader: SECRET_MICROBLOG_TOKEN is not set, skipping fetch');
-        return;
-      }
-
-      logger.info('micropub-loader: fetching posts from micro.blog...');
-
-      const response = await fetch('https://micro.blog/micropub?q=source', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `micropub-loader: failed to fetch posts: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const data = await response.json();
-
-      store.clear();
-
-      for (const item of data.items) {
-        const uid: string = item.properties.uid[0];
-        store.set({
-          id: uid,
-          data: {
-            uid,
-            rawContent: item.properties.content?.[0] ?? '',
-            published: item.properties.published[0],
-            title: item.properties.name?.[0] || null,
-            canonicalURL: item.properties.url[0],
-            category: item.properties.category ?? [],
-          },
-        });
-      }
-
-      meta.set('lastFetched', now.toString());
-      logger.info(`micropub-loader: loaded ${data.items.length} posts`);
+    loadCollection: async () => {
+      const items = await fetchAllPosts();
+      // Reset memo so a subsequent loadCollection always gets fresh data.
+      cachedItemsPromise = null;
+      return {
+        entries: items.map(mapItem),
+        cacheHint: { maxAge: CACHE_MAX_AGE_SECONDS },
+      };
+    },
+    loadEntry: async ({ filter }) => {
+      const items = await getItems();
+      const item = items.find((p: any) => p.properties.uid[0] === filter.id);
+      if (!item) return undefined;
+      return {
+        ...mapItem(item),
+        cacheHint: { maxAge: CACHE_MAX_AGE_SECONDS },
+      };
     },
   };
 }

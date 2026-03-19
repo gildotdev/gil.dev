@@ -1,33 +1,47 @@
 ---
 import { marked } from "marked";
-import { getCollection } from "astro:content";
+import { getLiveCollection } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
 import { formatPublishDate, truncateHTML } from "../../lib/utils";
 import "../../styles/global.css";
 import { Masonry } from "astro-masonry";
 
-export async function getStaticPaths({ paginate }: any) {
-  const allPosts = await getCollection("posts");
-
-  allPosts.sort(
+export async function getStaticPaths() {
+  const PAGE_SIZE = 12;
+  const result = await getLiveCollection("posts");
+  const allPosts = (result.entries ?? []).sort(
     (a, b) =>
-      new Date(b.data.published).getTime() - new Date(a.data.published).getTime(),
+      new Date(b.data.published).getTime() -
+      new Date(a.data.published).getTime(),
   );
 
-  const posts = allPosts.map((entry) => ({
-    uid: entry.data.uid,
-    content: truncateHTML(
-      marked(entry.data.rawContent, { async: false }),
-      entry.data.uid,
-    ),
-    published: entry.data.published,
-    title: entry.data.title,
-  }));
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / PAGE_SIZE));
 
-  return paginate(posts, { pageSize: 12 });
+  return Array.from({ length: totalPages }, (_, i) => {
+    const pageNum = i + 1;
+    const posts = allPosts
+      .slice((pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE)
+      .map((entry) => ({
+        uid: entry.data.uid,
+        content: truncateHTML(
+          marked(entry.data.rawContent, { async: false }),
+          entry.data.uid,
+        ),
+        published: entry.data.published,
+        title: entry.data.title,
+      }));
+    return {
+      params: { page: String(pageNum) },
+      props: { posts, pageNum, totalPages },
+    };
+  });
 }
-// All paginated data is passed on the "page" prop
-const { page } = Astro.props;
+
+const { posts, pageNum, totalPages } = Astro.props;
+const firstPage = pageNum > 1 ? "/posts/1" : null;
+const prevPage = pageNum > 1 ? `/posts/${pageNum - 1}` : null;
+const nextPage = pageNum < totalPages ? `/posts/${pageNum + 1}` : null;
+const lastPage = pageNum < totalPages ? `/posts/${totalPages}` : null;
 ---
 <style>
 a {
@@ -52,7 +66,7 @@ a:hover {
     class="gap-6"
   >
     {
-      page.data.map((post: any) => (
+      posts.map((post: any) => (
       <a href=`/posts/${post.uid}`>
         <article id=`${post.uid}` class="mb-6 p-6 border border-gray-900 rounded-xl shadow-2xl hover:bg-black hover:bg-opacity-50">
           {post.title && <span class="slab">{post?.title}</span>}
@@ -66,9 +80,9 @@ a:hover {
     }
   </Masonry>
   <section class="inline-flex rounded-md shadow-xs">
-    {page.url.first ? <a class="px-4 py-2 text-sm font-medium" href={page.url.first}>First</a> : null}
-    {page.url.prev ?  <a class="px-4 py-2 text-sm font-medium" href={page.url.prev}>Previous</a> : null}
-    {page.url.next ?  <a class="px-4 py-2 text-sm font-medium" href={page.url.next}>Next</a> : null}
-    {page.url.last ?  <a class="px-4 py-2 text-sm font-medium" href={page.url.last}>Last</a> : null}
+    {firstPage ? <a class="px-4 py-2 text-sm font-medium" href={firstPage}>First</a> : null}
+    {prevPage ?  <a class="px-4 py-2 text-sm font-medium" href={prevPage}>Previous</a> : null}
+    {nextPage ?  <a class="px-4 py-2 text-sm font-medium" href={nextPage}>Next</a> : null}
+    {lastPage ?  <a class="px-4 py-2 text-sm font-medium" href={lastPage}>Last</a> : null}
   </section>
 </PostLayout>
