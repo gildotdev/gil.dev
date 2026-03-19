@@ -2,7 +2,8 @@
 import { defineCollection, z } from 'astro:content';
 
 // 2. Import loader(s)
-import { glob, file } from 'astro/loaders';
+import { glob } from 'astro/loaders';
+import { micropubLoader } from './lib/micropubLoader';
 
 // 3. Define your collection(s)
 const notes = defineCollection({ loader: glob({ pattern: "**/*.md*", base: "./src/content/notes" }),
@@ -43,5 +44,18 @@ const topics = defineCollection({
   }),
 });
 
+// 3b. Posts loaded dynamically from micro.blog via content loader
+const posts = defineCollection({
+  loader: micropubLoader(),
+  schema: z.object({
+    uid: z.string(),
+    rawContent: z.string(),
+    published: z.string(),
+    title: z.string().nullable().optional(),
+    canonicalURL: z.string().url(),
+    category: z.array(z.string()).optional().default([]),
+  }),
+});
+
 // 4. Export a single `collections` object to register your collection(s)
-export const collections = { notes, topics };
+export const collections = { notes, topics, posts };

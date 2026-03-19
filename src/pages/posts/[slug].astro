@@ -5,57 +5,20 @@ import { formatPublishDate } from "../../lib/utils.ts";
 import "../../styles/global.css";
 import PostLayout from "../../layouts/PostLayout.astro";
 import Button from "../../components/Button.astro";
+import { getCollection } from "astro:content";
 
-const response = await fetch(`https://micro.blog/micropub?q=source`, {
-  method: "GET",
-  headers: {
-    Authorization: `Bearer ${import.meta.env.SECRET_MICROBLOG_TOKEN}`,
-  },
-});
-
-let posts = await response.json();
-
-// 2. When it's time to render, you can get the note directly from the prop
-
-let post = posts?.items?.find(
-  (post: any) => post.properties.uid[0] == Astro.params["slug"]
-);
-
-post = {
-  uid: post.properties.uid[0],
-  content: marked(post.properties.content[0]),
-  published: post.properties.published[0],
-  category: post.properties.category,
-  title: post.properties.name != "" ? post.properties.name : null,
-  canonicalURL: post.properties.url[0],
-};
-
-// 1. Generate a new path for every collection note
+// 1. Generate a new path for every collection entry
 export async function getStaticPaths() {
-  const response = await fetch(
-    "https://micro.blog/micropub?q=source&offset=0",
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${import.meta.env.SECRET_MICROBLOG_TOKEN}`,
-      },
-    }
-  );
-
-  let posts = await response.json();
-  posts = posts.items.map((post: any) => {
-    post.properties.content[0] = marked(post.properties.content[0]);
-    return post;
-  });
-
-  const slugs = posts.map((post: any) => ({
-    params: {
-      slug: post.properties.uid[0],
-    },
+  const allPosts = await getCollection("posts");
+  return allPosts.map((entry) => ({
+    params: { slug: entry.data.uid },
+    props: { post: entry.data },
   }));
-
-  return slugs;
 }
+
+// 2. When it's time to render, get the post from props
+const { post } = Astro.props;
+const content = marked(post.rawContent, { async: false });
 ---
 
 <PostLayout
@@ -73,7 +36,7 @@ export async function getStaticPaths() {
         )
       }
     </div>
-    <Fragment set:html={post.content} />
+    <Fragment set:html={content} />
     {
       post?.category?.length > 0 && (
         <p>
