@@ -51,7 +51,7 @@ const posts = defineCollection({
     uid: z.string(),
     rawContent: z.string(),
     published: z.string(),
-    title: z.string().nullable().optional(),
+    title: z.string().nullish(),
     canonicalURL: z.string().url(),
     category: z.array(z.string()).optional().default([]),
   }),

@@ -47,10 +47,7 @@ export function micropubLoader(): Loader {
             uid,
             rawContent: item.properties.content?.[0] ?? '',
             published: item.properties.published[0],
-            title:
-              item.properties.name && item.properties.name[0] !== ''
-                ? item.properties.name[0]
-                : null,
+            title: item.properties.name?.[0] || null,
             canonicalURL: item.properties.url[0],
             category: item.properties.category ?? [],
           },
