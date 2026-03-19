@@ -13,11 +13,12 @@ const pageDescription =
 import Footer from "../components/Footer.astro";
 import LatestNotes from "../components/LatestNotes.astro";
 import WiggleWrap from "../components/WiggleWrap.astro";
-import avatar from "../assets/avatar-pink-tv-ghibli-small.png";
+import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
 import { ViewTransitions } from "astro:transitions";
 import LatestPosts from "../components/LatestPosts.astro";
 import KnowledgeGarden from "../components/KnowledgeGarden.astro";
 import "../styles/global.css";
+const resolvedOgImage = ogImage ?? avatarImage.src;
 ---
 
 <!doctype html>
@@ -38,14 +39,11 @@ import "../styles/global.css";
     <meta property="og:type" content="website" />
     <meta property="og:title" content={`Gil Creque - ${pageTitle}`} />
     <meta property="og:description" content={pageDescription} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta
-      name="twitter:card"
-      content={ogImage ? "summary_large_image" : "summary"}
-    />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={`Gil Creque - ${pageTitle}`} />
     <meta name="twitter:description" content={pageDescription} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={resolvedOgImage} />
 
     <!-- Google Site Verification
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -99,7 +97,7 @@ import "../styles/global.css";
               <img
                 id="avatar"
                 transition:name="avatar"
-                src={avatar.src}
+                src={avatarImage.src}
                 alt="Photo of Gil Creque in a pink TV"
                 class="rounded-full w-32 h-32"
                 style="border: 2px solid var(--mint-green);"
@@ -123,7 +121,7 @@ import "../styles/global.css";
               <img
                 id="avatar"
                 transition:name="avatar"
-                src={avatar.src}
+                src={avatarImage.src}
                 alt="Photo of Gil Creque in a pink TV"
                 height="100px"
                 width="100px"
