@@ -30,7 +30,7 @@ const posts = allPosts
   .map((entry) => ({
     slug: entry.id,
     content: truncateHTML(
-      marked(entry.data.rawContent, { async: false }),
+      marked.parse(entry.data.rawContent, { async: false }),
       entry.id,
     ),
     published: entry.data.published,

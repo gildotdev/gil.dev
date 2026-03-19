@@ -5,12 +5,18 @@ const {
   frontmatter,
   description,
   canonicalURL,
+  ogImage,
 } = Astro.props;
-const defaultDescription = "Technologist and Developer";
+const defaultDescription =
+  "Software Engineer, Cyber Security Coach, Tech Community Organizer";
+const pageTitle = title || frontmatter?.title;
+const pageDescription =
+  description || frontmatter?.description || defaultDescription;
 import Footer from "../components/Footer.astro";
 import WiggleWrap from "../components/WiggleWrap.astro";
-import avatar from "../assets/avatar-pink-tv.jpeg";
+import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
 import { ViewTransitions } from "astro:transitions";
+const resolvedOgImage = ogImage ?? avatarImage.src;
 ---
 
 <!doctype html>
@@ -22,12 +28,21 @@ import { ViewTransitions } from "astro:transitions";
     <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta charset="utf-8" />
-    <title>Gil Creque - {title || frontmatter?.title}</title>
-    <meta
-      name="description"
-      content={description || frontmatter?.description || defaultDescription}
-    />
+    <title>Gil Creque - {pageTitle}</title>
+    <meta name="description" content={pageDescription} />
     <meta name="author" content="Gil Creque" />
+
+    <!-- Open Graph / Social Media
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={`Gil Creque - ${pageTitle}`} />
+    <meta property="og:description" content={pageDescription} />
+    {canonicalURL && <meta property="og:url" content={canonicalURL} />}
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`Gil Creque - ${pageTitle}`} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
 
     <link rel="canonical" href=`${canonicalURL}` />
 
@@ -53,16 +68,19 @@ import { ViewTransitions } from "astro:transitions";
     <link
       rel="shortcut icon"
       type="image/x-icon"
-      href="/img/avatar-pink-tv.jpeg"
+      href="/img/avatar-pink-tv-ghibli-small.png"
       sizes="16x16"
     />
     <link
       rel="icon"
       type="image/x-icon"
-      href="/img/avatar-pink-tv.jpeg"
+      href="/img/avatar-pink-tv-ghibli-small.png"
       sizes="16x16"
     />
-    <link rel="apple-touch-icon-precomposed" href="/img/avatar-pink-tv.jpeg" />
+    <link
+      rel="apple-touch-icon-precomposed"
+      href="/img/avatar-pink-tv-ghibli-small.png"
+    />
     <link
       rel="alternate"
       type="application/rss+xml"
@@ -86,7 +104,7 @@ import { ViewTransitions } from "astro:transitions";
         <img
           id="avatar"
           transition:name="avatar"
-          src={avatar.src}
+          src={avatarImage.src}
           alt="Photo of Gil Creque in a pink TV"
           height="100px"
           width="100px"
@@ -102,7 +120,7 @@ import { ViewTransitions } from "astro:transitions";
           class="inline"
           alt="Micro.blog Icon"
         />{" "}
-        <WiggleWrap>{title || frontmatter.title}</WiggleWrap>
+        <WiggleWrap>{pageTitle}</WiggleWrap>
       </h1>
     </header>
     <main class:list={["px-2 w-full", isPost ? "max-w-3xl" : "max-w-7xl"]}>

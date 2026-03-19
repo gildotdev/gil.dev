@@ -10,6 +10,29 @@ export function formatPublishDate(publishDate: string | number | Date): string {
   return new Date(publishDate).toLocaleDateString("en-US", dateOptions);
 }
 
+export function extractFirstImage(html: string): string | null {
+  const doc = new JSDOM(html).window.document;
+  const img = doc.querySelector("img");
+  if (!img) return null;
+  const src = img.getAttribute("src");
+  if (!src) return null;
+  try {
+    new URL(src);
+    return src;
+  } catch {
+    return null;
+  }
+}
+
+export function generateDescription(html: string, maxLength = 155): string {
+  const doc = new JSDOM(html).window.document;
+  const text = (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+  if (text.length <= maxLength) return text;
+  const truncated = text.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "…";
+}
+
 export function truncateHTML(html: string, slug: string): string {
   // Parse the HTML string into a DOM structure
   const doc = new JSDOM(html).window.document;
