@@ -4,6 +4,7 @@ const CACHE_MAX_AGE_SECONDS = 60 * 60; // 60 minutes
 
 export interface MicroblogPost {
   uid: string;
+  slug: string;
   rawContent: string;
   published: string;
   title: string | null | undefined;
@@ -11,16 +12,28 @@ export interface MicroblogPost {
   category: string[];
 }
 
+function extractSlug(canonicalURL: string, fallback: string): string {
+  try {
+    // Strip leading slash and .html extension to get e.g. "2026/03/19/post-name"
+    return new URL(canonicalURL).pathname.replace(/^\//, '').replace(/\.html?$/, '');
+  } catch {
+    return fallback;
+  }
+}
+
 function mapItem(item: any): { id: string; data: MicroblogPost } {
-  const uid: string = item.properties.uid[0];
+  const uid: string = String(item.properties.uid[0]);
+  const canonicalURL: string = item.properties.url[0];
+  const slug = extractSlug(canonicalURL, uid);
   return {
-    id: uid,
+    id: slug,
     data: {
       uid,
+      slug,
       rawContent: item.properties.content?.[0] ?? '',
       published: item.properties.published[0],
       title: item.properties.name?.[0] || null,
-      canonicalURL: item.properties.url[0],
+      canonicalURL,
       category: item.properties.category ?? [],
     },
   };
@@ -75,7 +88,7 @@ export function micropubLoader(): LiveLoader<MicroblogPost, { id: string }> {
     },
     loadEntry: async ({ filter }) => {
       const items = await getItems();
-      const item = items.find((p: any) => p.properties.uid[0] === filter.id);
+      const item = items.find((p: any) => extractSlug(p.properties.url?.[0] ?? '', String(p.properties.uid[0])) === filter.id);
       if (!item) return undefined;
       return {
         ...mapItem(item),

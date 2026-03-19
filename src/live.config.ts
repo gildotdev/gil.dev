@@ -5,6 +5,7 @@ const posts = defineLiveCollection({
   loader: micropubLoader(),
   schema: z.object({
     uid: z.string(),
+    slug: z.string(),
     rawContent: z.string(),
     published: z.string(),
     title: z.string().nullish(),

@@ -36,7 +36,7 @@ try {
         .trim()
         .slice(0, 200);
       return {
-        uid: entry.data.uid,
+        slug: entry.id,
         excerpt,
         published: entry.data.published,
         title: entry.data.title,
@@ -44,8 +44,9 @@ try {
         canonicalURL: entry.data.canonicalURL,
       };
     });
-} catch {
+} catch (err) {
   // Posts unavailable — fail silently so the homepage still renders
+  console.error('[LatestPosts] Failed to load posts:', err);
 }
 ---
 
@@ -74,8 +75,8 @@ try {
       <p class="opacity-75">Posts unavailable right now.</p>
     ) : (
       posts.map((post: any) => (
-        <article id={`${post.uid}`} class="post-card-item">
-          <a href={`/posts/${post.uid}`} class="post-card-link">
+        <article id={`${post.slug}`} class="post-card-item">
+          <a href={`/posts/${post.slug}`} class="post-card-link">
             <div class="post-card-body">
               <time class="post-card-date" datetime={post.published}>
                 {formatPublishDate(post.published)}
