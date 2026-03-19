@@ -24,6 +24,15 @@ export function extractFirstImage(html: string): string | null {
   }
 }
 
+export function generateDescription(html: string, maxLength = 155): string {
+  const doc = new JSDOM(html).window.document;
+  const text = (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+  if (text.length <= maxLength) return text;
+  const truncated = text.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "…";
+}
+
 export function truncateHTML(html: string, uid: string): string {
   // Parse the HTML string into a DOM structure
   const doc = new JSDOM(html).window.document;

@@ -1,8 +1,9 @@
 ---
 import { getCollection, render } from "astro:content";
+import { marked } from "marked";
 import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
-import { formatPublishDate } from "../lib/utils.ts";
+import { formatPublishDate, generateDescription } from "../lib/utils.ts";
 import "../styles/global.css";
 // 1. Generate a new path for every collection note
 export async function getStaticPaths() {
@@ -19,6 +20,9 @@ const { Content } = await render(note);
 const {
   data: { title, created, updated, tags, topics, status, images },
 } = note;
+
+const noteHtml = marked(note.body ?? "") as string;
+const pageDescription = note.data.description || generateDescription(noteHtml);
 
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
@@ -37,7 +41,7 @@ const statusLabel: Record<string, string> = {
 };
 ---
 
-<MainLayout title={title} description={note.data.description} ogImage={images?.[0] ?? undefined}>
+<MainLayout title={title} description={pageDescription} ogImage={images?.[0] ?? undefined}>
   <article>
     <div class="mb-1">
       <time class="slab" datetime={created}>

@@ -1,7 +1,7 @@
 ---
 import { marked } from "marked";
 import Tag from "../../components/Tag.astro";
-import { formatPublishDate, extractFirstImage } from "../../lib/utils.ts";
+import { formatPublishDate, extractFirstImage, generateDescription } from "../../lib/utils.ts";
 import "../../styles/global.css";
 import PostLayout from "../../layouts/PostLayout.astro";
 import Button from "../../components/Button.astro";
@@ -31,6 +31,7 @@ post = {
 };
 
 const ogImage = extractFirstImage(post.content as string) ?? undefined;
+const description = generateDescription(post.content as string);
 
 // 1. Generate a new path for every collection note
 export async function getStaticPaths() {
@@ -62,6 +63,7 @@ export async function getStaticPaths() {
 
 <PostLayout
   title={post?.title || formatPublishDate(post.published)}
+  description={description}
   canonicalURL={post.canonicalURL}
   isPost={true}
   ogImage={ogImage}
