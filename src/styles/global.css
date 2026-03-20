@@ -96,6 +96,44 @@ mark {
   padding: 0.25rem;
 }
 
+blockquote {
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem 1rem 1.5rem;
+  border-left: 4px solid var(--mint-green);
+  background: rgba(43, 240, 194, 0.05);
+  color: rgba(232, 230, 223, 0.85);
+  font-style: italic;
+}
+
+blockquote::before {
+  content: "\201C";
+  position: absolute;
+  top: -0.5rem;
+  left: 0.75rem;
+  font-family: "Alfa Slab One", cursive;
+  font-size: 3rem;
+  font-style: normal;
+  color: var(--mint-green);
+  opacity: 0.4;
+  line-height: 1;
+  pointer-events: none;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+blockquote cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-style: normal;
+  color: var(--mint-green);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 a,
 a:visited {
   color: var(--main-accent-color) !important;
