@@ -218,13 +218,9 @@ function ensureDir(dir: string): void {
  * up to the images directory (imageTargetSubpath).
  *
  * Example:
- *   notes: src/content/notes   → depth 3
- *   images: src/assets         → depth 2
- *   relative: ../../assets
+ *   notes: src/content/notes   → ../../assets
+ *   images: src/assets
  */
 function buildImageRelativePath(settings: PluginSettings): string {
-  const notesDepth = settings.notesTargetSubpath.split("/").length;
-  const ups = "../".repeat(notesDepth);
-  const imgSubpath = settings.imageTargetSubpath;
-  return (ups + imgSubpath).replace(/\/+$/, "");
+  return path.relative(settings.notesTargetSubpath, settings.imageTargetSubpath);
 }

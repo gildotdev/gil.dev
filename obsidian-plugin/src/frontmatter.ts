@@ -8,9 +8,10 @@ import slugify from "slugify";
 export interface NormalizedFrontmatter {
   title: string;
   slug: string;
-  date: string;
-  lastmod: string;
+  created: string;
+  updated: string;
   tags: string[];
+  description?: string;
   draft?: boolean;
   [key: string]: unknown;
 }
@@ -81,27 +82,43 @@ export function normalizeFrontmatter(
       ? existing.title
       : slugToTitle(slug);
 
-  const date =
-    typeof existing.date === "string" && existing.date
-      ? ensureDateFormat(existing.date)
-      : formatDate(ctime);
+  // Support Obsidian's `created`/`updated` as well as old `date`/`lastmod` names.
+  const rawCreated =
+    (typeof existing.created === "string" && existing.created) ||
+    (typeof existing.date === "string" && existing.date) ||
+    null;
+  const created = rawCreated ? ensureDateFormat(rawCreated) : formatDate(ctime);
 
-  const lastmod =
-    typeof existing.lastmod === "string" && existing.lastmod
-      ? ensureDateFormat(existing.lastmod)
-      : formatDate(mtime);
+  const rawUpdated =
+    (typeof existing.updated === "string" && existing.updated) ||
+    (typeof existing.lastmod === "string" && existing.lastmod) ||
+    null;
+  const updated = rawUpdated ? ensureDateFormat(rawUpdated) : formatDate(mtime);
 
   const tags: string[] = Array.isArray(existing.tags)
     ? (existing.tags as string[]).map(String)
     : [];
 
+  // Normalize description: arrays become a joined string; empty arrays are omitted.
+  let description: string | undefined;
+  if (typeof existing.description === "string" && existing.description) {
+    description = existing.description;
+  } else if (Array.isArray(existing.description) && (existing.description as unknown[]).length > 0) {
+    description = (existing.description as unknown[]).map(String).join(", ");
+  }
+
+  // Spread existing fields, removing ones we handle explicitly.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { date: _date, lastmod: _lastmod, created: _created, updated: _updated, description: _desc, ...rest } = existing;
+
   const result: NormalizedFrontmatter = {
-    ...existing,
+    ...rest,
     title,
     slug,
-    date,
-    lastmod,
+    created,
+    updated,
     tags,
+    ...(description !== undefined ? { description } : {}),
   };
 
   // Remove undefined values
@@ -154,6 +171,7 @@ function formatDate(ms: number): string {
  * If it already matches, return as-is.
  * If it ends with ±HH:MM (colon in offset), strip the colon.
  * If it's a plain YYYY-MM-DD, append T00:00:00+0000.
+ * Handles Obsidian's space-separated format: YYYY-MM-DD HH:mm[:ss].
  */
 function ensureDateFormat(raw: string): string {
   const exactMatch = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}$/.test(raw);
@@ -166,6 +184,21 @@ function ensureDateFormat(raw: string): string {
   // ISO 8601 with Z
   if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(raw)) {
     return raw.replace("Z", "+0000");
+  }
+
+  // Obsidian space-separated without seconds: "YYYY-MM-DD HH:mm"
+  const obsidianShort = raw.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
+  if (obsidianShort) {
+    // Parse as local time by using the T-separated form (no TZ → local)
+    const parsed = Date.parse(`${obsidianShort[1]}T${obsidianShort[2]}:00`);
+    if (!isNaN(parsed)) return formatDate(parsed);
+  }
+
+  // Obsidian space-separated with seconds: "YYYY-MM-DD HH:mm:ss"
+  const obsidianFull = raw.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/);
+  if (obsidianFull) {
+    const parsed = Date.parse(`${obsidianFull[1]}T${obsidianFull[2]}`);
+    if (!isNaN(parsed)) return formatDate(parsed);
   }
 
   // Plain date

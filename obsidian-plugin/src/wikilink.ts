@@ -65,7 +65,8 @@ export function transformWikilinks(
         const imgName = path.basename(trimmedTarget);
         referencedImages.push(trimmedTarget);
         const displayAlt = alias || imgName;
-        return `![${displayAlt}](${imageAssetsSubpath}/${imgName})`;
+        const encodedName = imgName.split("/").map(encodeURIComponent).join("/");
+        return `![${displayAlt}](${imageAssetsSubpath}/${encodedName})`;
       }
 
       // Regular link or non-image embed — resolve and check publish status

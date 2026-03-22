@@ -190,16 +190,26 @@ function serializeFrontmatter(fm) {
 function normalizeFrontmatter(existing, fileName, ctime, mtime) {
   const slug = typeof existing.slug === "string" && existing.slug ? existing.slug : fileNameToSlug(fileName);
   const title = typeof existing.title === "string" && existing.title ? existing.title : slugToTitle(slug);
-  const date = typeof existing.date === "string" && existing.date ? ensureDateFormat(existing.date) : formatDate(ctime);
-  const lastmod = typeof existing.lastmod === "string" && existing.lastmod ? ensureDateFormat(existing.lastmod) : formatDate(mtime);
+  const rawCreated = typeof existing.created === "string" && existing.created || typeof existing.date === "string" && existing.date || null;
+  const created = rawCreated ? ensureDateFormat(rawCreated) : formatDate(ctime);
+  const rawUpdated = typeof existing.updated === "string" && existing.updated || typeof existing.lastmod === "string" && existing.lastmod || null;
+  const updated = rawUpdated ? ensureDateFormat(rawUpdated) : formatDate(mtime);
   const tags = Array.isArray(existing.tags) ? existing.tags.map(String) : [];
+  let description;
+  if (typeof existing.description === "string" && existing.description) {
+    description = existing.description;
+  } else if (Array.isArray(existing.description) && existing.description.length > 0) {
+    description = existing.description.map(String).join(", ");
+  }
+  const { date: _date, lastmod: _lastmod, created: _created, updated: _updated, description: _desc, ...rest } = existing;
   const result = {
-    ...existing,
+    ...rest,
     title,
     slug,
-    date,
-    lastmod,
-    tags
+    created,
+    updated,
+    tags,
+    ...description !== void 0 ? { description } : {}
   };
   for (const key of Object.keys(result)) {
     if (result[key] === void 0) delete result[key];
@@ -232,6 +242,16 @@ function ensureDateFormat(raw) {
   if (colonOffset) return colonOffset[1] + colonOffset[2];
   if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(raw)) {
     return raw.replace("Z", "+0000");
+  }
+  const obsidianShort = raw.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
+  if (obsidianShort) {
+    const parsed2 = Date.parse(`${obsidianShort[1]}T${obsidianShort[2]}:00`);
+    if (!isNaN(parsed2)) return formatDate(parsed2);
+  }
+  const obsidianFull = raw.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/);
+  if (obsidianFull) {
+    const parsed2 = Date.parse(`${obsidianFull[1]}T${obsidianFull[2]}`);
+    if (!isNaN(parsed2)) return formatDate(parsed2);
   }
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
     return `${raw}T00:00:00+0000`;
@@ -313,7 +333,8 @@ function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets
         const imgName = import_path2.default.basename(trimmedTarget);
         referencedImages.push(trimmedTarget);
         const displayAlt = alias || imgName;
-        return `![${displayAlt}](${imageAssetsSubpath}/${imgName})`;
+        const encodedName = imgName.split("/").map(encodeURIComponent).join("/");
+        return `![${displayAlt}](${imageAssetsSubpath}/${encodedName})`;
       }
       const entry = resolveEntry(trimmedTarget, slugMap);
       const displayText = alias || trimmedTarget;
@@ -465,10 +486,7 @@ function ensureDir(dir) {
   }
 }
 function buildImageRelativePath(settings) {
-  const notesDepth = settings.notesTargetSubpath.split("/").length;
-  const ups = "../".repeat(notesDepth);
-  const imgSubpath = settings.imageTargetSubpath;
-  return (ups + imgSubpath).replace(/\/+$/, "");
+  return import_path3.default.relative(settings.notesTargetSubpath, settings.imageTargetSubpath);
 }
 
 // src/syncer.ts
