@@ -22,6 +22,13 @@ export function isImageFile(name: string): boolean {
   return IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase());
 }
 
+export interface ReferencedImage {
+  /** Vault-relative path of the source image (used to locate it in the vault). */
+  vaultPath: string;
+  /** Final filename to write on disk and reference in the markdown URL. */
+  destName: string;
+}
+
 /**
  * Transform all Obsidian wikilinks and image embeds in `content`.
  *
@@ -32,21 +39,20 @@ export function isImageFile(name: string): boolean {
  * - ![[image.png]]       → ![image.png](../../assets/image.png)
  * - ![[image.png|alt]]   → ![alt](../../assets/image.png)
  *
- * @param content          Raw markdown body (no frontmatter)
- * @param slugMap          Pre-built map of filename-stem/title → SlugEntry
+ * @param content             Raw markdown body (no frontmatter)
+ * @param slugMap             Pre-built map of filename-stem/title → SlugEntry
  * @param imageAssetsSubpath  Relative path from a note to the assets dir
- * @param publishedPaths   Set of vault-relative source paths that are published.
- *                         When provided, wikilinks to paths outside this set
- *                         are rendered as plain text rather than anchor tags.
- *                         Omit (or pass undefined) to link everything.
+ * @param publishedPaths      Set of vault-relative source paths that are published.
+ * @param imageNameTransform  Optional fn to transform the image filename (e.g. slugify).
  */
 export function transformWikilinks(
   content: string,
   slugMap: SlugMap,
   imageAssetsSubpath = "../../assets",
-  publishedPaths?: Set<string>
-): { transformed: string; referencedImages: string[] } {
-  const referencedImages: string[] = [];
+  publishedPaths?: Set<string>,
+  imageNameTransform?: (name: string) => string
+): { transformed: string; referencedImages: ReferencedImage[] } {
+  const referencedImages: ReferencedImage[] = [];
 
   // Match both image embeds (![[...]]) and regular links ([[...]])
   // Capture group 1: "!" if present (image embed)
@@ -63,10 +69,14 @@ export function transformWikilinks(
 
       if (isEmbed && isImageFile(trimmedTarget)) {
         const imgName = path.basename(trimmedTarget);
-        referencedImages.push(trimmedTarget);
+        const destName = imageNameTransform ? imageNameTransform(imgName) : imgName;
+        referencedImages.push({ vaultPath: trimmedTarget, destName });
         const displayAlt = alias || imgName;
-        const encodedName = imgName.split("/").map(encodeURIComponent).join("/");
-        return `![${displayAlt}](${imageAssetsSubpath}/${encodedName})`;
+        // Slugified names are already URL-safe; encode originals that may have spaces.
+        const urlName = imageNameTransform
+          ? destName
+          : imgName.split("/").map(encodeURIComponent).join("/");
+        return `![${displayAlt}](${imageAssetsSubpath}/${urlName})`;
       }
 
       // Regular link or non-image embed — resolve and check publish status

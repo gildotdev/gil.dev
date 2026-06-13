@@ -10,6 +10,7 @@ import {
   normalizeFrontmatter,
 } from "./frontmatter";
 import { transformWikilinks, isImageFile, type SlugMap } from "./wikilink";
+import type { ReferencedImage } from "./wikilink";
 
 export interface PublishResult {
   published: string[];
@@ -133,22 +134,23 @@ export async function publishFile(
     body,
     slugMap,
     imageAssetsSubpath,
-    publishedPaths
+    publishedPaths,
+    slugifyFilename
   );
 
   // Copy referenced images to the assets directory
   const assetsDir = path.join(settings.targetRepoPath, settings.imageTargetSubpath);
   await ensureDir(assetsDir);
 
-  for (const imgPath of referencedImages) {
-    await copyImage(app, imgPath, assetsDir);
+  for (const img of referencedImages) {
+    await copyImage(app, img, assetsDir);
   }
 
-  // Write the transformed note
+  // Write the transformed note using a slugified filename
   const notesDir = path.join(settings.targetRepoPath, settings.notesTargetSubpath);
   await ensureDir(notesDir);
 
-  const outputName = path.basename(file.path);
+  const outputName = slugifyFilename(file.name);
   const outputPath = path.join(notesDir, outputName);
   const outputContent = serializeFrontmatter(normalizedFm) + "\n\n" + transformed;
   fs.writeFileSync(outputPath, outputContent, "utf-8");
@@ -191,20 +193,33 @@ function frontmatterTitle(app: App, file: TFile): string | null {
   return typeof fm.title === "string" ? fm.title : null;
 }
 
-async function copyImage(app: App, imgPath: string, destDir: string): Promise<void> {
-  // imgPath may be a vault-relative path or just a filename
+async function copyImage(app: App, img: ReferencedImage, destDir: string): Promise<void> {
+  // vaultPath may be a vault-relative path or just a filename
+  const { vaultPath, destName } = img;
   const vaultFiles = app.vault.getFiles();
   const match = vaultFiles.find(
     (f) =>
-      f.path === imgPath ||
-      f.name === path.basename(imgPath) ||
-      (isImageFile(f.name) && f.name === imgPath)
+      f.path === vaultPath ||
+      f.name === path.basename(vaultPath) ||
+      (isImageFile(f.name) && f.name === vaultPath)
   );
   if (!match) return; // Image not found in vault — skip silently
 
   const data = await app.vault.readBinary(match);
-  const destPath = path.join(destDir, match.name);
+  const destPath = path.join(destDir, destName);
   fs.writeFileSync(destPath, Buffer.from(data));
+}
+
+/**
+ * Slugify a filename, preserving the extension.
+ * e.g. "My Note (Draft).md" → "my-note-draft.md"
+ *      "Screenshot 2026-02-26 at 12.38.01 PM.png" → "screenshot-2026-02-26-at-12-38-01-pm.png"
+ */
+function slugifyFilename(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  const stem = path.basename(filename, path.extname(filename));
+  const slugged = slugify(stem, { lower: true, strict: true, trim: true });
+  return slugged + ext;
 }
 
 function ensureDir(dir: string): void {

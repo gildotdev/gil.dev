@@ -320,7 +320,7 @@ var IMAGE_EXTENSIONS = /* @__PURE__ */ new Set([
 function isImageFile(name) {
   return IMAGE_EXTENSIONS.has(import_path2.default.extname(name).toLowerCase());
 }
-function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets", publishedPaths) {
+function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets", publishedPaths, imageNameTransform) {
   const referencedImages = [];
   const wikilinkRegex = /(!?)\[\[([^\]|#]+)(?:#[^\]|]*)?((?:\|[^\]]*)?)\]\]/g;
   const transformed = content.replace(
@@ -331,10 +331,11 @@ function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets
       const trimmedTarget = target.trim();
       if (isEmbed && isImageFile(trimmedTarget)) {
         const imgName = import_path2.default.basename(trimmedTarget);
-        referencedImages.push(trimmedTarget);
+        const destName = imageNameTransform ? imageNameTransform(imgName) : imgName;
+        referencedImages.push({ vaultPath: trimmedTarget, destName });
         const displayAlt = alias || imgName;
-        const encodedName = imgName.split("/").map(encodeURIComponent).join("/");
-        return `![${displayAlt}](${imageAssetsSubpath}/${encodedName})`;
+        const urlName = imageNameTransform ? destName : imgName.split("/").map(encodeURIComponent).join("/");
+        return `![${displayAlt}](${imageAssetsSubpath}/${urlName})`;
       }
       const entry = resolveEntry(trimmedTarget, slugMap);
       const displayText = alias || trimmedTarget;
@@ -430,16 +431,17 @@ async function publishFile(app, file, settings, slugMap, publishedPaths) {
     body,
     slugMap,
     imageAssetsSubpath,
-    publishedPaths
+    publishedPaths,
+    slugifyFilename
   );
   const assetsDir = import_path3.default.join(settings.targetRepoPath, settings.imageTargetSubpath);
   await ensureDir(assetsDir);
-  for (const imgPath of referencedImages) {
-    await copyImage(app, imgPath, assetsDir);
+  for (const img of referencedImages) {
+    await copyImage(app, img, assetsDir);
   }
   const notesDir = import_path3.default.join(settings.targetRepoPath, settings.notesTargetSubpath);
   await ensureDir(notesDir);
-  const outputName = import_path3.default.basename(file.path);
+  const outputName = slugifyFilename(file.name);
   const outputPath = import_path3.default.join(notesDir, outputName);
   const outputContent = serializeFrontmatter(normalizedFm) + "\n\n" + transformed;
   import_fs.default.writeFileSync(outputPath, outputContent, "utf-8");
@@ -470,15 +472,22 @@ function frontmatterTitle(app, file) {
   const fm = (_a = cache == null ? void 0 : cache.frontmatter) != null ? _a : {};
   return typeof fm.title === "string" ? fm.title : null;
 }
-async function copyImage(app, imgPath, destDir) {
+async function copyImage(app, img, destDir) {
+  const { vaultPath, destName } = img;
   const vaultFiles = app.vault.getFiles();
   const match = vaultFiles.find(
-    (f) => f.path === imgPath || f.name === import_path3.default.basename(imgPath) || isImageFile(f.name) && f.name === imgPath
+    (f) => f.path === vaultPath || f.name === import_path3.default.basename(vaultPath) || isImageFile(f.name) && f.name === vaultPath
   );
   if (!match) return;
   const data = await app.vault.readBinary(match);
-  const destPath = import_path3.default.join(destDir, match.name);
+  const destPath = import_path3.default.join(destDir, destName);
   import_fs.default.writeFileSync(destPath, Buffer.from(data));
+}
+function slugifyFilename(filename) {
+  const ext = import_path3.default.extname(filename).toLowerCase();
+  const stem = import_path3.default.basename(filename, import_path3.default.extname(filename));
+  const slugged = (0, import_slugify2.default)(stem, { lower: true, strict: true, trim: true });
+  return slugged + ext;
 }
 function ensureDir(dir) {
   if (!import_fs.default.existsSync(dir)) {

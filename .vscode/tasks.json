@@ -5,7 +5,12 @@
       "label": "New note",
       "type": "process",
       "command": "npm",
-      "args": ["run", "new:note", "--", "${input:noteTitle}"],
+      "args": [
+        "run",
+        "new:note",
+        "--",
+        "${input:noteTitle}"
+      ],
       "options": {
         "env": {
           "VSCODE_CLI": "1"
@@ -16,6 +21,63 @@
         "reveal": "silent",
         "panel": "shared",
         "clear": true
+      }
+    },
+    {
+      "label": "dev",
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "build",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "plugin: dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "obsidian-plugin/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "plugin: build",
+      "type": "npm",
+      "script": "build",
+      "path": "obsidian-plugin/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "plugin: install",
+      "type": "npm",
+      "script": "install-plugin",
+      "path": "obsidian-plugin/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
       }
     }
   ],
