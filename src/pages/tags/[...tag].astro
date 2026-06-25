@@ -2,19 +2,23 @@
 import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import { formatPublishDate } from "../../lib/utils.ts";
+import { getTagPaths, tagMatchesPath } from "../../lib/tags.ts";
 import "../../styles/global.css";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes", ({ data }) => data.draft !== true);
 
-  const allTags = [...new Set(notes.flatMap((note) => note.data.tags ?? []))];
+  const allTags = notes.flatMap((note) => note.data.tags ?? []);
+  const tagPaths = getTagPaths(allTags);
 
-  return allTags.map((tag) => ({
+  return tagPaths.map((tag) => ({
     params: { tag },
     props: {
       tag,
       notes: notes
-        .filter((note) => (note.data.tags ?? []).includes(tag))
+        .filter((note) =>
+          (note.data.tags ?? []).some((noteTag) => tagMatchesPath(noteTag, tag)),
+        )
         .sort(
           (a, b) =>
             new Date(b.data.updated ?? b.data.created).getTime() -

@@ -1,6 +1,10 @@
 ---
-const { tag, i, href } = Astro.props;
-const resolvedHref = href ?? `/tags/${tag}`;
+import { getTagHref, getTagPathHierarchy } from "../lib/tags.ts";
+
+const { tag, count, href } = Astro.props;
+const tagPaths = getTagPathHierarchy(tag);
+const segments = tag.split("/").filter(Boolean);
+const isHierarchical = segments.length > 1;
 ---
 
 <style>
@@ -22,4 +26,23 @@ const resolvedHref = href ?? `/tags/${tag}`;
     text-decoration: none !important;
   }
 </style>
-<a href={resolvedHref} class={`tag`}>{tag}</a>
+{
+  !isHierarchical && (
+    <a href={href ?? getTagHref(tag)} class="tag">
+      {tag}
+      {count ? ` (${count})` : ""}
+    </a>
+  )
+}
+{
+  isHierarchical &&
+    segments.map((segment: string, index: number) => (
+      <Fragment>
+        {index > 0 && "/"}
+        <a href={getTagHref(tagPaths[index])} class="tag">
+          {segment}
+          {count && index === segments.length - 1 ? ` (${count})` : ""}
+        </a>
+      </Fragment>
+    ))
+}

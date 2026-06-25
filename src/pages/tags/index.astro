@@ -2,31 +2,26 @@
 import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import Tag from "../../components/Tag.astro";
+import { getTagPaths, tagMatchesPath } from "../../lib/tags.ts";
 import "../../styles/global.css";
 
 const notes = await getCollection("notes", ({ data }) => data.draft !== true);
 
-const tagCounts = notes.reduce(
-  (acc, note) => {
-    for (const tag of note.data.tags ?? []) {
-      acc[tag] = (acc[tag] ?? 0) + 1;
-    }
-    return acc;
-  },
-  {} as Record<string, number>,
-);
-
-const sortedTags = Object.entries(tagCounts).sort(([a], [b]) =>
-  a.localeCompare(b),
-);
+const tagPaths = getTagPaths(notes.flatMap((note) => note.data.tags ?? []));
+const tagsWithCounts = tagPaths.map((tag) => ({
+  tag,
+  count: notes.filter((note) =>
+    (note.data.tags ?? []).some((noteTag) => tagMatchesPath(noteTag, tag)),
+  ).length,
+}));
 ---
 
 <MainLayout title="Tags">
   <p>All tags used across notes, sorted alphabetically.</p>
   <div class="flex flex-wrap gap-1">
     {
-      sortedTags.map(([tag, count]) => (
-        <Tag tag={`${tag} (${count})`} href={`/tags/${tag}`} i={0} />
+      tagsWithCounts.map(({ tag, count }) => (
+        <Tag tag={tag} count={count} />
       ))
     }
   </div>
