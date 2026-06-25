@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "new:note": "node scripts/new-note.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

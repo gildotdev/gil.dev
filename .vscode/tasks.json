@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "New note",
+      "type": "process",
+      "command": "npm",
+      "args": ["run", "new:note", "--", "${input:noteTitle}"],
+      "options": {
+        "env": {
+          "VSCODE_CLI": "1"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "clear": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "noteTitle",
+      "type": "promptString",
+      "description": "Note title"
+    }
+  ]
+}
