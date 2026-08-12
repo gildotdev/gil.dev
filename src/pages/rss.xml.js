@@ -17,14 +17,19 @@ export async function GET(context) {
         site: "https://gil.dev",
         // Array of `<item>`s in output xml
         // See "Generating items" section for examples using content collections and glob imports
-        items: notes.map((note) => ({
+        items: notes
+          .sort(
+            (a, b) =>
+              new Date(b.data.created).getTime() -
+              new Date(a.data.created).getTime(),
+          )
+          .map((note) => ({
             title: note.data.title,
             pubDate: note.data.created,
             customData: note.data.customData,
-            // Compute RSS link from post `slug`
-            // This example assumes all posts are rendered as `/blog/[slug]` routes
-            link: `/${note.slug}/`,
-        })),
+            // Keep feed URLs aligned with the routes generated in `[slug].astro`.
+            link: `/${note.data.slug || note.id}/`,
+          })),
         // (optional) inject custom xml
         customData: `<language>en-us</language>`,
     });
