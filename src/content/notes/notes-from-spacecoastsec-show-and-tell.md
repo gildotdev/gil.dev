@@ -3,9 +3,10 @@ title: Notes from SpaceCoastSec Show and Tell July 2025
 created: 2025-07-18T00:00:00-0500
 type: note
 tags:
-  - spacecoastsec
+  - cyber-security/spacecoastsec
   - security
   - tools
+  - meetup
 updated: 2025-07-18T00:00:00-0500
 slug: notes-from-spacecoastsec-show-and-tell-july-2025
 topics:
