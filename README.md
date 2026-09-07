@@ -32,7 +32,7 @@ The design goal is a site that feels personal, quick to load, and easy to keep t
 
 ## Run it locally
 
-This project requires Node.js 22 or newer and [pnpm](https://pnpm.io/).
+Use Node.js 22.22.3 (pinned in `.nvmrc`) and pnpm 11.5.2 (pinned in `package.json`). The supported Node ranges are 22.22.2+, 24.15.0+, or 26+ within the majors listed in `package.json`.
 
 ```bash
 pnpm install
@@ -46,6 +46,23 @@ To create a production build:
 ```bash
 pnpm build
 ```
+
+Commit `pnpm-lock.yaml` with dependency changes. pnpm is the project's package manager; do not generate an npm lockfile.
+
+Run `pnpm test` to check post HTML processing with Lambda's module-loading restrictions. jsdom stays on 26.x because newer releases require CommonJS-to-ESM loading that Lambda disables by default. Keep this check passing when upgrading it.
+
+## Versioning and releases
+
+[Release Please](https://github.com/googleapis/release-please-action) manages semantic versions, starting from the existing `0.0.1` version. Use Conventional Commits for commits merged into `main` (or for PR titles when squash merging):
+
+* `fix: correct RSS links` bumps the patch version.
+* `feat: add a topic index` bumps the minor version.
+* `feat!: change public URLs` or a `BREAKING CHANGE:` footer bumps the major version, including before 1.0.0.
+* `docs:`, `chore:`, and other non-release changes alone do not trigger a release.
+
+After a successful build on `main`, the workflow opens or updates a release PR containing the version bump and `CHANGELOG.md`. Merge that PR to create the `vX.Y.Z` tag and GitHub release. The package remains private; the workflow does not publish to npm. Initial release history starts after the bootstrap commit recorded in `release-please-config.json`.
+
+In GitHub Settings → Actions → General, enable **Allow GitHub Actions to create and approve pull requests**. The workflow uses the built-in `GITHUB_TOKEN`; PRs it creates do not trigger other GitHub Actions runs automatically. If branch protection requires PR checks, use a GitHub App token or a suitable personal access token for Release Please, or manually run the build workflow on the release branch. The release job only runs on `main` and is gated by a successful build.
 
 ## Add a note
 

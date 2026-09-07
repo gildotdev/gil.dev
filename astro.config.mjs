@@ -5,15 +5,14 @@ import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
-  experimental: {
-    liveContentCollections: true,
-  },
+  // Preserve spacing between inline elements across the Astro 7 upgrade.
+  compressHTML: true,
   output: "static",
   markdown: { shikiConfig: { theme: "css-variables" } },
-  assetsInclude: ["**/*.vtt"],
   server: { port: 1716, host: true },
   integrations: [mdx()],
   vite: {
+    assetsInclude: ["**/*.vtt"],
     plugins: [tailwindcss()],
   },
   redirects: {

@@ -15,7 +15,7 @@ import Footer from "../components/Footer.astro";
 import LatestNotes from "../components/LatestNotes.astro";
 import WiggleWrap from "../components/WiggleWrap.astro";
 import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import LatestPosts from "../components/LatestPosts.astro";
 import KnowledgeGarden from "../components/KnowledgeGarden.astro";
 import "../styles/global.css";
@@ -81,7 +81,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
       title="RSS Feed for gil.dev"
       href="/rss.xml"
     />
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body class="max-w-3xl mx-auto">
     <!-- Primary Page Layout
