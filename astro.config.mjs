@@ -1,4 +1,5 @@
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
 import { defineConfig } from "astro/config";
 import tailwindcss from '@tailwindcss/vite';
 import netlify from '@astrojs/netlify';
@@ -6,18 +7,17 @@ import remarkWikilinks from './src/lib/remark-wikilinks.ts';
 
 // https://astro.build/config
 export default defineConfig({
-  experimental: {
-    liveContentCollections: true,
-  },
+  // Preserve spacing between inline elements across the Astro 7 upgrade.
+  compressHTML: true,
   output: "static",
   markdown: {
-    remarkPlugins: [remarkWikilinks],
+    processor: unified({ remarkPlugins: [remarkWikilinks] }),
     shikiConfig: { theme: "css-variables" },
   },
-  assetsInclude: ["**/*.vtt"],
   server: { port: 1716, host: true },
   integrations: [mdx()],
   vite: {
+    assetsInclude: ["**/*.vtt"],
     plugins: [tailwindcss()],
   },
   redirects: {

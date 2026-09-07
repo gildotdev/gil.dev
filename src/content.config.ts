@@ -1,5 +1,6 @@
 // 1. Import utilities from `astro:content`
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 
 // 2. Import loader(s)
 import { glob } from 'astro/loaders';
@@ -11,14 +12,14 @@ schema: z.object({
       title: z.string(),
       description: z.string().optional(),
       microblog: z.boolean().optional(),
-      guid: z.string().url().optional(),
+      guid: z.url().optional(),
       post_id: z.number().optional(),
       created: z.date().or(z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}$/)),
       type: z.literal('note').optional(),
       tags: z.array(z.string()),
-      images: z.array(z.string().url()).nullable().optional(),
-      photos: z.string().url().nullable().optional(),
-      photos_with_metadata: z.string().url().nullable().optional(),
+      images: z.array(z.url()).nullable().optional(),
+      photos: z.url().nullable().optional(),
+      photos_with_metadata: z.url().nullable().optional(),
       url: z.string().optional(),
       updated: z.date().or(z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}$/)),
       slug: z.string(),
@@ -38,7 +39,7 @@ const topics = defineCollection({
     relatedTopics: z.array(z.string()).optional().default([]),
     externalLinks: z.array(z.object({
       title: z.string(),
-      url: z.string().url(),
+      url: z.url(),
     })).optional().default([]),
   }),
 });
