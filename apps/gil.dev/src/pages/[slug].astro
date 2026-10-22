@@ -1,10 +1,10 @@
 ---
 import { getCollection, render } from "astro:content";
 import { marked } from "marked";
-import Tag from "../components/Tag.astro";
 import NoteCard from "../components/NoteCard.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate, generateDescription } from "../lib/utils.ts";
+import { getTagHref } from "../lib/tags.ts";
 import {
   getDailyGardenSeed,
   isDiscoverableNote,
@@ -45,62 +45,103 @@ const wanderingNotes = selectRelatedNotes(
   3,
   `${note.id}-${getDailyGardenSeed()}`,
 );
+const createdLabel = formatPublishDate(created);
+const updatedLabel = formatPublishDate(updated);
+const statusHref =
+  status === "reference"
+    ? "/notes?status=reference#references"
+    : `/notes?status=${encodeURIComponent(status ?? "unstaged")}`;
+const getTopicHref = (topic: string) =>
+  topicTitles[topic]
+    ? `/topics/${encodeURIComponent(topic)}`
+    : `/notes?topic=${encodeURIComponent(topic)}`;
 
 ---
 
-<MainLayout title={title} description={pageDescription} ogImage={images?.[0] ?? undefined}>
-  <article>
-    <div class="mb-1">
-      <time class="slab" datetime={created}>
-        {formatPublishDate(created)}
-      </time>
-    </div>
-    {
-      status && (
-        <div class="text-sm slab mb-2" title={noteStatusLabel[status]}>
-          {noteStatusEmoji[status]} {status}
-        </div>
-      )
-    }
-    {
-      topics && topics.length > 0 && (
-        <div>
-          <img
-            src="/img/sticky-note.svg"
-            style="width:24px;height:24px;flex-shrink:0;border-radius: 0px; margin:0px;"
-            class="inline"
-            alt="Topics Icon"
-          />{" "}
-          {topics.map((topic: string) => (
-            <Tag
-              tag={topicTitles[topic] ?? topic}
-              href={`/topics/${topic}`}
-              i={0}
-            />
-          ))}
-        </div>
-      )
-    }
-    <Content />
-    <footer>
+<MainLayout
+  title={title}
+  description={pageDescription}
+  ogImage={images?.[0] ?? undefined}
+  wide
+>
+  <nav class="note-breadcrumb" aria-label="Note navigation">
+    <a href="/notes">← All notes</a>
+    <span aria-hidden="true">/</span>
+    <span>{status ? `${noteStatusEmoji[status]} ${status}` : "note"}</span>
+  </nav>
+
+  <div class="note-layout">
+    <aside class="note-context" aria-label="Explore this note">
+      <p class="note-context__eyebrow">Garden paths</p>
+
       {
-        tags.length > 0 && (
-          <p>
-            <img
-              src="/img/tags.svg"
-              width="24px"
-              height="24px"
-              class="inline"
-              alt="Tag Icon"
-            />{" "}
-            {note.data.tags.map((tag: any, i: number) => (
-              <Tag tag={tag} i={i} />
-            ))}
-          </p>
+        status && (
+          <a
+            class="note-stage"
+            href={statusHref}
+            title={noteStatusLabel[status]}
+          >
+            <span class="note-stage__icon" aria-hidden="true">
+              {noteStatusEmoji[status]}
+            </span>
+            <span>
+              <small>Stage</small>
+              <strong>{status}</strong>
+            </span>
+            <span aria-hidden="true">→</span>
+          </a>
         )
       }
-    </footer>
-  </article>
+
+      <dl class="note-dates">
+        <div>
+          <dt>Planted</dt>
+          <dd><time datetime={String(created)}>{createdLabel}</time></dd>
+        </div>
+        {
+          updatedLabel !== createdLabel && (
+            <div>
+              <dt>Tended</dt>
+              <dd><time datetime={String(updated)}>{updatedLabel}</time></dd>
+            </div>
+          )
+        }
+      </dl>
+
+      {
+        topics && topics.length > 0 && (
+          <section class="note-path-group" aria-labelledby="note-topics-title">
+            <h2 id="note-topics-title">Topics</h2>
+            <div class="note-path-links">
+              {topics.map((topic: string) => (
+                <a href={getTopicHref(topic)}>{topicTitles[topic] ?? topic}</a>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      {
+        tags.length > 0 && (
+          <section class="note-path-group" aria-labelledby="note-tags-title">
+            <h2 id="note-tags-title">Tags</h2>
+            <div class="note-path-links note-path-links--tags">
+              {tags.map((tag: string) => (
+                <a href={getTagHref(tag)}>#{tag}</a>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      <a class="note-all-link" href="/notes">Explore all notes →</a>
+    </aside>
+
+    <article class="note-content">
+      <Content />
+    </article>
+  </div>
+
   {
     wanderingNotes.length > 0 && (
       <aside class="continue-wandering">
@@ -122,6 +163,182 @@ const wanderingNotes = selectRelatedNotes(
 </MainLayout>
 
 <style>
+  .note-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1.25rem;
+    color: rgba(232, 230, 223, 0.52);
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .note-breadcrumb a {
+    text-decoration: none !important;
+  }
+
+  .note-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem);
+    grid-template-areas: "content context";
+    gap: clamp(1.5rem, 5vw, 3.25rem);
+    align-items: start;
+  }
+
+  .note-content {
+    grid-area: content;
+    min-width: 0;
+    max-width: 42rem;
+  }
+
+  :global(.note-content > h1:first-child) {
+    display: none;
+  }
+
+  .note-context {
+    grid-area: context;
+    position: sticky;
+    top: 1rem;
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid var(--pink);
+    border-radius: 0.7rem;
+    background: rgba(13, 21, 39, 0.72);
+    box-shadow: 0 18px 45px -30px rgba(0, 0, 0, 0.9);
+  }
+
+  .note-context__eyebrow {
+    margin: 0 0 0.6rem;
+    padding: 0;
+    color: var(--pink);
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .note-stage {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.55rem;
+    border: 1px solid rgba(43, 240, 194, 0.22);
+    border-radius: 0.55rem;
+    background: rgba(43, 240, 194, 0.06);
+    text-decoration: none !important;
+  }
+
+  .note-stage:hover {
+    border-color: var(--mint-green);
+    text-decoration: none !important;
+  }
+
+  .note-stage__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  .note-stage small,
+  .note-stage strong {
+    display: block;
+  }
+
+  .note-stage small {
+    color: rgba(232, 230, 223, 0.52);
+    font-size: 0.45rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .note-stage strong {
+    color: var(--mint-green);
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    text-transform: capitalize;
+  }
+
+  .note-dates {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.8rem 0;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .note-dates div {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0.45rem;
+  }
+
+  .note-dates dt {
+    color: rgba(232, 230, 223, 0.45);
+    font-size: 0.46rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .note-dates dd {
+    color: rgba(232, 230, 223, 0.78);
+    font-size: 0.52rem;
+    line-height: 1.4;
+  }
+
+  .note-path-group + .note-path-group {
+    margin-top: 0.75rem;
+  }
+
+  .note-path-group h2 {
+    margin: 0 0 0.35rem;
+    color: rgba(232, 230, 223, 0.52);
+    font-family: system-ui, sans-serif;
+    font-size: 0.46rem;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-shadow: none;
+    text-transform: uppercase;
+  }
+
+  .note-path-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .note-path-links a {
+    padding: 0.14rem 0.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 999px;
+    color: #e8e6df !important;
+    font-size: 0.5rem;
+    line-height: 1.35;
+    text-decoration: none !important;
+  }
+
+  .note-path-links a:hover {
+    border-color: var(--mint-green);
+    color: var(--mint-green) !important;
+  }
+
+  .note-path-links--tags a {
+    color: rgba(232, 230, 223, 0.66) !important;
+  }
+
+  .note-all-link {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.52rem;
+    line-height: 1.4;
+    text-decoration: none !important;
+  }
+
   .continue-wandering {
     margin-top: 2.5rem;
     padding-top: 1.5rem;
@@ -144,7 +361,29 @@ const wanderingNotes = selectRelatedNotes(
   }
 
   @media (max-width: 700px) {
+    .note-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "context"
+        "content";
+      gap: 1.25rem;
+    }
+
+    .note-context {
+      position: static;
+    }
+
+    .note-dates {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .continue-wandering__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 430px) {
+    .note-dates {
       grid-template-columns: 1fr;
     }
   }

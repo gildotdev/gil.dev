@@ -27,9 +27,9 @@ const topicTitles = Object.fromEntries(
 const usedTopicIds = new Set(
   primaryNotes.flatMap((note) => note.data.topics ?? []),
 );
-const topicOptions = allTopics
-  .filter((topic) => usedTopicIds.has(topic.id))
-  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+const topicOptions = [...usedTopicIds]
+  .map((id) => ({ id, title: topicTitles[id] ?? id }))
+  .sort((a, b) => a.title.localeCompare(b.title));
 const tagOptions = [
   ...new Set(primaryNotes.flatMap((note) => note.data.tags ?? [])),
 ].sort((a, b) => a.localeCompare(b));
@@ -57,7 +57,7 @@ const statusOptions = [
           <option value="">All topics</option>
           {
             topicOptions.map((topic) => (
-              <option value={topic.id}>{topic.data.title}</option>
+              <option value={topic.id}>{topic.title}</option>
             ))
           }
         </select>
@@ -108,7 +108,11 @@ const statusOptions = [
 
   {
     referenceNotes.length > 0 && (
-      <details class="reference-notes">
+      <details
+        id="references"
+        class="reference-notes"
+        data-reference-notes
+      >
         <summary>
           Supporting references and clippings ({referenceNotes.length})
         </summary>
@@ -144,6 +148,10 @@ const statusOptions = [
       const order = browser.querySelector("[data-note-order]");
       const count = browser.querySelector("[data-result-count]");
       const shuffle = browser.querySelector("[data-shuffle-notes]");
+      const query = new URLSearchParams(window.location.search);
+      const requestedTopic = query.get("topic");
+      const requestedStatus = query.get("status");
+      const requestedTag = query.get("tag");
 
       if (
         !(grid instanceof HTMLElement) ||
@@ -155,6 +163,39 @@ const statusOptions = [
 
       const readList = (card: Element, key: string): string[] =>
         JSON.parse(card.getAttribute(`data-${key}`) || "[]");
+
+      if (
+        requestedTopic &&
+        Array.from(topicFilter.options).some(
+          (option) => option.value === requestedTopic,
+        )
+      ) {
+        topicFilter.value = requestedTopic;
+      }
+
+      if (
+        requestedStatus &&
+        requestedStatus !== "reference" &&
+        Array.from(statusFilter.options).some(
+          (option) => option.value === requestedStatus,
+        )
+      ) {
+        statusFilter.value = requestedStatus;
+      }
+
+      if (requestedStatus === "reference") {
+        const references = document.querySelector("[data-reference-notes]");
+        if (references instanceof HTMLDetailsElement) references.open = true;
+      }
+
+      if (
+        requestedTag &&
+        Array.from(tagFilter.options).some(
+          (option) => option.value === requestedTag,
+        )
+      ) {
+        tagFilter.value = requestedTag;
+      }
 
       const render = () => {
         const visible = cards.filter((card) => {
@@ -197,6 +238,8 @@ const statusOptions = [
           .sort(() => Math.random() - 0.5)
           .forEach((card) => grid.append(card));
       });
+
+      render();
     });
   }
 
