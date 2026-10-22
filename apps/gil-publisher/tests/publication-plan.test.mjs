@@ -1,36 +1,45 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildDirectPublicationPaths } from "../src/publication-plan.ts";
+import {
+  buildRecursivePublicationPaths,
+  isIgnoredVaultPath,
+} from "../src/publication-plan.ts";
 
-test("publishes direct references without traversing their links", () => {
+test("recursively publishes references without looping", async () => {
   const references = new Map([
     ["notes/watch.md", ["clippings/clip-one.md", "clippings/clip-two.md"]],
     ["clippings/clip-one.md", ["daily/2026-10-22.md"]],
+    ["daily/2026-10-22.md", ["notes/watch.md"]],
   ]);
 
   assert.deepEqual(
-    buildDirectPublicationPaths(["notes/watch.md"], references),
-    ["notes/watch.md", "clippings/clip-one.md", "clippings/clip-two.md"]
+    await buildRecursivePublicationPaths(
+      ["notes/watch.md"],
+      async (filePath) => references.get(filePath) ?? []
+    ),
+    [
+      "notes/watch.md",
+      "clippings/clip-one.md",
+      "clippings/clip-two.md",
+      "daily/2026-10-22.md",
+    ]
   );
 });
 
-test("includes direct references for every full-publish root", () => {
-  const references = new Map([
-    ["published/one.md", ["clippings/clip-one.md"]],
-    ["published/two.md", ["clippings/clip-two.md"]],
-  ]);
+test("matches ignored folder names across common naming styles", () => {
+  const ignored = [
+    "Clients",
+    "ai-work",
+    "daily-notes",
+    "codecraft-works",
+    "codceraft-works",
+  ];
 
-  assert.deepEqual(
-    buildDirectPublicationPaths(
-      ["published/one.md", "published/two.md"],
-      references
-    ),
-    [
-      "published/one.md",
-      "published/two.md",
-      "clippings/clip-one.md",
-      "clippings/clip-two.md",
-    ]
-  );
+  assert.equal(isIgnoredVaultPath("Clients/Acme/brief.md", ignored), true);
+  assert.equal(isIgnoredVaultPath("AI Work/Daily/2026-10-22.md", ignored), true);
+  assert.equal(isIgnoredVaultPath("Daily_Notes/today.md", ignored), true);
+  assert.equal(isIgnoredVaultPath("CodeCraft Works/project.md", ignored), true);
+  assert.equal(isIgnoredVaultPath("codceraft-works/project.md", ignored), true);
+  assert.equal(isIgnoredVaultPath("clippings/watch.md", ignored), false);
 });

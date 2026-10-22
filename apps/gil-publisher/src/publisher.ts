@@ -16,7 +16,10 @@ import {
   type ReferencedAttachment,
   type SlugMap,
 } from "./wikilink";
-import { buildDirectPublicationPaths } from "./publication-plan";
+import {
+  buildRecursivePublicationPaths,
+  isIgnoredVaultPath,
+} from "./publication-plan";
 
 export interface PublishResult {
   published: string[];
@@ -33,7 +36,7 @@ export function buildSlugMap(app: App, ignoredFolders: string[]): SlugMap {
   const files = app.vault.getMarkdownFiles();
 
   for (const file of files) {
-    if (isInIgnoredFolder(file.path, ignoredFolders)) continue;
+    if (isIgnoredVaultPath(file.path, ignoredFolders)) continue;
 
     const stem = path.basename(file.path, path.extname(file.path));
     const slug = frontmatterSlugOrDerived(app, file);
@@ -78,7 +81,7 @@ export async function publishAll(
   const files = app.vault.getMarkdownFiles();
   const roots = files.filter(
     (file) =>
-      !isInIgnoredFolder(file.path, settings.ignoredFolders) &&
+      !isIgnoredVaultPath(file.path, settings.ignoredFolders) &&
       isInPublishFolder(file.path, settings.publishFolder)
   );
   const publication = await buildPublicationSet(app, roots, slugMap);
@@ -101,8 +104,8 @@ export async function publishAll(
 }
 
 /**
- * Publish one note plus the non-ignored Markdown notes referenced directly by
- * its wikilinks. Links inside related notes do not expand the publication set.
+ * Publish one note plus all non-ignored Markdown notes reachable through its
+ * wikilinks. Cycles are safe and ignored folders are hard traversal boundaries.
  */
 export async function publishFileWithRelated(
   app: App,
@@ -114,6 +117,11 @@ export async function publishFileWithRelated(
 
   if (!settings.targetRepoPath) {
     result.errors.push({ file: "", error: "Target repo path is not configured." });
+    return result;
+  }
+
+  if (isIgnoredVaultPath(file.path, settings.ignoredFolders)) {
+    result.skipped.push(file.path);
     return result;
   }
 
@@ -199,12 +207,6 @@ export async function publishFile(
 // Helpers
 // ---------------------------------------------------------------------------
 
-function isInIgnoredFolder(filePath: string, ignoredFolders: string[]): boolean {
-  if (ignoredFolders.length === 0) return false;
-  const parts = filePath.split("/");
-  return parts.some((part) => ignoredFolders.includes(part));
-}
-
 /**
  * Returns true if the file should be published based on the publishFolder setting.
  * If publishFolder is empty, all files qualify.
@@ -266,21 +268,18 @@ async function buildPublicationSet(
   const markdownByPath = new Map(
     app.vault.getMarkdownFiles().map((file) => [file.path, file])
   );
-  const uniqueRoots = [...new Map(roots.map((file) => [file.path, file])).values()];
-  const referencesByRoot = new Map<string, string[]>();
+  const uniqueRootPaths = [...new Set(roots.map((file) => file.path))];
+  const plannedPaths = await buildRecursivePublicationPaths(
+    uniqueRootPaths,
+    async (filePath) => {
+      const file = markdownByPath.get(filePath);
+      if (!file) return [];
 
-  for (const file of uniqueRoots) {
-    const raw = await app.vault.read(file);
-    const references = extractReferencedNotes(stripFrontmatter(raw), slugMap);
-    referencesByRoot.set(
-      file.path,
-      references.map((reference) => reference.sourcePath)
-    );
-  }
-
-  const plannedPaths = buildDirectPublicationPaths(
-    uniqueRoots.map((file) => file.path),
-    referencesByRoot
+      const raw = await app.vault.read(file);
+      return extractReferencedNotes(stripFrontmatter(raw), slugMap).map(
+        (reference) => reference.sourcePath
+      );
+    }
   );
   const files = plannedPaths
     .map((filePath) => markdownByPath.get(filePath))

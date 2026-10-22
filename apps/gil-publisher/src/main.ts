@@ -1,6 +1,7 @@
 import { Notice, Plugin } from "obsidian";
 import {
   DEFAULT_SETTINGS,
+  DEFAULT_IGNORED_FOLDERS,
   GilPublisherSettingTab,
   type PluginSettings,
 } from "./settings";
@@ -71,6 +72,13 @@ export default class GilPublisherPlugin extends Plugin {
                 8000
               );
               console.error("[GilPublisher] Errors:", result.errors);
+              return;
+            }
+
+            if (result.published.length === 0 && result.skipped.length > 0) {
+              new Notice(
+                `Gil Publisher: Skipped "${file.basename}" because it is in an ignored folder.`
+              );
               return;
             }
 
@@ -149,6 +157,13 @@ export default class GilPublisherPlugin extends Plugin {
           return;
         }
 
+        if (result.published.length === 0 && result.skipped.length > 0) {
+          new Notice(
+            `Gil Publisher: Skipped "${file.basename}" because it is in an ignored folder.`
+          );
+          return;
+        }
+
         const relatedCount = Math.max(0, result.published.length - 1);
         const relatedSummary = relatedCount
           ? ` and ${relatedCount} related note(s)`
@@ -167,6 +182,15 @@ export default class GilPublisherPlugin extends Plugin {
     const saved = (await this.loadData()) as Partial<PluginSettings> | null;
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
     let migrated = false;
+
+    const ignoredFolders = new Set([
+      ...(saved?.ignoredFolders ?? []),
+      ...DEFAULT_IGNORED_FOLDERS,
+    ]);
+    if (ignoredFolders.size !== this.settings.ignoredFolders.length) {
+      migrated = true;
+    }
+    this.settings.ignoredFolders = [...ignoredFolders];
 
     // Migrate the original single-package paths to the monorepo layout.
     if (saved?.notesTargetSubpath === "src/content/notes") {

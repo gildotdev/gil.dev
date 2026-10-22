@@ -9,10 +9,18 @@ export interface PluginSettings {
   notesTargetSubpath: string;
 }
 
+export const DEFAULT_IGNORED_FOLDERS = [
+  "Clients",
+  "ai-work",
+  "daily-notes",
+  "codecraft-works",
+  "codceraft-works",
+];
+
 export const DEFAULT_SETTINGS: PluginSettings = {
   targetRepoPath: "",
   publishFolder: "",
-  ignoredFolders: [],
+  ignoredFolders: DEFAULT_IGNORED_FOLDERS,
   imageTargetSubpath: "apps/gil.dev/src/assets",
   notesTargetSubpath: "apps/gil.dev/src/content/notes",
 };
@@ -88,11 +96,11 @@ export class GilPublisherSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Ignored folders")
       .setDesc(
-        "Comma-separated list of vault folder names to skip (e.g. Templates, Archive, Private)"
+        "Comma-separated vault folder names that recursive publishing must never enter. Matching ignores case and treats spaces, underscores, and hyphens alike."
       )
       .addText((text) =>
         text
-          .setPlaceholder("Templates, Archive, Private")
+          .setPlaceholder("Clients, ai-work, daily-notes, codecraft-works")
           .setValue(this.plugin.settings.ignoredFolders.join(", "))
           .onChange(async (value) => {
             this.plugin.settings.ignoredFolders = value

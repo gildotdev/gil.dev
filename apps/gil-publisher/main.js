@@ -94,10 +94,17 @@ var import_obsidian2 = require("obsidian");
 
 // src/settings.ts
 var import_obsidian = require("obsidian");
+var DEFAULT_IGNORED_FOLDERS = [
+  "Clients",
+  "ai-work",
+  "daily-notes",
+  "codecraft-works",
+  "codceraft-works"
+];
 var DEFAULT_SETTINGS = {
   targetRepoPath: "",
   publishFolder: "",
-  ignoredFolders: [],
+  ignoredFolders: DEFAULT_IGNORED_FOLDERS,
   imageTargetSubpath: "apps/gil.dev/src/assets",
   notesTargetSubpath: "apps/gil.dev/src/content/notes"
 };
@@ -138,9 +145,9 @@ var GilPublisherSettingTab = class extends import_obsidian.PluginSettingTab {
       })
     );
     new import_obsidian.Setting(containerEl).setName("Ignored folders").setDesc(
-      "Comma-separated list of vault folder names to skip (e.g. Templates, Archive, Private)"
+      "Comma-separated vault folder names that recursive publishing must never enter. Matching ignores case and treats spaces, underscores, and hyphens alike."
     ).addText(
-      (text) => text.setPlaceholder("Templates, Archive, Private").setValue(this.plugin.settings.ignoredFolders.join(", ")).onChange(async (value) => {
+      (text) => text.setPlaceholder("Clients, ai-work, daily-notes, codecraft-works").setValue(this.plugin.settings.ignoredFolders.join(", ")).onChange(async (value) => {
         this.plugin.settings.ignoredFolders = value.split(",").map((s) => s.trim()).filter(Boolean);
         await this.plugin.saveSettings();
       })
@@ -389,15 +396,25 @@ function resolveEntry(target, slugMap) {
 }
 
 // src/publication-plan.ts
-function buildDirectPublicationPaths(rootPaths, referencesByRoot) {
-  var _a;
-  const publicationPaths = new Set(rootPaths);
-  for (const rootPath of rootPaths) {
-    for (const referencePath of (_a = referencesByRoot.get(rootPath)) != null ? _a : []) {
-      publicationPaths.add(referencePath);
+async function buildRecursivePublicationPaths(rootPaths, getReferences) {
+  const publicationPaths = /* @__PURE__ */ new Set();
+  const queue = [...rootPaths];
+  while (queue.length > 0) {
+    const filePath = queue.shift();
+    if (publicationPaths.has(filePath)) continue;
+    publicationPaths.add(filePath);
+    for (const referencePath of await getReferences(filePath)) {
+      if (!publicationPaths.has(referencePath)) queue.push(referencePath);
     }
   }
   return [...publicationPaths];
+}
+function isIgnoredVaultPath(filePath, ignoredFolders) {
+  const ignored = new Set(ignoredFolders.map(normalizeFolderName));
+  return filePath.split("/").some((part) => ignored.has(normalizeFolderName(part)));
+}
+function normalizeFolderName(name) {
+  return name.trim().toLowerCase().replace(/[\s_-]+/g, "-");
 }
 
 // src/publisher.ts
@@ -405,7 +422,7 @@ function buildSlugMap(app, ignoredFolders) {
   const map = /* @__PURE__ */ new Map();
   const files = app.vault.getMarkdownFiles();
   for (const file of files) {
-    if (isInIgnoredFolder(file.path, ignoredFolders)) continue;
+    if (isIgnoredVaultPath(file.path, ignoredFolders)) continue;
     const stem = import_path3.default.basename(file.path, import_path3.default.extname(file.path));
     const slug = frontmatterSlugOrDerived(app, file);
     const entry = { slug, sourcePath: file.path };
@@ -430,7 +447,7 @@ async function publishAll(app, settings, onProgress) {
   const slugMap = buildSlugMap(app, settings.ignoredFolders);
   const files = app.vault.getMarkdownFiles();
   const roots = files.filter(
-    (file) => !isInIgnoredFolder(file.path, settings.ignoredFolders) && isInPublishFolder(file.path, settings.publishFolder)
+    (file) => !isIgnoredVaultPath(file.path, settings.ignoredFolders) && isInPublishFolder(file.path, settings.publishFolder)
   );
   const publication = await buildPublicationSet(app, roots, slugMap);
   for (const file of publication.files) {
@@ -451,6 +468,10 @@ async function publishFileWithRelated(app, file, settings, onProgress) {
   const result = { published: [], skipped: [], errors: [] };
   if (!settings.targetRepoPath) {
     result.errors.push({ file: "", error: "Target repo path is not configured." });
+    return result;
+  }
+  if (isIgnoredVaultPath(file.path, settings.ignoredFolders)) {
+    result.skipped.push(file.path);
     return result;
   }
   const slugMap = buildSlugMap(app, settings.ignoredFolders);
@@ -507,11 +528,6 @@ async function publishFile(app, file, settings, slugMap, publishedPaths) {
   const outputContent = serializeFrontmatter(normalizedFm) + "\n\n" + transformed;
   import_fs.default.writeFileSync(outputPath, outputContent, "utf-8");
 }
-function isInIgnoredFolder(filePath, ignoredFolders) {
-  if (ignoredFolders.length === 0) return false;
-  const parts = filePath.split("/");
-  return parts.some((part) => ignoredFolders.includes(part));
-}
 function isInPublishFolder(filePath, publishFolder) {
   if (!publishFolder) return true;
   const prefix = publishFolder.endsWith("/") ? publishFolder : publishFolder + "/";
@@ -551,19 +567,17 @@ async function buildPublicationSet(app, roots, slugMap) {
   const markdownByPath = new Map(
     app.vault.getMarkdownFiles().map((file) => [file.path, file])
   );
-  const uniqueRoots = [...new Map(roots.map((file) => [file.path, file])).values()];
-  const referencesByRoot = /* @__PURE__ */ new Map();
-  for (const file of uniqueRoots) {
-    const raw = await app.vault.read(file);
-    const references = extractReferencedNotes(stripFrontmatter(raw), slugMap);
-    referencesByRoot.set(
-      file.path,
-      references.map((reference) => reference.sourcePath)
-    );
-  }
-  const plannedPaths = buildDirectPublicationPaths(
-    uniqueRoots.map((file) => file.path),
-    referencesByRoot
+  const uniqueRootPaths = [...new Set(roots.map((file) => file.path))];
+  const plannedPaths = await buildRecursivePublicationPaths(
+    uniqueRootPaths,
+    async (filePath) => {
+      const file = markdownByPath.get(filePath);
+      if (!file) return [];
+      const raw = await app.vault.read(file);
+      return extractReferencedNotes(stripFrontmatter(raw), slugMap).map(
+        (reference) => reference.sourcePath
+      );
+    }
   );
   const files = plannedPaths.map((filePath) => markdownByPath.get(filePath)).filter((file) => file !== void 0);
   const paths = new Set(files.map((file) => file.path));
@@ -788,6 +802,12 @@ var GilPublisherPlugin = class extends import_obsidian2.Plugin {
             console.error("[GilPublisher] Errors:", result.errors);
             return;
           }
+          if (result.published.length === 0 && result.skipped.length > 0) {
+            new import_obsidian2.Notice(
+              `Gil Publisher: Skipped "${file.basename}" because it is in an ignored folder.`
+            );
+            return;
+          }
           const relatedCount = Math.max(0, result.published.length - 1);
           const relatedSummary = relatedCount ? ` and ${relatedCount} related note(s)` : "";
           new import_obsidian2.Notice(
@@ -844,6 +864,12 @@ var GilPublisherPlugin = class extends import_obsidian2.Plugin {
           console.error("[GilPublisher] Errors:", result.errors);
           return;
         }
+        if (result.published.length === 0 && result.skipped.length > 0) {
+          new import_obsidian2.Notice(
+            `Gil Publisher: Skipped "${file.basename}" because it is in an ignored folder.`
+          );
+          return;
+        }
         const relatedCount = Math.max(0, result.published.length - 1);
         const relatedSummary = relatedCount ? ` and ${relatedCount} related note(s)` : "";
         new import_obsidian2.Notice(`Gil Publisher: Published "${file.basename}"${relatedSummary}.`);
@@ -856,9 +882,18 @@ var GilPublisherPlugin = class extends import_obsidian2.Plugin {
   onunload() {
   }
   async loadSettings() {
+    var _a;
     const saved = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
     let migrated = false;
+    const ignoredFolders = /* @__PURE__ */ new Set([
+      ...(_a = saved == null ? void 0 : saved.ignoredFolders) != null ? _a : [],
+      ...DEFAULT_IGNORED_FOLDERS
+    ]);
+    if (ignoredFolders.size !== this.settings.ignoredFolders.length) {
+      migrated = true;
+    }
+    this.settings.ignoredFolders = [...ignoredFolders];
     if ((saved == null ? void 0 : saved.notesTargetSubpath) === "src/content/notes") {
       this.settings.notesTargetSubpath = DEFAULT_SETTINGS.notesTargetSubpath;
       migrated = true;
