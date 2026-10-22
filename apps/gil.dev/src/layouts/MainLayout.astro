@@ -5,14 +5,16 @@ const {
   frontmatter,
   description,
   ogImage,
+  wide = false,
 } = Astro.props;
+const useWideLayout = isHome || wide;
 const defaultDescription =
   "Software Engineer, Cyber Security Coach, Tech Community Organizer";
 const pageTitle = title || frontmatter?.title;
 const pageDescription =
   description || frontmatter?.description || defaultDescription;
 import Footer from "../components/Footer.astro";
-import LatestNotes from "../components/LatestNotes.astro";
+import GardenNotes from "../components/GardenNotes.astro";
 import WiggleWrap from "../components/WiggleWrap.astro";
 import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
 import { ClientRouter } from "astro:transitions";
@@ -83,12 +85,16 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
     />
     <ClientRouter />
   </head>
-  <body class="max-w-3xl mx-auto">
+  <body class:list={["mx-auto", useWideLayout ? "max-w-6xl" : "max-w-3xl"]}>
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
     <header
-      class={`flex flex-row px-2 w-full max-w-3xl items-center gap-8${isHome ? " hero-header" : " justify-center"}`}
+      class:list={[
+        "flex flex-row px-2 w-full items-center gap-8",
+        useWideLayout ? "max-w-6xl" : "max-w-3xl",
+        isHome ? "hero-header" : "justify-center",
+      ]}
     >
       {
         isHome ? (
@@ -190,7 +196,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
 
     {
       isHome ? null : (
-        <main class="px-2 w-full max-w-3xl">
+        <main class:list={["px-2 w-full", useWideLayout ? "max-w-6xl" : "max-w-3xl"]}>
           <slot />
         </main>
       )
@@ -201,7 +207,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
         <section id="home-content">
           <div id="posts-notes-row">
             <LatestPosts />
-            <LatestNotes />
+            <GardenNotes />
           </div>
           <KnowledgeGarden />
         </section>

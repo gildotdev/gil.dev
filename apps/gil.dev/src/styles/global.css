@@ -166,9 +166,9 @@ footer {
   min-width: 0;
 }
 
-/* Homepage sections wrapper – hidden on mobile, shown on desktop */
+/* Homepage discovery sections */
 #home-content {
-  display: none;
+  display: block;
   min-width: 0;
 }
 
@@ -310,73 +310,7 @@ footer {
   object-fit: cover;
 }
 
-/* ── Notes panel ── */
-.notes-section-header {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 0.75rem 0.75rem 0 0;
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 0;
-}
-
-.notes-panel {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: none;
-  border-radius: 0 0 0.75rem 0.75rem;
-  padding: 1.25rem;
-}
-
-.notes-panel-title {
-  font-family: "Alfa Slab One", cursive;
-  letter-spacing: 0.06em;
-  color: var(--pink);
-  margin: 0;
-  padding: 0;
-}
-
-.note-panel-item {
-  padding: 0.6rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.note-panel-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.note-panel-item:first-child {
-  padding-top: 0;
-}
-
-.note-panel-link {
-  text-decoration: none !important;
-  display: block;
-}
-
-.note-panel-link:hover .note-panel-note-title {
-  color: var(--pink) !important;
-}
-
-.note-panel-note-title {
-  color: #e8e6df;
-  line-height: 1.35;
-  margin: 0;
-  padding: 0;
-  transition: color 0.15s;
-}
-
-.note-panel-date {
-  font-size: 11px;
-  color: rgba(232, 230, 223, 0.45);
-  margin: 0.15rem 0 0;
-  padding: 0;
-}
-
-/* Posts + Notes side-by-side row — stacked on mobile */
+/* Posts + Garden side-by-side row — stacked on mobile */
 #posts-notes-row {
   display: flex;
   flex-direction: column;
@@ -415,7 +349,7 @@ footer {
     grid-column: 1 / -1;
   }
 
-  /* Posts + Notes side by side on desktop */
+  /* Posts + Garden side by side on desktop */
   #posts-notes-row {
     flex-direction: row;
     align-items: flex-start;
@@ -426,15 +360,20 @@ footer {
     min-width: 0;
   }
 
-  #posts-notes-row > #notes {
-    flex: 2;
+  #posts-notes-row > #garden-wander {
+    flex: 5;
     min-width: 0;
-    position: sticky;
-    top: 1rem;
   }
 
-  .notes-panel {
-    position: static;
+  #posts-notes-row > #posts {
+    flex: 3;
+  }
+
+}
+
+@media (min-width: 1000px) {
+  #posts-notes-row {
+    gap: 2.5rem;
   }
 }
 

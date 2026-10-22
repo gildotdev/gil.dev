@@ -2,9 +2,16 @@
 import { getCollection, render } from "astro:content";
 import { marked } from "marked";
 import Tag from "../components/Tag.astro";
+import NoteCard from "../components/NoteCard.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate, generateDescription } from "../lib/utils.ts";
-import { noteStatusEmoji, noteStatusLabel } from "../lib/notes.ts";
+import {
+  getDailyGardenSeed,
+  isDiscoverableNote,
+  noteStatusEmoji,
+  noteStatusLabel,
+  selectRelatedNotes,
+} from "../lib/notes.ts";
 import "../styles/global.css";
 // 1. Generate a new path for every collection note
 export async function getStaticPaths() {
@@ -28,6 +35,15 @@ const pageDescription = note.data.description || generateDescription(noteHtml);
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
   allTopics.map((t) => [t.id, t.data.title]),
+);
+const discoverableNotes = await getCollection("notes", ({ data }) =>
+  isDiscoverableNote(data),
+);
+const wanderingNotes = selectRelatedNotes(
+  discoverableNotes,
+  note,
+  3,
+  `${note.id}-${getDailyGardenSeed()}`,
 );
 
 ---
@@ -85,4 +101,51 @@ const topicTitles = Object.fromEntries(
       }
     </footer>
   </article>
+  {
+    wanderingNotes.length > 0 && (
+      <aside class="continue-wandering">
+        <h2>Continue Wandering</h2>
+        <p>Nearby ideas and another path through the garden.</p>
+        <div class="continue-wandering__grid">
+          {wanderingNotes.map((wanderingNote, index) => (
+            <NoteCard
+              note={wanderingNote}
+              topicTitles={topicTitles}
+              compact
+              index={index}
+            />
+          ))}
+        </div>
+      </aside>
+    )
+  }
 </MainLayout>
+
+<style>
+  .continue-wandering {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 0.15rem solid var(--yellowalpha);
+  }
+
+  .continue-wandering h2 {
+    margin-bottom: 0.35rem;
+  }
+
+  .continue-wandering > p {
+    color: rgba(232, 230, 223, 0.68);
+    font-size: 0.65rem;
+  }
+
+  .continue-wandering__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  @media (max-width: 700px) {
+    .continue-wandering__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

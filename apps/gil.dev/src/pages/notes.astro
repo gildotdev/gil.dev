@@ -1,93 +1,111 @@
 ---
 import { getCollection } from "astro:content";
-import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
-import { formatPublishDate } from "../lib/utils.ts";
+import NoteCard from "../components/NoteCard.astro";
 import {
+  getDailyGardenSeed,
   isPublishedNote,
   isReferenceNote,
   noteStatusEmoji,
+  seededShuffle,
 } from "../lib/notes.ts";
 import "../styles/global.css";
 
-const notes = await getCollection("notes", ({ data }) => {
-  return isPublishedNote(data);
-});
-const primaryNotes = notes.filter(({ data }) => !isReferenceNote(data));
+const notes = await getCollection("notes", ({ data }) => isPublishedNote(data));
+const primaryNotes = seededShuffle(
+  notes.filter(({ data }) => !isReferenceNote(data)),
+  `all-notes-${getDailyGardenSeed()}`,
+);
 const referenceNotes = notes
   .filter(({ data }) => isReferenceNote(data))
-  .sort(
-    (a, b) =>
-      new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime(),
-  );
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
 
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
-  allTopics.map((t) => [t.id, t.data.title]),
+  allTopics.map((topic) => [topic.id, topic.data.title]),
 );
-
+const usedTopicIds = new Set(
+  primaryNotes.flatMap((note) => note.data.topics ?? []),
+);
+const topicOptions = allTopics
+  .filter((topic) => usedTopicIds.has(topic.id))
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+const tagOptions = [
+  ...new Set(primaryNotes.flatMap((note) => note.data.tags ?? [])),
+].sort((a, b) => a.localeCompare(b));
+const statusOptions = [
+  ...new Set(primaryNotes.map((note) => note.data.status ?? "unstaged")),
+].sort();
 ---
 
-<style>
-  .reference-notes {
-    margin-top: 2.5rem;
-    opacity: 0.72;
-  }
+<MainLayout title="Explore All Notes" wide>
+  <section class="garden-browser" data-garden-browser>
+    <div class="garden-browser__intro">
+      <p>
+        Follow a topic, choose a stage, or shuffle the paths. Notes are arranged
+        for discovery rather than by date.
+      </p>
+      <button type="button" class="garden-control-button" data-shuffle-notes>
+        Shuffle paths ↻
+      </button>
+    </div>
 
-  .reference-notes summary {
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
+    <div class="garden-filters" aria-label="Filter notes">
+      <label>
+        <span>Topic</span>
+        <select data-filter-topic>
+          <option value="">All topics</option>
+          {
+            topicOptions.map((topic) => (
+              <option value={topic.id}>{topic.data.title}</option>
+            ))
+          }
+        </select>
+      </label>
+      <label>
+        <span>Stage</span>
+        <select data-filter-status>
+          <option value="">All stages</option>
+          {
+            statusOptions.map((status) => (
+              <option value={status}>
+                {status === "unstaged"
+                  ? "🪱 Unstaged"
+                  : `${noteStatusEmoji[status]} ${status}`}
+              </option>
+            ))
+          }
+        </select>
+      </label>
+      <label>
+        <span>Tag</span>
+        <select data-filter-tag>
+          <option value="">All tags</option>
+          {tagOptions.map((tag) => <option value={tag}>{tag}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>Order</span>
+        <select data-note-order>
+          <option value="wander">Garden paths</option>
+          <option value="alphabetical">A–Z</option>
+        </select>
+      </label>
+    </div>
 
-  .reference-notes ul {
-    font-size: 0.85rem;
-  }
+    <p class="garden-result-count" aria-live="polite" data-result-count>
+      {primaryNotes.length} notes to explore
+    </p>
 
-  .reference-notes li {
-    margin-block: 0.35rem;
-  }
-</style>
+    <div class="garden-paths-grid" data-note-grid>
+      {
+        primaryNotes.map((note, index) => (
+          <NoteCard note={note} topicTitles={topicTitles} index={index} />
+        ))
+      }
+    </div>
+  </section>
 
-<MainLayout title="Notes">
-  <ul>
-    {
-      primaryNotes.map((note) => (
-        <li>
-          <a href={`/${note.data.slug || note.id}`}>
-            {note.data.status && (
-              <span title={note.data.status}>
-                {noteStatusEmoji[note.data.status]}{" "}
-              </span>
-            )}
-            {note.data.title}
-          </a>
-          <p>
-            <time class="slab text-sm" datetime={note.data.created}>
-              {formatPublishDate(note.data.created)}
-            </time>
-          </p>
-          {note.data.topics && note.data.topics.length > 0 && (
-            <p>
-              Topics:{" "}
-              {note.data.topics.map((topic: string) => (
-                <a href={`/topics/${topic}`} class="mr-2 text-sm">
-                  {topicTitles[topic] ?? topic}
-                </a>
-              ))}
-            </p>
-          )}
-          {note.data.tags.length > 0 && (
-            <p>
-              Tags:{" "}
-              {note.data.tags.map((tag: any, i: number) => (
-                <Tag tag={tag} i={i} />
-              ))}
-            </p>
-          )}
-        </li>
-      ))
-    }
-  </ul>
   {
     referenceNotes.length > 0 && (
       <details class="reference-notes">
@@ -95,18 +113,15 @@ const topicTitles = Object.fromEntries(
           Supporting references and clippings ({referenceNotes.length})
         </summary>
         <p>
-          Source material collected for the notes above. These are usually best
-          read from the note that links to them.
+          Source material collected for the notes above. References are also
+          available while browsing their tags.
         </p>
         <ul>
           {referenceNotes.map((note) => (
             <li>
               <a href={`/${note.data.slug || note.id}`}>
                 {noteStatusEmoji.reference} {note.data.title}
-              </a>{" "}
-              <time class="slab text-sm" datetime={note.data.created}>
-                {formatPublishDate(note.data.created)}
-              </time>
+              </a>
             </li>
           ))}
         </ul>
@@ -114,3 +129,190 @@ const topicTitles = Object.fromEntries(
     )
   }
 </MainLayout>
+
+<script>
+  function initializeGardenBrowser() {
+    document.querySelectorAll("[data-garden-browser]").forEach((browser) => {
+      if (!(browser instanceof HTMLElement) || browser.dataset.ready) return;
+      browser.dataset.ready = "true";
+
+      const grid = browser.querySelector("[data-note-grid]");
+      const cards = Array.from(browser.querySelectorAll("[data-note-card]"));
+      const topicFilter = browser.querySelector("[data-filter-topic]");
+      const statusFilter = browser.querySelector("[data-filter-status]");
+      const tagFilter = browser.querySelector("[data-filter-tag]");
+      const order = browser.querySelector("[data-note-order]");
+      const count = browser.querySelector("[data-result-count]");
+      const shuffle = browser.querySelector("[data-shuffle-notes]");
+
+      if (
+        !(grid instanceof HTMLElement) ||
+        !(topicFilter instanceof HTMLSelectElement) ||
+        !(statusFilter instanceof HTMLSelectElement) ||
+        !(tagFilter instanceof HTMLSelectElement) ||
+        !(order instanceof HTMLSelectElement)
+      ) return;
+
+      const readList = (card: Element, key: string): string[] =>
+        JSON.parse(card.getAttribute(`data-${key}`) || "[]");
+
+      const render = () => {
+        const visible = cards.filter((card) => {
+          const matchesTopic =
+            !topicFilter.value ||
+            readList(card, "topics").includes(topicFilter.value);
+          const matchesStatus =
+            !statusFilter.value ||
+            card.getAttribute("data-status") === statusFilter.value;
+          const matchesTag =
+            !tagFilter.value || readList(card, "tags").includes(tagFilter.value);
+          return matchesTopic && matchesStatus && matchesTag;
+        });
+
+        cards.forEach((card) => {
+          (card as HTMLElement).hidden = !visible.includes(card);
+        });
+
+        if (order.value === "alphabetical") {
+          visible.sort((a, b) =>
+            (a.getAttribute("data-title") || "").localeCompare(
+              b.getAttribute("data-title") || "",
+            ),
+          );
+        }
+        visible.forEach((card) => grid.append(card));
+
+        if (count) {
+          count.textContent = `${visible.length} ${visible.length === 1 ? "note" : "notes"} to explore`;
+        }
+      };
+
+      [topicFilter, statusFilter, tagFilter, order].forEach((control) =>
+        control.addEventListener("change", render),
+      );
+      shuffle?.addEventListener("click", () => {
+        order.value = "wander";
+        cards
+          .filter((card) => !(card as HTMLElement).hidden)
+          .sort(() => Math.random() - 0.5)
+          .forEach((card) => grid.append(card));
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initializeGardenBrowser);
+  initializeGardenBrowser();
+</script>
+
+<style>
+  .garden-browser__intro {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .garden-browser__intro p {
+    max-width: 34rem;
+    margin: 0;
+    padding: 0;
+    color: rgba(232, 230, 223, 0.78);
+  }
+
+  .garden-control-button {
+    flex-shrink: 0;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--pink);
+    border-radius: 999px;
+    color: var(--pink);
+    cursor: pointer;
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.58rem;
+  }
+
+  .garden-control-button:hover,
+  .garden-control-button:focus-visible {
+    background: var(--pink);
+    color: #0d1527;
+  }
+
+  .garden-filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.65rem;
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .garden-filters label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: rgba(232, 230, 223, 0.62);
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.5rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .garden-filters select {
+    min-width: 0;
+    padding: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.35rem;
+    background: #111a2d;
+    color: #e8e6df;
+    font-family: system-ui, sans-serif;
+    font-size: 0.58rem;
+    text-transform: none;
+  }
+
+  .garden-result-count {
+    margin: 0.65rem 0;
+    padding: 0;
+    color: rgba(232, 230, 223, 0.55);
+    font-size: 0.58rem;
+  }
+
+  .garden-paths-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .reference-notes {
+    margin-top: 2.5rem;
+    opacity: 0.72;
+  }
+
+  .reference-notes summary {
+    font-size: 0.75rem;
+  }
+
+  .reference-notes p,
+  .reference-notes ul {
+    font-size: 0.65rem;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 850px) {
+    .garden-filters,
+    .garden-paths-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .garden-browser__intro {
+      flex-direction: column;
+    }
+
+    .garden-filters,
+    .garden-paths-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

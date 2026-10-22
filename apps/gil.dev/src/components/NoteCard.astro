@@ -1,0 +1,147 @@
+---
+import {
+  getNoteSummary,
+  noteStatusEmoji,
+  noteStatusLabel,
+} from "../lib/notes.ts";
+
+const {
+  note,
+  topicTitles = {},
+  hidden = false,
+  compact = false,
+  index,
+} = Astro.props;
+const summary = getNoteSummary(note.data.description, note.body);
+const status = note.data.status ?? "unstaged";
+const topics = note.data.topics ?? [];
+const tags = note.data.tags ?? [];
+---
+
+<article
+  class:list={["garden-note-card", { "garden-note-card--compact": compact }]}
+  data-note-card
+  data-title={note.data.title.toLowerCase()}
+  data-status={status}
+  data-topics={JSON.stringify(topics)}
+  data-tags={JSON.stringify(tags)}
+  data-index={index}
+  hidden={hidden}
+>
+  <div class="garden-note-card__meta">
+    {
+      note.data.status ? (
+        <span title={noteStatusLabel[note.data.status]}>
+          {noteStatusEmoji[note.data.status]} {note.data.status}
+        </span>
+      ) : (
+        <span>🪱 note</span>
+      )
+    }
+  </div>
+  <h3 class="garden-note-card__title">
+    <a href={`/${note.data.slug || note.id}`}>{note.data.title}</a>
+  </h3>
+  {summary && <p class="garden-note-card__summary">{summary}</p>}
+  {
+    topics.length > 0 && (
+      <div class="garden-note-card__topics" aria-label="Topics">
+        {topics.slice(0, 3).map((topic: string) => (
+          <a href={`/topics/${topic}`}>{topicTitles[topic] ?? topic}</a>
+        ))}
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .garden-note-card {
+    --card-accent: var(--mint-green);
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    flex-direction: column;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--card-accent) 30%, transparent);
+    border-top: 3px solid var(--card-accent);
+    border-radius: 0.65rem;
+    background: rgba(255, 255, 255, 0.035);
+    transition: transform 0.15s ease, border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .garden-note-card:nth-child(4n + 2) {
+    --card-accent: var(--yellow);
+  }
+
+  .garden-note-card:nth-child(4n + 3) {
+    --card-accent: var(--pink);
+  }
+
+  .garden-note-card:nth-child(4n + 4) {
+    --card-accent: var(--blue);
+  }
+
+  .garden-note-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--card-accent);
+    box-shadow: 0 8px 28px -14px var(--card-accent);
+  }
+
+  .garden-note-card__meta {
+    color: rgba(232, 230, 223, 0.62);
+    font-family: "Alfa Slab One", cursive;
+    font-size: 0.52rem;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .garden-note-card__title {
+    margin: 0.35rem 0 0.5rem;
+    padding: 0;
+    color: var(--card-accent);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    letter-spacing: 0.04em;
+    text-shadow: none;
+  }
+
+  .garden-note-card__title a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .garden-note-card__summary {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    color: rgba(232, 230, 223, 0.78);
+    font-size: 0.62rem;
+    line-height: 1.55;
+  }
+
+  .garden-note-card__topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.7rem;
+  }
+
+  .garden-note-card__topics a {
+    padding: 0.08rem 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    color: rgba(232, 230, 223, 0.72) !important;
+    font-size: 0.5rem;
+    line-height: 1.4;
+    text-decoration: none !important;
+  }
+
+  .garden-note-card--compact .garden-note-card__summary {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+</style>

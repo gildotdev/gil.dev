@@ -72,6 +72,8 @@ Gil Publisher writes published notes and their attachments into the Astro app. P
 
 Notes in a `Clippings` folder or tagged `clippings` are automatically assigned the `reference` stage unless they already have an explicit stage. References remain directly addressable, appear in a subdued collapsed section on the all-notes page, and remain discoverable through their tags. They are excluded from the homepage, topic discovery, and RSS.
 
+The homepage's **Wander the Garden** section rotates through a balanced mix of stages and topics without using recency. The all-notes page uses the same discovery-first approach with topic, stage, and tag filters, shuffle and alphabetical controls, and a wider responsive card layout. Individual notes offer additional paths through related ideas.
+
 Configure the plugin with the monorepo root as its repository path. Its defaults are:
 
 - Notes: `apps/gil.dev/src/content/notes`
