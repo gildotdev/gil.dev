@@ -23,7 +23,7 @@ The site is a place for small, useful pieces of work rather than a polished arch
 
 ## Requirements and installation
 
-Use Node.js 22.22.3 (pinned in [`.nvmrc`](.nvmrc)) and pnpm 11.5.2 (pinned in the root [`package.json`](package.json)). The supported Node ranges are 22.22.2+, 24.15.0+, or 26+ within the listed majors.
+Use Node.js 22.23.4 (pinned in [`.nvmrc`](.nvmrc)) and pnpm 11.5.2 (pinned in the root [`package.json`](package.json)). The supported Node ranges are 22.23.4+, 24.15.0+, or 26+ within the listed majors.
 
 Install every workspace dependency from the repository root:
 
