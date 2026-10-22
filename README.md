@@ -70,6 +70,8 @@ The new file is placed in [`apps/gil.dev/src/content/notes`](apps/gil.dev/src/co
 
 Gil Publisher writes published notes and their attachments into the Astro app. Publishing follows Obsidian wikilinks recursively so linked notes such as clippings and the files they reference are published together. Recursion never enters folders listed in the plugin's ignore setting. Folder matching is case-insensitive and treats spaces, underscores, and hyphens equivalently; the defaults are `Clients`, `ai-work`, `daily-notes`, and `codecraft-works`.
 
+Published frontmatter always includes the Obsidian `topics` and `status` properties. Existing values are preserved and normalized for Astro; notes without them receive `topics: []` and the `seed` stage.
+
 Notes in a `Clippings` folder or tagged `clippings` are automatically assigned the `reference` stage unless they already have an explicit stage. References remain directly addressable, appear in a subdued collapsed section on the all-notes page, and remain discoverable through their tags. They are excluded from the homepage, topic discovery, and RSS.
 
 The homepage's **Wander the Garden** section rotates through a balanced mix of stages and topics without using recency. The all-notes page uses the same discovery-first approach with topic, stage, and tag filters, shuffle and alphabetical controls, and a wider responsive card layout. Individual notes offer additional paths through related ideas.

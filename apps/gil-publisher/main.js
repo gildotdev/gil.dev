@@ -163,6 +163,12 @@ var import_slugify2 = __toESM(require_slugify());
 // src/frontmatter.ts
 var import_path = __toESM(require("path"));
 var import_slugify = __toESM(require_slugify());
+var NOTE_STATUSES = /* @__PURE__ */ new Set([
+  "seed",
+  "growing",
+  "evergreen",
+  "reference"
+]);
 var FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---/;
 function parseFrontmatter(content) {
   const match = content.match(FRONTMATTER_REGEX);
@@ -206,14 +212,29 @@ function normalizeFrontmatter(existing, fileName, ctime, mtime, sourcePath = fil
   const created = rawCreated ? ensureDateFormat(rawCreated) : formatDate(ctime);
   const rawUpdated = typeof existing.updated === "string" && existing.updated || typeof existing.lastmod === "string" && existing.lastmod || null;
   const updated = rawUpdated ? ensureDateFormat(rawUpdated) : formatDate(mtime);
-  const tags = Array.isArray(existing.tags) ? existing.tags.map(String) : [];
+  const tags = normalizeStringList(existing.tags);
+  const topics = normalizeStringList(existing.topics);
+  const isClipping = tags.some((tag) => tag.toLowerCase() === "clippings") || sourcePath.replace(/\\/g, "/").split("/").some((part) => part.toLowerCase() === "clippings");
+  const status = normalizeStatus(
+    existing.status,
+    isClipping ? "reference" : "seed"
+  );
   let description;
   if (typeof existing.description === "string" && existing.description) {
     description = existing.description;
   } else if (Array.isArray(existing.description) && existing.description.length > 0) {
     description = existing.description.map(String).join(", ");
   }
-  const { date: _date, lastmod: _lastmod, created: _created, updated: _updated, description: _desc, ...rest } = existing;
+  const {
+    date: _date,
+    lastmod: _lastmod,
+    created: _created,
+    updated: _updated,
+    description: _desc,
+    topics: _topics,
+    status: _status,
+    ...rest
+  } = existing;
   const result = {
     ...rest,
     title,
@@ -221,16 +242,25 @@ function normalizeFrontmatter(existing, fileName, ctime, mtime, sourcePath = fil
     created,
     updated,
     tags,
+    topics,
+    status,
     ...description !== void 0 ? { description } : {}
   };
-  const isClipping = tags.some((tag) => tag.toLowerCase() === "clippings") || sourcePath.replace(/\\/g, "/").split("/").some((part) => part.toLowerCase() === "clippings");
-  if (isClipping && result.status === void 0) {
-    result.status = "reference";
-  }
   for (const key of Object.keys(result)) {
     if (result[key] === void 0) delete result[key];
   }
   return result;
+}
+function normalizeStringList(value) {
+  const values = Array.isArray(value) ? value : [value];
+  return values.filter(
+    (item) => typeof item === "string" || typeof item === "number"
+  ).map((item) => String(item).trim()).filter(Boolean);
+}
+function normalizeStatus(value, fallback) {
+  if (typeof value !== "string") return fallback;
+  const normalized = value.trim().toLowerCase();
+  return NOTE_STATUSES.has(normalized) ? normalized : fallback;
 }
 function fileNameToSlug(fileName) {
   const base = import_path.default.basename(fileName, import_path.default.extname(fileName));

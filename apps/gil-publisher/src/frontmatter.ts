@@ -11,10 +11,21 @@ export interface NormalizedFrontmatter {
   created: string;
   updated: string;
   tags: string[];
+  topics: string[];
+  status: NoteStatus;
   description?: string;
   draft?: boolean;
   [key: string]: unknown;
 }
+
+export type NoteStatus = "seed" | "growing" | "evergreen" | "reference";
+
+const NOTE_STATUSES = new Set<NoteStatus>([
+  "seed",
+  "growing",
+  "evergreen",
+  "reference",
+]);
 
 const FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---/;
 
@@ -102,9 +113,21 @@ export function normalizeFrontmatter(
     null;
   const updated = rawUpdated ? ensureDateFormat(rawUpdated) : formatDate(mtime);
 
-  const tags: string[] = Array.isArray(existing.tags)
-    ? (existing.tags as string[]).map(String)
-    : [];
+  const tags = normalizeStringList(existing.tags);
+  const topics = normalizeStringList(existing.topics);
+
+  // Clippings are supporting source material rather than standalone garden
+  // notes. Default them to `reference`; regular notes begin as `seed`.
+  const isClipping =
+    tags.some((tag) => tag.toLowerCase() === "clippings") ||
+    sourcePath
+      .replace(/\\/g, "/")
+      .split("/")
+      .some((part) => part.toLowerCase() === "clippings");
+  const status = normalizeStatus(
+    existing.status,
+    isClipping ? "reference" : "seed"
+  );
 
   // Normalize description: arrays become a joined string; empty arrays are omitted.
   let description: string | undefined;
@@ -116,7 +139,16 @@ export function normalizeFrontmatter(
 
   // Spread existing fields, removing ones we handle explicitly.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { date: _date, lastmod: _lastmod, created: _created, updated: _updated, description: _desc, ...rest } = existing;
+  const {
+    date: _date,
+    lastmod: _lastmod,
+    created: _created,
+    updated: _updated,
+    description: _desc,
+    topics: _topics,
+    status: _status,
+    ...rest
+  } = existing;
 
   const result: NormalizedFrontmatter = {
     ...rest,
@@ -125,21 +157,10 @@ export function normalizeFrontmatter(
     created,
     updated,
     tags,
+    topics,
+    status,
     ...(description !== undefined ? { description } : {}),
   };
-
-  // Clippings are supporting source material rather than standalone garden
-  // notes. Give them a stage that the site can display less prominently while
-  // preserving any stage the author explicitly chose in Obsidian.
-  const isClipping =
-    tags.some((tag) => tag.toLowerCase() === "clippings") ||
-    sourcePath
-      .replace(/\\/g, "/")
-      .split("/")
-      .some((part) => part.toLowerCase() === "clippings");
-  if (isClipping && result.status === undefined) {
-    result.status = "reference";
-  }
 
   // Remove undefined values
   for (const key of Object.keys(result)) {
@@ -152,6 +173,24 @@ export function normalizeFrontmatter(
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+function normalizeStringList(value: unknown): string[] {
+  const values = Array.isArray(value) ? value : [value];
+
+  return values
+    .filter((item): item is string | number =>
+      typeof item === "string" || typeof item === "number"
+    )
+    .map((item) => String(item).trim())
+    .filter(Boolean);
+}
+
+function normalizeStatus(value: unknown, fallback: NoteStatus): NoteStatus {
+  if (typeof value !== "string") return fallback;
+
+  const normalized = value.trim().toLowerCase() as NoteStatus;
+  return NOTE_STATUSES.has(normalized) ? normalized : fallback;
+}
 
 function fileNameToSlug(fileName: string): string {
   // Strip directory, extension, and optional YYYY-MM-DD- prefix
