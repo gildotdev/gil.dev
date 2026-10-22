@@ -11,5 +11,5 @@ Release Please maintains this file from Conventional Commits when preparing a re
 - Updated Gil Publisher defaults and legacy-setting migration for the site's new monorepo paths.
 - Updated Gil Publisher to recursively publish wikilinked notes and their attachments while treating configured ignored folders as hard traversal boundaries.
 - Quoted generated YAML scalar values so clipping metadata containing colons, quotes, or URLs remains valid Astro frontmatter.
-- Added monorepo-aware Netlify build and publish configuration for the Astro app.
+- Added root-level, monorepo-aware Netlify build and publish configuration for the Astro app.
 - Updated the Astro stack and GitHub Actions workflow, including pnpm dependency caching and a compatible Node.js pin.
