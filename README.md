@@ -68,7 +68,7 @@ The new file is placed in [`apps/gil.dev/src/content/notes`](apps/gil.dev/src/co
 
 ## Gil Publisher
 
-Gil Publisher writes published notes and their attachments into the Astro app. Publishing the current note also follows its Obsidian wikilinks recursively, so linked notes such as clippings and the files they reference are published together. Folders listed in the plugin's ignore setting remain excluded.
+Gil Publisher writes published notes and their attachments into the Astro app. Publishing the current note also includes notes referenced by its direct Obsidian wikilinks, so linked notes such as clippings and the files they reference are published together. Links inside those related notes do not pull in more notes, and folders listed in the plugin's ignore setting remain excluded.
 
 Configure the plugin with the monorepo root as its repository path. Its defaults are:
 

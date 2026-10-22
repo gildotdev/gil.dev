@@ -16,6 +16,7 @@ import {
   type ReferencedAttachment,
   type SlugMap,
 } from "./wikilink";
+import { buildDirectPublicationPaths } from "./publication-plan";
 
 export interface PublishResult {
   published: string[];
@@ -80,7 +81,7 @@ export async function publishAll(
       !isInIgnoredFolder(file.path, settings.ignoredFolders) &&
       isInPublishFolder(file.path, settings.publishFolder)
   );
-  const publication = await buildPublicationClosure(app, roots, slugMap);
+  const publication = await buildPublicationSet(app, roots, slugMap);
 
   for (const file of publication.files) {
     try {
@@ -100,8 +101,8 @@ export async function publishAll(
 }
 
 /**
- * Publish one note plus every non-ignored Markdown note reachable through its
- * wikilinks. Cycles are safe and each related note is written at most once.
+ * Publish one note plus the non-ignored Markdown notes referenced directly by
+ * its wikilinks. Links inside related notes do not expand the publication set.
  */
 export async function publishFileWithRelated(
   app: App,
@@ -117,7 +118,7 @@ export async function publishFileWithRelated(
   }
 
   const slugMap = buildSlugMap(app, settings.ignoredFolders);
-  const publication = await buildPublicationClosure(app, [file], slugMap);
+  const publication = await buildPublicationSet(app, [file], slugMap);
 
   for (const relatedFile of publication.files) {
     try {
@@ -257,7 +258,7 @@ async function copyAttachment(
   fs.writeFileSync(destPath, Buffer.from(data));
 }
 
-async function buildPublicationClosure(
+async function buildPublicationSet(
   app: App,
   roots: TFile[],
   slugMap: SlugMap
@@ -265,24 +266,26 @@ async function buildPublicationClosure(
   const markdownByPath = new Map(
     app.vault.getMarkdownFiles().map((file) => [file.path, file])
   );
-  const files: TFile[] = [];
-  const paths = new Set<string>();
-  const queue = [...roots];
+  const uniqueRoots = [...new Map(roots.map((file) => [file.path, file])).values()];
+  const referencesByRoot = new Map<string, string[]>();
 
-  while (queue.length > 0) {
-    const file = queue.shift()!;
-    if (paths.has(file.path)) continue;
-
-    paths.add(file.path);
-    files.push(file);
-
+  for (const file of uniqueRoots) {
     const raw = await app.vault.read(file);
     const references = extractReferencedNotes(stripFrontmatter(raw), slugMap);
-    for (const reference of references) {
-      const relatedFile = markdownByPath.get(reference.sourcePath);
-      if (relatedFile && !paths.has(relatedFile.path)) queue.push(relatedFile);
-    }
+    referencesByRoot.set(
+      file.path,
+      references.map((reference) => reference.sourcePath)
+    );
   }
+
+  const plannedPaths = buildDirectPublicationPaths(
+    uniqueRoots.map((file) => file.path),
+    referencesByRoot
+  );
+  const files = plannedPaths
+    .map((filePath) => markdownByPath.get(filePath))
+    .filter((file): file is TFile => file !== undefined);
+  const paths = new Set(files.map((file) => file.path));
 
   return { files, paths };
 }

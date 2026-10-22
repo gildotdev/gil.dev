@@ -388,6 +388,18 @@ function resolveEntry(target, slugMap) {
   return null;
 }
 
+// src/publication-plan.ts
+function buildDirectPublicationPaths(rootPaths, referencesByRoot) {
+  var _a;
+  const publicationPaths = new Set(rootPaths);
+  for (const rootPath of rootPaths) {
+    for (const referencePath of (_a = referencesByRoot.get(rootPath)) != null ? _a : []) {
+      publicationPaths.add(referencePath);
+    }
+  }
+  return [...publicationPaths];
+}
+
 // src/publisher.ts
 function buildSlugMap(app, ignoredFolders) {
   const map = /* @__PURE__ */ new Map();
@@ -420,7 +432,7 @@ async function publishAll(app, settings, onProgress) {
   const roots = files.filter(
     (file) => !isInIgnoredFolder(file.path, settings.ignoredFolders) && isInPublishFolder(file.path, settings.publishFolder)
   );
-  const publication = await buildPublicationClosure(app, roots, slugMap);
+  const publication = await buildPublicationSet(app, roots, slugMap);
   for (const file of publication.files) {
     try {
       onProgress == null ? void 0 : onProgress(`Publishing ${file.path}\u2026`);
@@ -442,7 +454,7 @@ async function publishFileWithRelated(app, file, settings, onProgress) {
     return result;
   }
   const slugMap = buildSlugMap(app, settings.ignoredFolders);
-  const publication = await buildPublicationClosure(app, [file], slugMap);
+  const publication = await buildPublicationSet(app, [file], slugMap);
   for (const relatedFile of publication.files) {
     try {
       onProgress == null ? void 0 : onProgress(`Publishing ${relatedFile.path}\u2026`);
@@ -535,25 +547,26 @@ async function copyAttachment(app, attachment, destDir, sourcePath) {
   const destPath = import_path3.default.join(destDir, destName);
   import_fs.default.writeFileSync(destPath, Buffer.from(data));
 }
-async function buildPublicationClosure(app, roots, slugMap) {
+async function buildPublicationSet(app, roots, slugMap) {
   const markdownByPath = new Map(
     app.vault.getMarkdownFiles().map((file) => [file.path, file])
   );
-  const files = [];
-  const paths = /* @__PURE__ */ new Set();
-  const queue = [...roots];
-  while (queue.length > 0) {
-    const file = queue.shift();
-    if (paths.has(file.path)) continue;
-    paths.add(file.path);
-    files.push(file);
+  const uniqueRoots = [...new Map(roots.map((file) => [file.path, file])).values()];
+  const referencesByRoot = /* @__PURE__ */ new Map();
+  for (const file of uniqueRoots) {
     const raw = await app.vault.read(file);
     const references = extractReferencedNotes(stripFrontmatter(raw), slugMap);
-    for (const reference of references) {
-      const relatedFile = markdownByPath.get(reference.sourcePath);
-      if (relatedFile && !paths.has(relatedFile.path)) queue.push(relatedFile);
-    }
+    referencesByRoot.set(
+      file.path,
+      references.map((reference) => reference.sourcePath)
+    );
   }
+  const plannedPaths = buildDirectPublicationPaths(
+    uniqueRoots.map((file) => file.path),
+    referencesByRoot
+  );
+  const files = plannedPaths.map((filePath) => markdownByPath.get(filePath)).filter((file) => file !== void 0);
+  const paths = new Set(files.map((file) => file.path));
   return { files, paths };
 }
 function slugifyFilename(filename) {
