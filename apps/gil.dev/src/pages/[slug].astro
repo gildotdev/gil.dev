@@ -275,16 +275,19 @@ const getTopicHref = (topic: string) =>
     display: grid;
     grid-template-columns: 3rem 1fr;
     gap: 0.45rem;
+    align-items: baseline;
   }
 
   .note-dates dt {
     color: rgba(232, 230, 223, 0.45);
     font-size: 0.46rem;
     letter-spacing: 0.06em;
+    line-height: 1.4;
     text-transform: uppercase;
   }
 
   .note-dates dd {
+    margin: 0;
     color: rgba(232, 230, 223, 0.78);
     font-size: 0.52rem;
     line-height: 1.4;
