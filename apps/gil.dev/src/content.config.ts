@@ -11,6 +11,14 @@ const notes = defineCollection({ loader: glob({ pattern: "**/*.md*", base: "./sr
 schema: z.object({
       title: z.string(),
       description: z.string().optional(),
+      author: z.preprocess(
+        (value) =>
+          Array.isArray(value) ? value.flat(Infinity).map(String) : value,
+        z.string().or(z.array(z.string())).optional(),
+      ),
+      canonicalURL: z.url().optional(),
+      source: z.url().nullable().optional(),
+      published: z.date().or(z.string()).optional(),
       microblog: z.boolean().optional(),
       guid: z.url().optional(),
       post_id: z.number().optional(),
