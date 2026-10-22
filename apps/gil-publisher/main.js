@@ -199,7 +199,7 @@ function serializeScalar(value) {
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
   return JSON.stringify(String(value));
 }
-function normalizeFrontmatter(existing, fileName, ctime, mtime) {
+function normalizeFrontmatter(existing, fileName, ctime, mtime, sourcePath = fileName) {
   const slug = typeof existing.slug === "string" && existing.slug ? existing.slug : fileNameToSlug(fileName);
   const title = typeof existing.title === "string" && existing.title ? existing.title : slugToTitle(slug);
   const rawCreated = typeof existing.created === "string" && existing.created || typeof existing.date === "string" && existing.date || null;
@@ -223,6 +223,10 @@ function normalizeFrontmatter(existing, fileName, ctime, mtime) {
     tags,
     ...description !== void 0 ? { description } : {}
   };
+  const isClipping = tags.some((tag) => tag.toLowerCase() === "clippings") || sourcePath.replace(/\\/g, "/").split("/").some((part) => part.toLowerCase() === "clippings");
+  if (isClipping && result.status === void 0) {
+    result.status = "reference";
+  }
   for (const key of Object.keys(result)) {
     if (result[key] === void 0) delete result[key];
   }
@@ -520,7 +524,8 @@ async function publishFile(app, file, settings, slugMap, publishedPaths) {
     existingFm,
     file.name,
     (_a = stat == null ? void 0 : stat.ctime) != null ? _a : Date.now(),
-    (_b = stat == null ? void 0 : stat.mtime) != null ? _b : Date.now()
+    (_b = stat == null ? void 0 : stat.mtime) != null ? _b : Date.now(),
+    file.path
   );
   const body = stripFrontmatter(raw);
   const imageAssetsSubpath = buildImageRelativePath(settings);

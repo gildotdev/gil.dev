@@ -3,33 +3,60 @@ import { getCollection } from "astro:content";
 import Tag from "../components/Tag.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { formatPublishDate } from "../lib/utils.ts";
+import {
+  isPublishedNote,
+  isReferenceNote,
+  noteStatusEmoji,
+} from "../lib/notes.ts";
 import "../styles/global.css";
 
 const notes = await getCollection("notes", ({ data }) => {
-  return data.draft !== true;
+  return isPublishedNote(data);
 });
+const primaryNotes = notes.filter(({ data }) => !isReferenceNote(data));
+const referenceNotes = notes
+  .filter(({ data }) => isReferenceNote(data))
+  .sort(
+    (a, b) =>
+      new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime(),
+  );
 
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
   allTopics.map((t) => [t.id, t.data.title]),
 );
 
-const statusEmoji: Record<string, string> = {
-  seed: "🌱",
-  growing: "🌿",
-  evergreen: "🌳",
-};
 ---
+
+<style>
+  .reference-notes {
+    margin-top: 2.5rem;
+    opacity: 0.72;
+  }
+
+  .reference-notes summary {
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .reference-notes ul {
+    font-size: 0.85rem;
+  }
+
+  .reference-notes li {
+    margin-block: 0.35rem;
+  }
+</style>
 
 <MainLayout title="Notes">
   <ul>
     {
-      notes.map((note) => (
+      primaryNotes.map((note) => (
         <li>
           <a href={`/${note.data.slug || note.id}`}>
             {note.data.status && (
               <span title={note.data.status}>
-                {statusEmoji[note.data.status]}{" "}
+                {noteStatusEmoji[note.data.status]}{" "}
               </span>
             )}
             {note.data.title}
@@ -61,4 +88,29 @@ const statusEmoji: Record<string, string> = {
       ))
     }
   </ul>
+  {
+    referenceNotes.length > 0 && (
+      <details class="reference-notes">
+        <summary>
+          Supporting references and clippings ({referenceNotes.length})
+        </summary>
+        <p>
+          Source material collected for the notes above. These are usually best
+          read from the note that links to them.
+        </p>
+        <ul>
+          {referenceNotes.map((note) => (
+            <li>
+              <a href={`/${note.data.slug || note.id}`}>
+                {noteStatusEmoji.reference} {note.data.title}
+              </a>{" "}
+              <time class="slab text-sm" datetime={note.data.created}>
+                {formatPublishDate(note.data.created)}
+              </time>
+            </li>
+          ))}
+        </ul>
+      </details>
+    )
+  }
 </MainLayout>

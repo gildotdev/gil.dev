@@ -3,12 +3,16 @@ import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import { formatPublishDate } from "../../lib/utils.ts";
 import { getTagPaths, tagMatchesPath } from "../../lib/tags.ts";
+import { isDiscoverableNote, isPublishedNote, noteStatusEmoji } from "../../lib/notes.ts";
 import "../../styles/global.css";
 
 export async function getStaticPaths() {
-  const notes = await getCollection("notes", ({ data }) => data.draft !== true);
+  const publishedNotes = await getCollection("notes", ({ data }) =>
+    isPublishedNote(data),
+  );
+  const notes = publishedNotes.filter(({ data }) => isDiscoverableNote(data));
 
-  const allTags = notes.flatMap((note) => note.data.tags ?? []);
+  const allTags = publishedNotes.flatMap((note) => note.data.tags ?? []);
   const tagPaths = getTagPaths(allTags);
 
   return tagPaths.map((tag) => ({
@@ -30,11 +34,6 @@ export async function getStaticPaths() {
 
 const { tag, notes } = Astro.props;
 
-const statusEmoji: Record<string, string> = {
-  seed: "🌱",
-  growing: "🌿",
-  evergreen: "🌳",
-};
 ---
 
 <MainLayout title={`#${tag}`} description={`Notes tagged with ${tag}`}>
@@ -46,7 +45,7 @@ const statusEmoji: Record<string, string> = {
             <a href={`/${note.data.slug || note.id}`}>
               {note.data.status && (
                 <span title={note.data.status}>
-                  {statusEmoji[note.data.status]}{" "}
+                  {noteStatusEmoji[note.data.status]}{" "}
                 </span>
               )}
               {note.data.title}

@@ -1,12 +1,13 @@
 ---
 import { getCollection } from "astro:content";
 import WiggleWrap from "./WiggleWrap.astro";
+import { isDiscoverableNote } from "../lib/notes";
 import "../styles/global.css";
 
 const topics = await getCollection("topics");
-const notes = await getCollection("notes", ({ data }) => {
-  return data.draft !== true;
-});
+const notes = await getCollection("notes", ({ data }) =>
+  isDiscoverableNote(data),
+);
 
 // Count notes per topic
 const notesCountByTopic = topics.reduce(

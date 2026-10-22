@@ -1,17 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 import { formatPublishDate } from "../lib/utils";
+import { isDiscoverableNote, noteStatusEmoji } from "../lib/notes";
 import "../styles/global.css";
 
-const notes = await getCollection("notes", ({ data }) => {
-  return data.draft !== true;
-});
-
-const statusEmoji: Record<string, string> = {
-  seed: "🌱",
-  growing: "🌿",
-  evergreen: "🌳",
-};
+const notes = await getCollection("notes", ({ data }) =>
+  isDiscoverableNote(data),
+);
 
 const sorted = notes
   .sort(
@@ -52,7 +47,7 @@ const sorted = notes
               <p class="note-panel-note-title">
                 {note.data.status ? (
                   <span title={note.data.status}>
-                    {statusEmoji[note.data.status]}{" "}
+                    {noteStatusEmoji[note.data.status]}{" "}
                   </span>
                 ) : (
                   <img

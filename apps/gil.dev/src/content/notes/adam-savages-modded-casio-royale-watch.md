@@ -10,6 +10,7 @@ tags:
 feature: "thumbnails/youtube/DDv-GFTo87E.webp"
 thumbnail: "thumbnails/resized/8923f0095db5836070403765d870400e_86cf658e.webp"
 slug: "adam-savages-modded-casio-royale-watch"
+status: "reference"
 created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:40:14-0400"
 description: "Adam opens and shares two gifts from fans he received at a recent convention: a COD-inspired mask based on a pun, and this lovely modded Casio AE-1200 watch, aka the \"Casio Royale\". Adam loves the NAS"

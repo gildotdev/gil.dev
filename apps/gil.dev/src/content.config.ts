@@ -25,7 +25,7 @@ schema: z.object({
       slug: z.string(),
       draft: z.boolean().optional(),
       topics: z.array(z.string()).optional().default([]),
-      status: z.enum(['seed', 'growing', 'evergreen']).optional(),
+      status: z.enum(['seed', 'growing', 'evergreen', 'reference']).optional(),
   }),
 
 });

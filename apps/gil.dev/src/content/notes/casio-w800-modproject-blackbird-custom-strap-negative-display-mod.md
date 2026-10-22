@@ -10,6 +10,7 @@ tags:
 feature: "thumbnails/youtube/JYmBn8XwadU.webp"
 thumbnail: "thumbnails/resized/a51edff87ca9e6229897443f07a83271_86cf658e.webp"
 slug: "casio-w800-modproject-blackbird-custom-strap-negative-display-mo"
+status: "reference"
 created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:40:34-0400"
 description: "+Full Build Write-up: https://casimods.com/builds/blackbird/+Instagram: https://www.instagram.com/casimods/+Custom Casios Club: https://facebook.com/groups/customcasiosclub::This is a Casio W800 m"

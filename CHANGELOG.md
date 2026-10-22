@@ -13,3 +13,4 @@ Release Please maintains this file from Conventional Commits when preparing a re
 - Quoted generated YAML scalar values so clipping metadata containing colons, quotes, or URLs remains valid Astro frontmatter.
 - Added root-level, monorepo-aware Netlify build and publish configuration for the Astro app.
 - Updated the Astro stack and GitHub Actions workflow, including pnpm dependency caching and a compatible Node.js pin.
+- Added a `reference` note stage so published clippings remain available from their parent notes while staying out of prominent site listings and feeds.

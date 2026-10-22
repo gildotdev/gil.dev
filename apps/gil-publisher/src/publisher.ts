@@ -168,7 +168,8 @@ export async function publishFile(
     existingFm,
     file.name,
     stat?.ctime ?? Date.now(),
-    stat?.mtime ?? Date.now()
+    stat?.mtime ?? Date.now(),
+    file.path
   );
 
   // Strip old frontmatter and transform wikilinks

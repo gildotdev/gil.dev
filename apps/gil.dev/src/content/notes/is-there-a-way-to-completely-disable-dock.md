@@ -18,6 +18,7 @@ tags:
   - macosx
   - commands
 slug: is-there-a-way-to-completely-disable-dock
+status: reference
 created: 2026-02-04T00:00:00+0000
 updated: 2026-03-22T12:57:02-0400
 description: I want the Dock completely gone.  I haven't used it in the past three releases of OS X (10.5 to present).  I want it completely gone, and LaunchBar there instead.  Is there a way to kill the Dock s...

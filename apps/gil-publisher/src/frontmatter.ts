@@ -76,7 +76,8 @@ export function normalizeFrontmatter(
   existing: Record<string, unknown>,
   fileName: string,
   ctime: number,
-  mtime: number
+  mtime: number,
+  sourcePath = fileName
 ): NormalizedFrontmatter {
   const slug =
     typeof existing.slug === "string" && existing.slug
@@ -126,6 +127,19 @@ export function normalizeFrontmatter(
     tags,
     ...(description !== undefined ? { description } : {}),
   };
+
+  // Clippings are supporting source material rather than standalone garden
+  // notes. Give them a stage that the site can display less prominently while
+  // preserving any stage the author explicitly chose in Obsidian.
+  const isClipping =
+    tags.some((tag) => tag.toLowerCase() === "clippings") ||
+    sourcePath
+      .replace(/\\/g, "/")
+      .split("/")
+      .some((part) => part.toLowerCase() === "clippings");
+  if (isClipping && result.status === undefined) {
+    result.status = "reference";
+  }
 
   // Remove undefined values
   for (const key of Object.keys(result)) {

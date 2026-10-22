@@ -1,11 +1,12 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
+import { isDiscoverableNote } from '../lib/notes.ts';
 
 export async function GET(context) {
 
-    const notes = await getCollection("notes", ({ data }) => {
-        return data.draft !== true;
-    });
+    const notes = await getCollection("notes", ({ data }) =>
+        isDiscoverableNote(data)
+    );
     
     return rss({
         // `<title>` field in output xml

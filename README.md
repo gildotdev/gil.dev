@@ -70,6 +70,8 @@ The new file is placed in [`apps/gil.dev/src/content/notes`](apps/gil.dev/src/co
 
 Gil Publisher writes published notes and their attachments into the Astro app. Publishing follows Obsidian wikilinks recursively so linked notes such as clippings and the files they reference are published together. Recursion never enters folders listed in the plugin's ignore setting. Folder matching is case-insensitive and treats spaces, underscores, and hyphens equivalently; the defaults are `Clients`, `ai-work`, `daily-notes`, and `codecraft-works`.
 
+Notes in a `Clippings` folder or tagged `clippings` are automatically assigned the `reference` stage unless they already have an explicit stage. References remain directly addressable and appear in a subdued, collapsed section on the all-notes page, but are excluded from the homepage, topic and tag discovery, and RSS.
+
 Configure the plugin with the monorepo root as its repository path. Its defaults are:
 
 - Notes: `apps/gil.dev/src/content/notes`
