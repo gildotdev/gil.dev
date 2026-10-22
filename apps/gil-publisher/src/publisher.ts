@@ -233,8 +233,8 @@ function ensureDir(dir: string): void {
  * up to the images directory (imageTargetSubpath).
  *
  * Example:
- *   notes: src/content/notes   → ../../assets
- *   images: src/assets
+ *   notes: apps/gil.dev/src/content/notes   → ../../assets
+ *   images: apps/gil.dev/src/assets
  */
 function buildImageRelativePath(settings: PluginSettings): string {
   return path.relative(settings.notesTargetSubpath, settings.imageTargetSubpath);

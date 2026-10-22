@@ -38,7 +38,7 @@ const optional = ["styles.css"];
 for (const file of filesToCopy) {
   const src = path.join(pluginRoot, file);
   if (!fs.existsSync(src)) {
-    console.error(`Required file not found: ${src}\nRun "npm run build" first.`);
+    console.error(`Required file not found: ${src}\nRun "pnpm build" first.`);
     process.exit(1);
   }
   fs.copyFileSync(src, path.join(pluginDestDir, file));

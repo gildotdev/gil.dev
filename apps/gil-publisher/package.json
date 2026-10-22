@@ -1,11 +1,13 @@
 {
-  "name": "gil-publisher",
+  "name": "@gilcreque/gil-publisher",
   "version": "1.0.0",
+  "private": true,
   "description": "Obsidian plugin to publish notes to the gil.dev Astro site",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
+    "typecheck": "tsc --noEmit",
     "install-plugin": "node scripts/install.mjs"
   },
   "keywords": [],

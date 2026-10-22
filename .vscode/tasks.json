@@ -4,9 +4,8 @@
     {
       "label": "New note",
       "type": "process",
-      "command": "npm",
+      "command": "pnpm",
       "args": [
-        "run",
         "new:note",
         "--",
         "${input:noteTitle}"
@@ -25,8 +24,9 @@
     },
     {
       "label": "dev",
-      "type": "npm",
-      "script": "dev",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["dev"],
       "problemMatcher": [],
       "group": {
         "kind": "build",
@@ -39,8 +39,9 @@
     },
     {
       "label": "build",
-      "type": "npm",
-      "script": "build",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["build"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -49,9 +50,9 @@
     },
     {
       "label": "plugin: dev",
-      "type": "npm",
-      "script": "dev",
-      "path": "obsidian-plugin/",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["plugin:dev"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -60,9 +61,9 @@
     },
     {
       "label": "plugin: build",
-      "type": "npm",
-      "script": "build",
-      "path": "obsidian-plugin/",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["plugin:build"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -71,9 +72,9 @@
     },
     {
       "label": "plugin: install",
-      "type": "npm",
-      "script": "install-plugin",
-      "path": "obsidian-plugin/",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["plugin:install", "--", "--vault", "${input:vaultPath}"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -86,6 +87,11 @@
       "id": "noteTitle",
       "type": "promptString",
       "description": "Note title"
+    },
+    {
+      "id": "vaultPath",
+      "type": "promptString",
+      "description": "Absolute path to the Obsidian vault"
     }
   ]
 }

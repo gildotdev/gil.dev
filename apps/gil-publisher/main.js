@@ -34,9 +34,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// node_modules/slugify/slugify.js
+// ../../node_modules/.pnpm/slugify@1.6.9/node_modules/slugify/slugify.js
 var require_slugify = __commonJS({
-  "node_modules/slugify/slugify.js"(exports, module2) {
+  "../../node_modules/.pnpm/slugify@1.6.9/node_modules/slugify/slugify.js"(exports, module2) {
     (function(name, root, factory) {
       if (typeof exports === "object") {
         module2.exports = factory();
@@ -98,8 +98,8 @@ var DEFAULT_SETTINGS = {
   targetRepoPath: "",
   publishFolder: "",
   ignoredFolders: [],
-  imageTargetSubpath: "src/assets",
-  notesTargetSubpath: "src/content/notes"
+  imageTargetSubpath: "apps/gil.dev/src/assets",
+  notesTargetSubpath: "apps/gil.dev/src/content/notes"
 };
 var GilPublisherSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
@@ -126,13 +126,13 @@ var GilPublisherSettingTab = class extends import_obsidian.PluginSettingTab {
       })
     );
     new import_obsidian.Setting(containerEl).setName("Notes output path").setDesc("Subpath within the repo where notes are written.").addText(
-      (text) => text.setPlaceholder("src/content/notes").setValue(this.plugin.settings.notesTargetSubpath).onChange(async (value) => {
+      (text) => text.setPlaceholder("apps/gil.dev/src/content/notes").setValue(this.plugin.settings.notesTargetSubpath).onChange(async (value) => {
         this.plugin.settings.notesTargetSubpath = value.trim();
         await this.plugin.saveSettings();
       })
     );
     new import_obsidian.Setting(containerEl).setName("Images output path").setDesc("Subpath within the repo where images are copied.").addText(
-      (text) => text.setPlaceholder("src/assets").setValue(this.plugin.settings.imageTargetSubpath).onChange(async (value) => {
+      (text) => text.setPlaceholder("apps/gil.dev/src/assets").setValue(this.plugin.settings.imageTargetSubpath).onChange(async (value) => {
         this.plugin.settings.imageTargetSubpath = value.trim();
         await this.plugin.saveSettings();
       })
@@ -752,7 +752,20 @@ var GilPublisherPlugin = class extends import_obsidian2.Plugin {
   onunload() {
   }
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const saved = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
+    let migrated = false;
+    if ((saved == null ? void 0 : saved.notesTargetSubpath) === "src/content/notes") {
+      this.settings.notesTargetSubpath = DEFAULT_SETTINGS.notesTargetSubpath;
+      migrated = true;
+    }
+    if ((saved == null ? void 0 : saved.imageTargetSubpath) === "src/assets") {
+      this.settings.imageTargetSubpath = DEFAULT_SETTINGS.imageTargetSubpath;
+      migrated = true;
+    }
+    if (migrated) {
+      await this.saveSettings();
+    }
   }
   async saveSettings() {
     await this.saveData(this.settings);

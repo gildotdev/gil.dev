@@ -10,7 +10,7 @@ const args = process.argv.slice(2);
 const title = args.join(" ").trim();
 
 if (!title) {
-  console.error('Usage: npm run new:note -- "My note title"');
+  console.error('Usage: pnpm new:note "My note title"');
   process.exit(1);
 }
 

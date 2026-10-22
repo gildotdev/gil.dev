@@ -13,8 +13,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   targetRepoPath: "",
   publishFolder: "",
   ignoredFolders: [],
-  imageTargetSubpath: "src/assets",
-  notesTargetSubpath: "src/content/notes",
+  imageTargetSubpath: "apps/gil.dev/src/assets",
+  notesTargetSubpath: "apps/gil.dev/src/content/notes",
 };
 
 export class GilPublisherSettingTab extends PluginSettingTab {
@@ -64,7 +64,7 @@ export class GilPublisherSettingTab extends PluginSettingTab {
       .setDesc("Subpath within the repo where notes are written.")
       .addText((text) =>
         text
-          .setPlaceholder("src/content/notes")
+          .setPlaceholder("apps/gil.dev/src/content/notes")
           .setValue(this.plugin.settings.notesTargetSubpath)
           .onChange(async (value) => {
             this.plugin.settings.notesTargetSubpath = value.trim();
@@ -77,7 +77,7 @@ export class GilPublisherSettingTab extends PluginSettingTab {
       .setDesc("Subpath within the repo where images are copied.")
       .addText((text) =>
         text
-          .setPlaceholder("src/assets")
+          .setPlaceholder("apps/gil.dev/src/assets")
           .setValue(this.plugin.settings.imageTargetSubpath)
           .onChange(async (value) => {
             this.plugin.settings.imageTargetSubpath = value.trim();

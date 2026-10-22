@@ -140,7 +140,23 @@ export default class GilPublisherPlugin extends Plugin {
   onunload() {}
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const saved = (await this.loadData()) as Partial<PluginSettings> | null;
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
+    let migrated = false;
+
+    // Migrate the original single-package paths to the monorepo layout.
+    if (saved?.notesTargetSubpath === "src/content/notes") {
+      this.settings.notesTargetSubpath = DEFAULT_SETTINGS.notesTargetSubpath;
+      migrated = true;
+    }
+    if (saved?.imageTargetSubpath === "src/assets") {
+      this.settings.imageTargetSubpath = DEFAULT_SETTINGS.imageTargetSubpath;
+      migrated = true;
+    }
+
+    if (migrated) {
+      await this.saveSettings();
+    }
   }
 
   async saveSettings() {
