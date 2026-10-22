@@ -321,7 +321,7 @@ function isImageFile(name) {
   return IMAGE_EXTENSIONS.has(import_path2.default.extname(name).toLowerCase());
 }
 function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets", publishedPaths, imageNameTransform) {
-  const referencedImages = [];
+  const referencedAttachments = [];
   const wikilinkRegex = /(!?)\[\[([^\]|#]+)(?:#[^\]|]*)?((?:\|[^\]]*)?)\]\]/g;
   const transformed = content.replace(
     wikilinkRegex,
@@ -329,15 +329,21 @@ function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets
       const isEmbed = bang === "!";
       const alias = aliasPart ? aliasPart.slice(1) : "";
       const trimmedTarget = target.trim();
-      if (isEmbed && isImageFile(trimmedTarget)) {
-        const imgName = import_path2.default.basename(trimmedTarget);
-        const destName = imageNameTransform ? imageNameTransform(imgName) : imgName;
-        referencedImages.push({ vaultPath: trimmedTarget, destName });
-        const displayAlt = alias || imgName;
-        const urlName = imageNameTransform ? destName : imgName.split("/").map(encodeURIComponent).join("/");
-        return `![${displayAlt}](${imageAssetsSubpath}/${urlName})`;
-      }
       const entry = resolveEntry(trimmedTarget, slugMap);
+      if (!entry && isAttachmentFile(trimmedTarget)) {
+        const attachmentName = import_path2.default.basename(trimmedTarget);
+        const destName = imageNameTransform ? imageNameTransform(attachmentName) : attachmentName;
+        const isImage = isImageFile(trimmedTarget);
+        referencedAttachments.push({
+          vaultPath: trimmedTarget,
+          destName,
+          isImage
+        });
+        const displayText2 = alias || attachmentName;
+        const urlName = imageNameTransform ? destName : attachmentName.split("/").map(encodeURIComponent).join("/");
+        const url = `${imageAssetsSubpath}/${urlName}`;
+        return isEmbed && isImage ? `![${displayText2}](${url})` : `[${displayText2}](${url})`;
+      }
       const displayText = alias || trimmedTarget;
       if (!entry) {
         return displayText;
@@ -348,9 +354,28 @@ function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets
       return `[${displayText}](/${entry.slug})`;
     }
   );
-  return { transformed, referencedImages };
+  return { transformed, referencedAttachments };
+}
+function extractReferencedNotes(content, slugMap) {
+  const references = /* @__PURE__ */ new Map();
+  const wikilinkRegex = /!?\[\[([^\]|#]+)(?:#[^\]|]*)?((?:\|[^\]]*)?)\]\]/g;
+  let match;
+  while ((match = wikilinkRegex.exec(content)) !== null) {
+    const target = match[1].trim();
+    const entry = resolveEntry(target, slugMap);
+    if (entry) references.set(entry.sourcePath, entry);
+  }
+  return [...references.values()];
+}
+function isAttachmentFile(name) {
+  const extension = import_path2.default.extname(name).toLowerCase();
+  return extension !== "" && extension !== ".md" && extension !== ".mdx";
 }
 function resolveEntry(target, slugMap) {
+  const normalizedTarget = target.replace(/\\/g, "/");
+  const withoutExtension = normalizedTarget.replace(/\.mdx?$/i, "");
+  if (slugMap.has(normalizedTarget)) return slugMap.get(normalizedTarget);
+  if (slugMap.has(withoutExtension)) return slugMap.get(withoutExtension);
   const stem = import_path2.default.basename(target, import_path2.default.extname(target));
   if (slugMap.has(stem)) return slugMap.get(stem);
   const lower = stem.toLowerCase();
@@ -372,19 +397,17 @@ function buildSlugMap(app, ignoredFolders) {
     const stem = import_path3.default.basename(file.path, import_path3.default.extname(file.path));
     const slug = frontmatterSlugOrDerived(app, file);
     const entry = { slug, sourcePath: file.path };
-    map.set(stem, entry);
+    const normalizedPath = file.path.replace(/\\/g, "/");
+    const pathWithoutExtension = normalizedPath.replace(/\.mdx?$/i, "");
+    map.set(normalizedPath, entry);
+    map.set(pathWithoutExtension, entry);
+    if (!map.has(stem)) map.set(stem, entry);
     const title = frontmatterTitle(app, file);
     if (title && title.toLowerCase() !== stem.toLowerCase()) {
-      map.set(title, entry);
+      if (!map.has(title)) map.set(title, entry);
     }
   }
   return map;
-}
-function buildPublishedPaths(app, settings) {
-  const files = app.vault.getMarkdownFiles();
-  return new Set(
-    files.filter((f) => !isInIgnoredFolder(f.path, settings.ignoredFolders)).filter((f) => isInPublishFolder(f.path, settings.publishFolder)).map((f) => f.path)
-  );
 }
 async function publishAll(app, settings, onProgress) {
   const result = { published: [], skipped: [], errors: [] };
@@ -394,22 +417,45 @@ async function publishAll(app, settings, onProgress) {
   }
   const slugMap = buildSlugMap(app, settings.ignoredFolders);
   const files = app.vault.getMarkdownFiles();
-  const publishedPaths = buildPublishedPaths(app, settings);
-  for (const file of files) {
-    if (isInIgnoredFolder(file.path, settings.ignoredFolders)) {
-      result.skipped.push(file.path);
-      continue;
-    }
-    if (!isInPublishFolder(file.path, settings.publishFolder)) {
-      result.skipped.push(file.path);
-      continue;
-    }
+  const roots = files.filter(
+    (file) => !isInIgnoredFolder(file.path, settings.ignoredFolders) && isInPublishFolder(file.path, settings.publishFolder)
+  );
+  const publication = await buildPublicationClosure(app, roots, slugMap);
+  for (const file of publication.files) {
     try {
       onProgress == null ? void 0 : onProgress(`Publishing ${file.path}\u2026`);
-      await publishFile(app, file, settings, slugMap, publishedPaths);
+      await publishFile(app, file, settings, slugMap, publication.paths);
       result.published.push(file.path);
     } catch (err) {
       result.errors.push({ file: file.path, error: String(err) });
+    }
+  }
+  for (const file of files) {
+    if (!publication.paths.has(file.path)) result.skipped.push(file.path);
+  }
+  return result;
+}
+async function publishFileWithRelated(app, file, settings, onProgress) {
+  const result = { published: [], skipped: [], errors: [] };
+  if (!settings.targetRepoPath) {
+    result.errors.push({ file: "", error: "Target repo path is not configured." });
+    return result;
+  }
+  const slugMap = buildSlugMap(app, settings.ignoredFolders);
+  const publication = await buildPublicationClosure(app, [file], slugMap);
+  for (const relatedFile of publication.files) {
+    try {
+      onProgress == null ? void 0 : onProgress(`Publishing ${relatedFile.path}\u2026`);
+      await publishFile(
+        app,
+        relatedFile,
+        settings,
+        slugMap,
+        publication.paths
+      );
+      result.published.push(relatedFile.path);
+    } catch (err) {
+      result.errors.push({ file: relatedFile.path, error: String(err) });
     }
   }
   return result;
@@ -427,7 +473,7 @@ async function publishFile(app, file, settings, slugMap, publishedPaths) {
   );
   const body = stripFrontmatter(raw);
   const imageAssetsSubpath = buildImageRelativePath(settings);
-  const { transformed, referencedImages } = transformWikilinks(
+  const { transformed, referencedAttachments } = transformWikilinks(
     body,
     slugMap,
     imageAssetsSubpath,
@@ -436,8 +482,11 @@ async function publishFile(app, file, settings, slugMap, publishedPaths) {
   );
   const assetsDir = import_path3.default.join(settings.targetRepoPath, settings.imageTargetSubpath);
   await ensureDir(assetsDir);
-  for (const img of referencedImages) {
-    await copyImage(app, img, assetsDir);
+  const copiedAttachments = /* @__PURE__ */ new Set();
+  for (const attachment of referencedAttachments) {
+    if (copiedAttachments.has(attachment.destName)) continue;
+    await copyAttachment(app, attachment, assetsDir, file.path);
+    copiedAttachments.add(attachment.destName);
   }
   const notesDir = import_path3.default.join(settings.targetRepoPath, settings.notesTargetSubpath);
   await ensureDir(notesDir);
@@ -472,16 +521,40 @@ function frontmatterTitle(app, file) {
   const fm = (_a = cache == null ? void 0 : cache.frontmatter) != null ? _a : {};
   return typeof fm.title === "string" ? fm.title : null;
 }
-async function copyImage(app, img, destDir) {
-  const { vaultPath, destName } = img;
+async function copyAttachment(app, attachment, destDir, sourcePath) {
+  const { vaultPath, destName } = attachment;
   const vaultFiles = app.vault.getFiles();
-  const match = vaultFiles.find(
-    (f) => f.path === vaultPath || f.name === import_path3.default.basename(vaultPath) || isImageFile(f.name) && f.name === vaultPath
+  const resolved = app.metadataCache.getFirstLinkpathDest(vaultPath, sourcePath);
+  const match = resolved != null ? resolved : vaultFiles.find(
+    (candidate) => candidate.path === vaultPath || candidate.name === import_path3.default.basename(vaultPath) || isImageFile(candidate.name) && candidate.name === vaultPath
   );
-  if (!match) return;
+  if (!match) {
+    throw new Error(`Referenced attachment not found: ${vaultPath}`);
+  }
   const data = await app.vault.readBinary(match);
   const destPath = import_path3.default.join(destDir, destName);
   import_fs.default.writeFileSync(destPath, Buffer.from(data));
+}
+async function buildPublicationClosure(app, roots, slugMap) {
+  const markdownByPath = new Map(
+    app.vault.getMarkdownFiles().map((file) => [file.path, file])
+  );
+  const files = [];
+  const paths = /* @__PURE__ */ new Set();
+  const queue = [...roots];
+  while (queue.length > 0) {
+    const file = queue.shift();
+    if (paths.has(file.path)) continue;
+    paths.add(file.path);
+    files.push(file);
+    const raw = await app.vault.read(file);
+    const references = extractReferencedNotes(stripFrontmatter(raw), slugMap);
+    for (const reference of references) {
+      const relatedFile = markdownByPath.get(reference.sourcePath);
+      if (relatedFile && !paths.has(relatedFile.path)) queue.push(relatedFile);
+    }
+  }
+  return { files, paths };
 }
 function slugifyFilename(filename) {
   const ext = import_path3.default.extname(filename).toLowerCase();
@@ -693,10 +766,20 @@ var GilPublisherPlugin = class extends import_obsidian2.Plugin {
           );
           return;
         }
-        const slugMap = buildSlugMap(this.app, this.settings.ignoredFolders);
-        const publishedPaths = buildPublishedPaths(this.app, this.settings);
-        publishFile(this.app, file, this.settings, slugMap, publishedPaths).then(() => {
-          new import_obsidian2.Notice(`Gil Publisher: Published "${file.basename}".`);
+        publishFileWithRelated(this.app, file, this.settings).then((result) => {
+          if (result.errors.length) {
+            new import_obsidian2.Notice(
+              `Gil Publisher: Published ${result.published.length} note(s) with ${result.errors.length} error(s).`,
+              8e3
+            );
+            console.error("[GilPublisher] Errors:", result.errors);
+            return;
+          }
+          const relatedCount = Math.max(0, result.published.length - 1);
+          const relatedSummary = relatedCount ? ` and ${relatedCount} related note(s)` : "";
+          new import_obsidian2.Notice(
+            `Gil Publisher: Published "${file.basename}"${relatedSummary}.`
+          );
         }).catch((err) => {
           new import_obsidian2.Notice(`Gil Publisher: Error publishing "${file.basename}": ${String(err)}`, 8e3);
           console.error("[GilPublisher]", err);
@@ -738,11 +821,19 @@ var GilPublisherPlugin = class extends import_obsidian2.Plugin {
         );
         return;
       }
-      const slugMap = buildSlugMap(this.app, this.settings.ignoredFolders);
-      const publishedPaths = buildPublishedPaths(this.app, this.settings);
       try {
-        await publishFile(this.app, file, this.settings, slugMap, publishedPaths);
-        new import_obsidian2.Notice(`Gil Publisher: Published "${file.basename}".`);
+        const result = await publishFileWithRelated(this.app, file, this.settings);
+        if (result.errors.length) {
+          new import_obsidian2.Notice(
+            `Gil Publisher: Published ${result.published.length} note(s) with ${result.errors.length} error(s).`,
+            8e3
+          );
+          console.error("[GilPublisher] Errors:", result.errors);
+          return;
+        }
+        const relatedCount = Math.max(0, result.published.length - 1);
+        const relatedSummary = relatedCount ? ` and ${relatedCount} related note(s)` : "";
+        new import_obsidian2.Notice(`Gil Publisher: Published "${file.basename}"${relatedSummary}.`);
       } catch (err) {
         new import_obsidian2.Notice(`Gil Publisher: Error \u2014 ${String(err)}`, 8e3);
         console.error("[GilPublisher]", err);

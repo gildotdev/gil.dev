@@ -68,7 +68,9 @@ The new file is placed in [`apps/gil.dev/src/content/notes`](apps/gil.dev/src/co
 
 ## Gil Publisher
 
-Gil Publisher writes published notes and their images into the Astro app. Configure the plugin with the monorepo root as its repository path. Its defaults are:
+Gil Publisher writes published notes and their attachments into the Astro app. Publishing the current note also follows its Obsidian wikilinks recursively, so linked notes such as clippings and the files they reference are published together. Folders listed in the plugin's ignore setting remain excluded.
+
+Configure the plugin with the monorepo root as its repository path. Its defaults are:
 
 - Notes: `apps/gil.dev/src/content/notes`
 - Images: `apps/gil.dev/src/assets`
@@ -81,6 +83,8 @@ To install a built plugin into an Obsidian vault:
 pnpm plugin:build
 pnpm plugin:install -- --vault /absolute/path/to/vault
 ```
+
+After installation, reload Obsidian (or disable and re-enable Gil Publisher), open the source note, and run **Gil Publisher: Publish current note to site** from the command palette. The upload ribbon button runs the same operation.
 
 ## Colophon
 

@@ -22,11 +22,13 @@ export function isImageFile(name: string): boolean {
   return IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase());
 }
 
-export interface ReferencedImage {
-  /** Vault-relative path of the source image (used to locate it in the vault). */
+export interface ReferencedAttachment {
+  /** Vault-relative link target used to locate the source file in the vault. */
   vaultPath: string;
   /** Final filename to write on disk and reference in the markdown URL. */
   destName: string;
+  /** Whether the attachment can be rendered with Markdown image syntax. */
+  isImage: boolean;
 }
 
 /**
@@ -38,6 +40,8 @@ export interface ReferencedImage {
  * - [[note|alias]]       → alias                if note is outside publishedPaths
  * - ![[image.png]]       → ![image.png](../../assets/image.png)
  * - ![[image.png|alt]]   → ![alt](../../assets/image.png)
+ * - [[document.pdf]]     → [document.pdf](../../assets/document.pdf)
+ * - ![[document.pdf]]    → [document.pdf](../../assets/document.pdf)
  *
  * @param content             Raw markdown body (no frontmatter)
  * @param slugMap             Pre-built map of filename-stem/title → SlugEntry
@@ -51,8 +55,8 @@ export function transformWikilinks(
   imageAssetsSubpath = "../../assets",
   publishedPaths?: Set<string>,
   imageNameTransform?: (name: string) => string
-): { transformed: string; referencedImages: ReferencedImage[] } {
-  const referencedImages: ReferencedImage[] = [];
+): { transformed: string; referencedAttachments: ReferencedAttachment[] } {
+  const referencedAttachments: ReferencedAttachment[] = [];
 
   // Match both image embeds (![[...]]) and regular links ([[...]])
   // Capture group 1: "!" if present (image embed)
@@ -66,21 +70,31 @@ export function transformWikilinks(
       const isEmbed = bang === "!";
       const alias = aliasPart ? aliasPart.slice(1) : ""; // strip leading "|"
       const trimmedTarget = target.trim();
+      const entry = resolveEntry(trimmedTarget, slugMap);
 
-      if (isEmbed && isImageFile(trimmedTarget)) {
-        const imgName = path.basename(trimmedTarget);
-        const destName = imageNameTransform ? imageNameTransform(imgName) : imgName;
-        referencedImages.push({ vaultPath: trimmedTarget, destName });
-        const displayAlt = alias || imgName;
+      if (!entry && isAttachmentFile(trimmedTarget)) {
+        const attachmentName = path.basename(trimmedTarget);
+        const destName = imageNameTransform
+          ? imageNameTransform(attachmentName)
+          : attachmentName;
+        const isImage = isImageFile(trimmedTarget);
+        referencedAttachments.push({
+          vaultPath: trimmedTarget,
+          destName,
+          isImage,
+        });
+        const displayText = alias || attachmentName;
         // Slugified names are already URL-safe; encode originals that may have spaces.
         const urlName = imageNameTransform
           ? destName
-          : imgName.split("/").map(encodeURIComponent).join("/");
-        return `![${displayAlt}](${imageAssetsSubpath}/${urlName})`;
+          : attachmentName.split("/").map(encodeURIComponent).join("/");
+        const url = `${imageAssetsSubpath}/${urlName}`;
+        return isEmbed && isImage
+          ? `![${displayText}](${url})`
+          : `[${displayText}](${url})`;
       }
 
       // Regular link or non-image embed — resolve and check publish status
-      const entry = resolveEntry(trimmedTarget, slugMap);
       const displayText = alias || trimmedTarget;
 
       if (!entry) {
@@ -97,7 +111,33 @@ export function transformWikilinks(
     }
   );
 
-  return { transformed, referencedImages };
+  return { transformed, referencedAttachments };
+}
+
+/**
+ * Return the unique Markdown notes referenced by Obsidian wikilinks in content.
+ * Attachments are intentionally excluded from the note dependency graph.
+ */
+export function extractReferencedNotes(
+  content: string,
+  slugMap: SlugMap
+): SlugEntry[] {
+  const references = new Map<string, SlugEntry>();
+  const wikilinkRegex = /!?\[\[([^\]|#]+)(?:#[^\]|]*)?((?:\|[^\]]*)?)\]\]/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = wikilinkRegex.exec(content)) !== null) {
+    const target = match[1].trim();
+    const entry = resolveEntry(target, slugMap);
+    if (entry) references.set(entry.sourcePath, entry);
+  }
+
+  return [...references.values()];
+}
+
+function isAttachmentFile(name: string): boolean {
+  const extension = path.extname(name).toLowerCase();
+  return extension !== "" && extension !== ".md" && extension !== ".mdx";
 }
 
 /**
@@ -108,7 +148,12 @@ export function transformWikilinks(
  *   3. Case-insensitive title match
  *   4. Returns null if unresolvable
  */
-function resolveEntry(target: string, slugMap: SlugMap): SlugEntry | null {
+export function resolveEntry(target: string, slugMap: SlugMap): SlugEntry | null {
+  const normalizedTarget = target.replace(/\\/g, "/");
+  const withoutExtension = normalizedTarget.replace(/\.mdx?$/i, "");
+  if (slugMap.has(normalizedTarget)) return slugMap.get(normalizedTarget)!;
+  if (slugMap.has(withoutExtension)) return slugMap.get(withoutExtension)!;
+
   const stem = path.basename(target, path.extname(target));
 
   // 1. Exact key match

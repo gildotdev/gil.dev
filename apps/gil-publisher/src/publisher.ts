@@ -9,8 +9,13 @@ import {
   serializeFrontmatter,
   normalizeFrontmatter,
 } from "./frontmatter";
-import { transformWikilinks, isImageFile, type SlugMap } from "./wikilink";
-import type { ReferencedImage } from "./wikilink";
+import {
+  extractReferencedNotes,
+  transformWikilinks,
+  isImageFile,
+  type ReferencedAttachment,
+  type SlugMap,
+} from "./wikilink";
 
 export interface PublishResult {
   published: string[];
@@ -32,33 +37,25 @@ export function buildSlugMap(app: App, ignoredFolders: string[]): SlugMap {
     const stem = path.basename(file.path, path.extname(file.path));
     const slug = frontmatterSlugOrDerived(app, file);
     const entry = { slug, sourcePath: file.path };
+    const normalizedPath = file.path.replace(/\\/g, "/");
+    const pathWithoutExtension = normalizedPath.replace(/\.mdx?$/i, "");
+
+    // Register path-qualified targets before the shorter aliases so links such
+    // as [[clippings/example]] resolve even when filenames repeat elsewhere.
+    map.set(normalizedPath, entry);
+    map.set(pathWithoutExtension, entry);
 
     // Register by stem
-    map.set(stem, entry);
+    if (!map.has(stem)) map.set(stem, entry);
 
     // Also register by title if different
     const title = frontmatterTitle(app, file);
     if (title && title.toLowerCase() !== stem.toLowerCase()) {
-      map.set(title, entry);
+      if (!map.has(title)) map.set(title, entry);
     }
   }
 
   return map;
-}
-
-/**
- * Build the set of vault-relative paths that qualify for publishing
- * (inside publishFolder, not in ignoredFolders).
- * Used to filter wikilinks when publishing individual notes.
- */
-export function buildPublishedPaths(app: App, settings: PluginSettings): Set<string> {
-  const files = app.vault.getMarkdownFiles();
-  return new Set(
-    files
-      .filter((f) => !isInIgnoredFolder(f.path, settings.ignoredFolders))
-      .filter((f) => isInPublishFolder(f.path, settings.publishFolder))
-      .map((f) => f.path)
-  );
 }
 
 /**
@@ -78,25 +75,63 @@ export async function publishAll(
 
   const slugMap = buildSlugMap(app, settings.ignoredFolders);
   const files = app.vault.getMarkdownFiles();
-  const publishedPaths = buildPublishedPaths(app, settings);
+  const roots = files.filter(
+    (file) =>
+      !isInIgnoredFolder(file.path, settings.ignoredFolders) &&
+      isInPublishFolder(file.path, settings.publishFolder)
+  );
+  const publication = await buildPublicationClosure(app, roots, slugMap);
 
-  for (const file of files) {
-    if (isInIgnoredFolder(file.path, settings.ignoredFolders)) {
-      result.skipped.push(file.path);
-      continue;
-    }
-
-    if (!isInPublishFolder(file.path, settings.publishFolder)) {
-      result.skipped.push(file.path);
-      continue;
-    }
-
+  for (const file of publication.files) {
     try {
       onProgress?.(`Publishing ${file.path}…`);
-      await publishFile(app, file, settings, slugMap, publishedPaths);
+      await publishFile(app, file, settings, slugMap, publication.paths);
       result.published.push(file.path);
     } catch (err) {
       result.errors.push({ file: file.path, error: String(err) });
+    }
+  }
+
+  for (const file of files) {
+    if (!publication.paths.has(file.path)) result.skipped.push(file.path);
+  }
+
+  return result;
+}
+
+/**
+ * Publish one note plus every non-ignored Markdown note reachable through its
+ * wikilinks. Cycles are safe and each related note is written at most once.
+ */
+export async function publishFileWithRelated(
+  app: App,
+  file: TFile,
+  settings: PluginSettings,
+  onProgress?: (msg: string) => void
+): Promise<PublishResult> {
+  const result: PublishResult = { published: [], skipped: [], errors: [] };
+
+  if (!settings.targetRepoPath) {
+    result.errors.push({ file: "", error: "Target repo path is not configured." });
+    return result;
+  }
+
+  const slugMap = buildSlugMap(app, settings.ignoredFolders);
+  const publication = await buildPublicationClosure(app, [file], slugMap);
+
+  for (const relatedFile of publication.files) {
+    try {
+      onProgress?.(`Publishing ${relatedFile.path}…`);
+      await publishFile(
+        app,
+        relatedFile,
+        settings,
+        slugMap,
+        publication.paths
+      );
+      result.published.push(relatedFile.path);
+    } catch (err) {
+      result.errors.push({ file: relatedFile.path, error: String(err) });
     }
   }
 
@@ -130,7 +165,7 @@ export async function publishFile(
   // Strip old frontmatter and transform wikilinks
   const body = stripFrontmatter(raw);
   const imageAssetsSubpath = buildImageRelativePath(settings);
-  const { transformed, referencedImages } = transformWikilinks(
+  const { transformed, referencedAttachments } = transformWikilinks(
     body,
     slugMap,
     imageAssetsSubpath,
@@ -142,8 +177,11 @@ export async function publishFile(
   const assetsDir = path.join(settings.targetRepoPath, settings.imageTargetSubpath);
   await ensureDir(assetsDir);
 
-  for (const img of referencedImages) {
-    await copyImage(app, img, assetsDir);
+  const copiedAttachments = new Set<string>();
+  for (const attachment of referencedAttachments) {
+    if (copiedAttachments.has(attachment.destName)) continue;
+    await copyAttachment(app, attachment, assetsDir, file.path);
+    copiedAttachments.add(attachment.destName);
   }
 
   // Write the transformed note using a slugified filename
@@ -193,21 +231,60 @@ function frontmatterTitle(app: App, file: TFile): string | null {
   return typeof fm.title === "string" ? fm.title : null;
 }
 
-async function copyImage(app: App, img: ReferencedImage, destDir: string): Promise<void> {
-  // vaultPath may be a vault-relative path or just a filename
-  const { vaultPath, destName } = img;
+async function copyAttachment(
+  app: App,
+  attachment: ReferencedAttachment,
+  destDir: string,
+  sourcePath: string
+): Promise<void> {
+  // Prefer Obsidian's own resolver so relative links and duplicate filenames
+  // resolve the same way they do inside the source note.
+  const { vaultPath, destName } = attachment;
   const vaultFiles = app.vault.getFiles();
-  const match = vaultFiles.find(
-    (f) =>
-      f.path === vaultPath ||
-      f.name === path.basename(vaultPath) ||
-      (isImageFile(f.name) && f.name === vaultPath)
+  const resolved = app.metadataCache.getFirstLinkpathDest(vaultPath, sourcePath);
+  const match = resolved ?? vaultFiles.find(
+    (candidate) =>
+      candidate.path === vaultPath ||
+      candidate.name === path.basename(vaultPath) ||
+      (isImageFile(candidate.name) && candidate.name === vaultPath)
   );
-  if (!match) return; // Image not found in vault — skip silently
+  if (!match) {
+    throw new Error(`Referenced attachment not found: ${vaultPath}`);
+  }
 
   const data = await app.vault.readBinary(match);
   const destPath = path.join(destDir, destName);
   fs.writeFileSync(destPath, Buffer.from(data));
+}
+
+async function buildPublicationClosure(
+  app: App,
+  roots: TFile[],
+  slugMap: SlugMap
+): Promise<{ files: TFile[]; paths: Set<string> }> {
+  const markdownByPath = new Map(
+    app.vault.getMarkdownFiles().map((file) => [file.path, file])
+  );
+  const files: TFile[] = [];
+  const paths = new Set<string>();
+  const queue = [...roots];
+
+  while (queue.length > 0) {
+    const file = queue.shift()!;
+    if (paths.has(file.path)) continue;
+
+    paths.add(file.path);
+    files.push(file);
+
+    const raw = await app.vault.read(file);
+    const references = extractReferencedNotes(stripFrontmatter(raw), slugMap);
+    for (const reference of references) {
+      const relatedFile = markdownByPath.get(reference.sourcePath);
+      if (relatedFile && !paths.has(relatedFile.path)) queue.push(relatedFile);
+    }
+  }
+
+  return { files, paths };
 }
 
 /**

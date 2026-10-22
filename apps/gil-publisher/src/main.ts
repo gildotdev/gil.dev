@@ -4,7 +4,7 @@ import {
   GilPublisherSettingTab,
   type PluginSettings,
 } from "./settings";
-import { buildSlugMap, buildPublishedPaths, publishAll, publishFile } from "./publisher";
+import { publishAll, publishFileWithRelated } from "./publisher";
 import { syncFromRepo } from "./syncer";
 
 export default class GilPublisherPlugin extends Plugin {
@@ -63,11 +63,24 @@ export default class GilPublisherPlugin extends Plugin {
           return;
         }
 
-        const slugMap = buildSlugMap(this.app, this.settings.ignoredFolders);
-        const publishedPaths = buildPublishedPaths(this.app, this.settings);
-        publishFile(this.app, file, this.settings, slugMap, publishedPaths)
-          .then(() => {
-            new Notice(`Gil Publisher: Published "${file.basename}".`);
+        publishFileWithRelated(this.app, file, this.settings)
+          .then((result) => {
+            if (result.errors.length) {
+              new Notice(
+                `Gil Publisher: Published ${result.published.length} note(s) with ${result.errors.length} error(s).`,
+                8000
+              );
+              console.error("[GilPublisher] Errors:", result.errors);
+              return;
+            }
+
+            const relatedCount = Math.max(0, result.published.length - 1);
+            const relatedSummary = relatedCount
+              ? ` and ${relatedCount} related note(s)`
+              : "";
+            new Notice(
+              `Gil Publisher: Published "${file.basename}"${relatedSummary}.`
+            );
           })
           .catch((err: unknown) => {
             new Notice(`Gil Publisher: Error publishing "${file.basename}": ${String(err)}`, 8000);
@@ -125,11 +138,22 @@ export default class GilPublisherPlugin extends Plugin {
         return;
       }
 
-      const slugMap = buildSlugMap(this.app, this.settings.ignoredFolders);
-      const publishedPaths = buildPublishedPaths(this.app, this.settings);
       try {
-        await publishFile(this.app, file, this.settings, slugMap, publishedPaths);
-        new Notice(`Gil Publisher: Published "${file.basename}".`);
+        const result = await publishFileWithRelated(this.app, file, this.settings);
+        if (result.errors.length) {
+          new Notice(
+            `Gil Publisher: Published ${result.published.length} note(s) with ${result.errors.length} error(s).`,
+            8000
+          );
+          console.error("[GilPublisher] Errors:", result.errors);
+          return;
+        }
+
+        const relatedCount = Math.max(0, result.published.length - 1);
+        const relatedSummary = relatedCount
+          ? ` and ${relatedCount} related note(s)`
+          : "";
+        new Notice(`Gil Publisher: Published "${file.basename}"${relatedSummary}.`);
       } catch (err) {
         new Notice(`Gil Publisher: Error — ${String(err)}`, 8000);
         console.error("[GilPublisher]", err);
