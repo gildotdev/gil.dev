@@ -11,6 +11,7 @@
     "start": "astro dev",
     "new:note": "node scripts/new-note.mjs",
     "build": "astro build",
+    "check:links": "node scripts/check-links.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "node --no-experimental-require-module --experimental-strip-types --test tests/*.test.mjs"

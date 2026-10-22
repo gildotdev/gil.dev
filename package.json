@@ -11,7 +11,7 @@
     "build": "pnpm -r --if-present build",
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
-    "check": "pnpm test && pnpm typecheck && pnpm build",
+    "check": "pnpm test && pnpm typecheck && pnpm build && pnpm --filter @gilcreque/gil.dev check:links",
     "new:note": "pnpm --filter @gilcreque/gil.dev new:note",
     "plugin:dev": "pnpm --filter @gilcreque/gil-publisher dev",
     "plugin:build": "pnpm --filter @gilcreque/gil-publisher build",

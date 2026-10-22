@@ -47,7 +47,13 @@ const tags = note.data.tags ?? [];
     topics.length > 0 && (
       <div class="garden-note-card__topics" aria-label="Topics">
         {topics.slice(0, 3).map((topic: string) => (
-          <a href={`/topics/${topic}`}>{topicTitles[topic] ?? topic}</a>
+          <a
+            href={topicTitles[topic]
+              ? `/topics/${encodeURIComponent(topic)}`
+              : `/notes?topic=${encodeURIComponent(topic)}`}
+          >
+            {topicTitles[topic] ?? topic}
+          </a>
         ))}
       </div>
     )
