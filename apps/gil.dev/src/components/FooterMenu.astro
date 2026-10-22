@@ -1,3 +1,8 @@
+---
+import { Image } from "astro:assets";
+import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
+---
+
 <style>
   li {
     list-style-type: none;
@@ -47,7 +52,14 @@
     <li>
       <a class="footer-menu-link" href="/about">
         <span class="footer-menu-icon" aria-hidden="true">
-          <img src="/img/avatar-pink-tv-ghibli-small.png" alt="" />
+          <Image
+            src={avatarImage}
+            alt=""
+            width={48}
+            height={48}
+            format="webp"
+            quality={82}
+          />
         </span>
         <span class="footer-menu-label">About</span>
       </a>

@@ -13,9 +13,11 @@ import PostLayout from "../../layouts/PostLayout.astro";
 import Button from "../../components/Button.astro";
 import { getLiveEntry } from "astro:content";
 import type { MicroblogPost } from "../../lib/micropubLoader";
+import { setMicroblogPageCacheHeaders } from "../../lib/cache";
 
 // Astro.params.slug is the full path e.g. "2026/03/19/i-did-my-somewhat-annual"
 const { slug } = Astro.params;
+setMicroblogPageCacheHeaders(Astro.response.headers);
 const result = await getLiveEntry("posts", slug!);
 const post = result.entry?.data as MicroblogPost | undefined;
 

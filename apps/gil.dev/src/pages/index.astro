@@ -3,7 +3,10 @@ export const prerender = false;
 
 import "../layouts/MainLayout.astro";
 import MainLayout from "../layouts/MainLayout.astro";
+import { setMicroblogPageCacheHeaders } from "../lib/cache";
 import "../styles/global.css";
+
+setMicroblogPageCacheHeaders(Astro.response.headers);
 ---
 
 <MainLayout title="Home" isHome="true" />

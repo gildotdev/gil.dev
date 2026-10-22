@@ -22,6 +22,7 @@ import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
 import { ClientRouter } from "astro:transitions";
 import LatestPosts from "../components/LatestPosts.astro";
 import KnowledgeGarden from "../components/KnowledgeGarden.astro";
+import { Image } from "astro:assets";
 import "../styles/global.css";
 const resolvedOgImage = ogImage ?? avatarImage.src;
 ---
@@ -88,19 +89,20 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <link
       rel="shortcut icon"
-      type="image/x-icon"
-      href="/img/avatar-pink-tv-ghibli-small.png"
-      sizes="16x16"
+      type="image/png"
+      href="/img/avatar-pink-tv-ghibli-32.png"
+      sizes="32x32"
     />
     <link
       rel="icon"
-      type="image/x-icon"
-      href="/img/avatar-pink-tv-ghibli-small.png"
-      sizes="16x16"
+      type="image/png"
+      href="/img/avatar-pink-tv-ghibli-32.png"
+      sizes="32x32"
     />
     <link
       rel="apple-touch-icon-precomposed"
-      href="/img/avatar-pink-tv-ghibli-small.png"
+      href="/img/avatar-pink-tv-ghibli-180.png"
+      sizes="180x180"
     />
     <link
       rel="alternate"
@@ -126,11 +128,17 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
           <>
             <div class="hero-avatar-wrap mr-3 mb-3">
               <div class="hero-ring" />
-              <img
+              <Image
                 id="avatar"
                 transition:name="avatar"
-                src={avatarImage.src}
+                src={avatarImage}
                 alt="Photo of Gil Creque in a pink TV"
+                width={256}
+                height={256}
+                format="webp"
+                quality={82}
+                loading="eager"
+                fetchpriority="high"
                 class="rounded-full w-32 h-32"
                 style="border: 2px solid var(--mint-green);"
               />
@@ -150,15 +158,18 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
           <>
             <a href="/" class="hero-avatar-wrap mr-3 focus:outline-none">
               <div class="hero-ring hero-ring--hover" />
-              <img
+              <Image
                 id="avatar"
                 transition:name="avatar"
-                src={avatarImage.src}
+                src={avatarImage}
                 alt="Photo of Gil Creque in a pink TV"
-                height="100px"
-                width="100px"
+                width={200}
+                height={200}
+                format="webp"
+                quality={82}
+                loading="eager"
                 class="rounded-full"
-                style="border: 2px solid var(--mint-green);"
+                style="width: 100px; height: 100px; border: 2px solid var(--mint-green);"
               />
             </a>
             <h1 class="grow text-center">

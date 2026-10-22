@@ -11,9 +11,12 @@ import {
 } from "../../lib/utils";
 import "../../styles/global.css";
 import type { MicroblogPost } from "../../lib/micropubLoader";
+import { setMicroblogPageCacheHeaders } from "../../lib/cache";
 
 const PAGE_SIZE = 12;
 const pageNum = parseInt(Astro.params.page ?? "1");
+
+setMicroblogPageCacheHeaders(Astro.response.headers);
 
 const result = await getLiveCollection("posts");
 const allPosts = ((result.entries ?? []) as { id: string; data: MicroblogPost }[]).sort(
