@@ -3,16 +3,15 @@ import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import { formatPublishDate } from "../../lib/utils.ts";
 import { getTagPaths, tagMatchesPath } from "../../lib/tags.ts";
-import { isDiscoverableNote, isPublishedNote, noteStatusEmoji } from "../../lib/notes.ts";
+import { isPublishedNote, noteStatusEmoji } from "../../lib/notes.ts";
 import "../../styles/global.css";
 
 export async function getStaticPaths() {
-  const publishedNotes = await getCollection("notes", ({ data }) =>
+  const notes = await getCollection("notes", ({ data }) =>
     isPublishedNote(data),
   );
-  const notes = publishedNotes.filter(({ data }) => isDiscoverableNote(data));
 
-  const allTags = publishedNotes.flatMap((note) => note.data.tags ?? []);
+  const allTags = notes.flatMap((note) => note.data.tags ?? []);
   const tagPaths = getTagPaths(allTags);
 
   return tagPaths.map((tag) => ({
