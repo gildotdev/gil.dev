@@ -90,7 +90,7 @@ After installation, reload Obsidian (or disable and re-enable Gil Publisher), op
 
 [Astro](https://astro.build/) powers the site and its content collections, [Netlify](https://www.netlify.com/) hosts it, and Markdown and MDX keep the writing close to the source. The design goal is a site that feels personal, quick to load, and easy to keep tending—and, occasionally, it is fueled by [burritos 🌯](https://gil.dev/chipotle).
 
-Netlify reads the root [`netlify.toml`](netlify.toml), builds only the Astro workspace package, and publishes `apps/gil.dev/dist`. Keep the Netlify base directory at the repository root; the checked-in configuration supplies the monorepo-aware build and publish paths.
+Netlify reads the root [`netlify.toml`](netlify.toml), builds only the Astro workspace package, and publishes `apps/gil.dev/dist`. Keep the Netlify base directory at the repository root and set the package directory to `apps/gil.dev` so Netlify detects Astro and deploys the adapter-generated SSR function.
 
 ## Versioning and releases
 

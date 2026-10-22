@@ -1,6 +1,3 @@
 [build]
   command = "pnpm --filter @gilcreque/gil.dev build"
   publish = "apps/gil.dev/dist"
-
-[functions]
-  directory = "apps/gil.dev/.netlify/functions"
