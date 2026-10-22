@@ -129,6 +129,11 @@ const initialIds = new Set(initialNotes.map((note) => note.id));
     margin-bottom: 0.8rem;
   }
 
+  .garden-wander__header > div {
+    min-width: 0;
+    flex: 1;
+  }
+
   .garden-wander__title {
     margin: 0;
     padding: 0;
@@ -178,10 +183,17 @@ const initialIds = new Set(initialNotes.map((note) => note.id));
   @media (max-width: 700px) {
     .garden-wander__header {
       align-items: flex-start;
+      flex-wrap: wrap;
     }
 
     .garden-wander__grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .garden-wander__header {
+      flex-direction: column;
     }
   }
 </style>

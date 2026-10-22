@@ -202,6 +202,7 @@ footer {
 }
 
 .hero-header {
+  gap: clamp(1rem, 4vw, 2rem);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -224,6 +225,8 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   padding-top: 0.75rem;
   margin-bottom: 1rem;
 }
@@ -234,6 +237,13 @@ footer {
   gap: 0.4rem;
   margin: 0;
   padding: 0;
+}
+
+.view-all {
+  margin-left: auto;
+  font-size: 0.6rem;
+  line-height: 1.35;
+  white-space: nowrap;
 }
 
 /* ── Post cards ── */
@@ -252,12 +262,17 @@ footer {
 
 .post-card-link {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) 72px;
   gap: 0.75rem;
   align-items: start;
   padding: 0.75rem 0;
   text-decoration: none !important;
   transition: padding-left 0.15s;
+}
+
+.post-card-body {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .post-card-link:hover {
@@ -349,10 +364,13 @@ footer {
     grid-column: 1 / -1;
   }
 
-  /* Posts + Garden side by side on desktop */
+}
+
+@media (min-width: 1024px) {
   #posts-notes-row {
     flex-direction: row;
     align-items: flex-start;
+    gap: 2.5rem;
   }
 
   #posts-notes-row > #posts {
@@ -364,16 +382,66 @@ footer {
     flex: 5;
     min-width: 0;
   }
-
-  #posts-notes-row > #posts {
-    flex: 3;
-  }
-
 }
 
-@media (min-width: 1000px) {
-  #posts-notes-row {
-    gap: 2.5rem;
+@media (max-width: 639px) {
+  :root {
+    font-size: 20px;
+  }
+
+  body {
+    grid-row-gap: 1.25rem;
+  }
+
+  header {
+    margin-top: 1rem;
+  }
+
+  .hero-header {
+    align-items: center;
+    gap: 1rem;
+    padding-inline: 1rem;
+  }
+
+  .hero-header .hero-avatar-wrap {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  .hero-header #avatar {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .hero-tagline {
+    margin-top: 0.15rem;
+    padding-bottom: 0.75rem;
+    line-height: 1.35;
+  }
+
+  #home-content {
+    width: 100%;
+    padding-inline: 0.5rem;
+  }
+
+  .post-card-link {
+    grid-template-columns: minmax(0, 1fr) 64px;
+    gap: 0.6rem;
+  }
+
+  .post-card-thumb {
+    width: 64px;
+    height: 64px;
+  }
+
+  footer {
+    flex-direction: column;
+    gap: 1rem;
+    padding-inline: 0.5rem;
+  }
+
+  footer > aside {
+    width: 100% !important;
   }
 }
 
