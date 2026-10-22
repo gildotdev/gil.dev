@@ -182,17 +182,22 @@ function serializeFrontmatter(fm) {
       } else {
         lines.push(`${key}:`);
         for (const item of value) {
-          lines.push(`  - ${String(item)}`);
+          lines.push(`  - ${serializeScalar(item)}`);
         }
       }
     } else if (typeof value === "boolean") {
       lines.push(`${key}: ${value}`);
     } else {
-      lines.push(`${key}: ${String(value)}`);
+      lines.push(`${key}: ${serializeScalar(value)}`);
     }
   }
   lines.push("---");
   return lines.join("\n");
+}
+function serializeScalar(value) {
+  if (typeof value === "string") return JSON.stringify(value);
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return JSON.stringify(String(value));
 }
 function normalizeFrontmatter(existing, fileName, ctime, mtime) {
   const slug = typeof existing.slug === "string" && existing.slug ? existing.slug : fileNameToSlug(fileName);
@@ -286,7 +291,7 @@ function parseSimpleYaml(yaml) {
       i++;
       while (i < lines.length && /^\s+-\s+/.test(lines[i])) {
         const item = lines[i].replace(/^\s+-\s+/, "").trim();
-        items.push(item.replace(/^['"]|['"]$/g, ""));
+        items.push(parseScalar(item));
         i++;
       }
       result[key] = items;
@@ -304,11 +309,24 @@ function parseSimpleYaml(yaml) {
       result[key] = inner ? inner.split(",").map((s) => s.trim().replace(/^['"]|['"]$/g, "")) : [];
       i++;
     } else {
-      result[key] = rest.replace(/^['"]|['"]$/g, "");
+      result[key] = parseScalar(rest);
       i++;
     }
   }
   return result;
+}
+function parseScalar(value) {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === "string") return parsed;
+    } catch (e) {
+    }
+  }
+  if (value.startsWith("'") && value.endsWith("'")) {
+    return value.slice(1, -1).replace(/''/g, "'");
+  }
+  return value;
 }
 
 // src/wikilink.ts
