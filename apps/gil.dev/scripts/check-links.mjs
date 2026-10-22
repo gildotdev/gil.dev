@@ -6,6 +6,11 @@ const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const distRoot = path.join(appRoot, "dist");
 const siteOrigin = "https://gil.dev";
 const serverRenderedPaths = new Set(["/blog", "/blog/", "/posts", "/posts/"]);
+const baseUrlFlag = process.argv.indexOf("--base-url");
+const liveBaseUrl =
+  baseUrlFlag >= 0 && process.argv[baseUrlFlag + 1]
+    ? new URL(process.argv[baseUrlFlag + 1])
+    : null;
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -58,6 +63,7 @@ async function localTargetExists(pathname) {
 
 const htmlFiles = (await walk(distRoot)).filter((file) => file.endsWith(".html"));
 const brokenLinks = [];
+const liveTargets = new Map();
 let checkedLinks = 0;
 
 for (const htmlFile of htmlFiles) {
@@ -80,13 +86,49 @@ for (const htmlFile of htmlFiles) {
     if (target.origin !== siteOrigin) continue;
     checkedLinks += 1;
 
-    if (!(await localTargetExists(target.pathname))) {
+    if (liveBaseUrl) {
+      const targetPath = `${target.pathname}${target.search}`;
+      const sources = liveTargets.get(targetPath) ?? new Set();
+      sources.add(sourceRoute);
+      liveTargets.set(targetPath, sources);
+    } else if (!(await localTargetExists(target.pathname))) {
       brokenLinks.push({
         sourceRoute,
         href,
         resolvedPath: target.pathname,
       });
     }
+  }
+}
+
+if (liveBaseUrl) {
+  const targets = [...liveTargets.entries()];
+  const concurrency = 10;
+
+  for (let index = 0; index < targets.length; index += concurrency) {
+    const batch = targets.slice(index, index + concurrency);
+    const results = await Promise.all(
+      batch.map(async ([targetPath, sources]) => {
+        const url = new URL(targetPath, liveBaseUrl);
+        try {
+          const response = await fetch(url, { redirect: "follow" });
+          return response.ok
+            ? null
+            : {
+                sourceRoute: [...sources].join(", "),
+                href: url.href,
+                resolvedPath: `HTTP ${response.status}`,
+              };
+        } catch (error) {
+          return {
+            sourceRoute: [...sources].join(", "),
+            href: url.href,
+            resolvedPath: error instanceof Error ? error.message : String(error),
+          };
+        }
+      }),
+    );
+    brokenLinks.push(...results.filter(Boolean));
   }
 }
 
@@ -97,7 +139,10 @@ if (brokenLinks.length > 0) {
   }
   process.exitCode = 1;
 } else {
+  const targetSummary = liveBaseUrl
+    ? `${liveTargets.size} unique deployed URLs`
+    : `${checkedLinks} internal links`;
   console.log(
-    `Checked ${checkedLinks} internal links across ${htmlFiles.length} generated pages; all targets exist.`,
+    `Checked ${targetSummary} across ${htmlFiles.length} generated pages; all targets exist.`,
   );
 }
