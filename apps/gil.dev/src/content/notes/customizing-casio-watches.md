@@ -3,14 +3,15 @@ class: "note"
 title: "Customizing Casio Watches"
 slug: "customizing-casio-watches"
 tags:
-  - "seedling"
-  - "diy"
   - "watches/casio"
   - "ai/generated"
 aliases:
   - "Casio Watch Mods"
-created: "2026-10-22T00:00:00+0000"
-updated: "2026-10-22T00:00:00+0000"
+created: "2026-10-22T10:39:00-0400"
+updated: "2026-10-22T15:50:00-0400"
+topics:
+  - "diy"
+status: "seed"
 description: "Exploring Casio watch customization through themed builds, display mods, custom straps, and replacement electronics."
 ---
 

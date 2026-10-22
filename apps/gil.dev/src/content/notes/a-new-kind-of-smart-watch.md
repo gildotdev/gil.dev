@@ -10,9 +10,10 @@ tags:
 feature: "thumbnails/youtube/iBSRyRcO2HQ.webp"
 thumbnail: "thumbnails/resized/97af0e6747cae321cdd947d805fe84aa_86cf658e.webp"
 slug: "a-new-kind-of-smart-watch"
-status: "reference"
 created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:39:02-0400"
+topics: []
+status: "reference"
 description: "Sneak Peek NEW TECH 👉 https://www.instagram.com/camshand.jpgGet cheap & quick PCB/3D Printing/CNC machining services from today's Sponsor PCBWay 👉 https://www.pcbway.com/SUBSCRIBE 🔔  @camshand"
 ---
 

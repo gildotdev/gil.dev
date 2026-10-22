@@ -10,9 +10,10 @@ tags:
 feature: "thumbnails/youtube/3lDeurBV2dY.webp"
 thumbnail: "thumbnails/resized/026f9c9a099e11da56f8c0a8a7e7ab66_86cf658e.webp"
 slug: "turning-a-dollar30-casio-into-a-custom-oil-filled-watch"
-status: "reference"
 created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:41:07-0400"
+topics: []
+status: "reference"
 description: "In this tutorial, I'm walking you through the hardest watch build I've ever attempted: a stainless steel Casio Royale (AE1200) with three mods stacked on top of each other. A custom logo on the dial,"
 ---
 
