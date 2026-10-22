@@ -44,4 +44,4 @@ name: gildotdev
 # attach: false
 
 windows:
-  - server: npm start
+  - server: pnpm dev

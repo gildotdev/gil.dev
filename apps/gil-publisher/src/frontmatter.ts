@@ -1,0 +1,347 @@
+import path from "path";
+import slugify from "slugify";
+
+/**
+ * Represents the normalized frontmatter fields we inject/guarantee
+ * for the Astro content schema.
+ */
+export interface NormalizedFrontmatter {
+  title: string;
+  slug: string;
+  created: string;
+  updated: string;
+  tags: string[];
+  topics: string[];
+  status: NoteStatus;
+  description?: string;
+  draft?: boolean;
+  [key: string]: unknown;
+}
+
+export type NoteStatus = "seed" | "growing" | "evergreen" | "reference";
+
+const NOTE_STATUSES = new Set<NoteStatus>([
+  "seed",
+  "growing",
+  "evergreen",
+  "reference",
+]);
+
+const FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---/;
+
+/**
+ * Parse the YAML frontmatter from a markdown string.
+ * Returns the fields as a plain object using a naive line-by-line parser
+ * (avoids a heavy YAML dep inside the Obsidian plugin bundle).
+ */
+export function parseFrontmatter(content: string): Record<string, unknown> {
+  const match = content.match(FRONTMATTER_REGEX);
+  if (!match) return {};
+  return parseSimpleYaml(match[1]);
+}
+
+/**
+ * Strip the existing frontmatter block and return the body.
+ */
+export function stripFrontmatter(content: string): string {
+  return content.replace(FRONTMATTER_REGEX, "").replace(/^\r?\n/, "");
+}
+
+/**
+ * Serialize a frontmatter object back to a YAML block string.
+ */
+export function serializeFrontmatter(fm: Record<string, unknown>): string {
+  const lines: string[] = ["---"];
+  for (const [key, value] of Object.entries(fm)) {
+    if (value === undefined || value === null) continue;
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        lines.push(`${key}: []`);
+      } else {
+        lines.push(`${key}:`);
+        for (const item of value) {
+          lines.push(`  - ${serializeScalar(item)}`);
+        }
+      }
+    } else if (typeof value === "boolean") {
+      lines.push(`${key}: ${value}`);
+    } else {
+      lines.push(`${key}: ${serializeScalar(value)}`);
+    }
+  }
+  lines.push("---");
+  return lines.join("\n");
+}
+
+function serializeScalar(value: unknown): string {
+  if (typeof value === "string") return JSON.stringify(value);
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return JSON.stringify(String(value));
+}
+
+/**
+ * Given a file's existing frontmatter + file metadata, return a complete
+ * frontmatter object satisfying the Astro notes schema.
+ */
+export function normalizeFrontmatter(
+  existing: Record<string, unknown>,
+  fileName: string,
+  ctime: number,
+  mtime: number,
+  sourcePath = fileName
+): NormalizedFrontmatter {
+  const slug =
+    typeof existing.slug === "string" && existing.slug
+      ? existing.slug
+      : fileNameToSlug(fileName);
+
+  const title =
+    typeof existing.title === "string" && existing.title
+      ? existing.title
+      : slugToTitle(slug);
+
+  // Support Obsidian's `created`/`updated` as well as old `date`/`lastmod` names.
+  const rawCreated =
+    (typeof existing.created === "string" && existing.created) ||
+    (typeof existing.date === "string" && existing.date) ||
+    null;
+  const created = rawCreated ? ensureDateFormat(rawCreated) : formatDate(ctime);
+
+  const rawUpdated =
+    (typeof existing.updated === "string" && existing.updated) ||
+    (typeof existing.lastmod === "string" && existing.lastmod) ||
+    null;
+  const updated = rawUpdated ? ensureDateFormat(rawUpdated) : formatDate(mtime);
+
+  const tags = normalizeStringList(existing.tags);
+  const topics = normalizeStringList(existing.topics);
+
+  // Clippings are supporting source material rather than standalone garden
+  // notes. Default them to `reference`; regular notes begin as `seed`.
+  const isClipping =
+    tags.some((tag) => tag.toLowerCase() === "clippings") ||
+    sourcePath
+      .replace(/\\/g, "/")
+      .split("/")
+      .some((part) => part.toLowerCase() === "clippings");
+  const status = normalizeStatus(
+    existing.status,
+    isClipping ? "reference" : "seed"
+  );
+
+  // Normalize description: arrays become a joined string; empty arrays are omitted.
+  let description: string | undefined;
+  if (typeof existing.description === "string" && existing.description) {
+    description = existing.description;
+  } else if (Array.isArray(existing.description) && (existing.description as unknown[]).length > 0) {
+    description = (existing.description as unknown[]).map(String).join(", ");
+  }
+
+  // Spread existing fields, removing ones we handle explicitly.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {
+    date: _date,
+    lastmod: _lastmod,
+    created: _created,
+    updated: _updated,
+    description: _desc,
+    topics: _topics,
+    status: _status,
+    ...rest
+  } = existing;
+
+  const result: NormalizedFrontmatter = {
+    ...rest,
+    title,
+    slug,
+    created,
+    updated,
+    tags,
+    topics,
+    status,
+    ...(description !== undefined ? { description } : {}),
+  };
+
+  // Remove undefined values
+  for (const key of Object.keys(result)) {
+    if (result[key] === undefined) delete result[key];
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function normalizeStringList(value: unknown): string[] {
+  const values = Array.isArray(value) ? value : [value];
+
+  return values
+    .filter((item): item is string | number =>
+      typeof item === "string" || typeof item === "number"
+    )
+    .map((item) => String(item).trim())
+    .filter(Boolean);
+}
+
+function normalizeStatus(value: unknown, fallback: NoteStatus): NoteStatus {
+  if (typeof value !== "string") return fallback;
+
+  const normalized = value.trim().toLowerCase() as NoteStatus;
+  return NOTE_STATUSES.has(normalized) ? normalized : fallback;
+}
+
+function fileNameToSlug(fileName: string): string {
+  // Strip directory, extension, and optional YYYY-MM-DD- prefix
+  const base = path.basename(fileName, path.extname(fileName));
+  const withoutDate = base.replace(/^\d{4}-\d{2}-\d{2}-/, "");
+  const slug = slugify(withoutDate, { lower: true, strict: true, trim: true });
+  return slug.slice(0, 64).replace(/-+$/, "");
+}
+
+function slugToTitle(slug: string): string {
+  return slug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
+ * Format a Unix timestamp (ms) as YYYY-MM-DDTHH:mm:ss+HHMM.
+ * The schema regex requires no colon in the tz offset.
+ */
+function formatDate(ms: number): string {
+  const d = new Date(ms);
+  const pad = (n: number, w = 2) => String(n).padStart(w, "0");
+  const tzOffset = -d.getTimezoneOffset(); // minutes
+  const sign = tzOffset >= 0 ? "+" : "-";
+  const absOffset = Math.abs(tzOffset);
+  const tzHH = pad(Math.floor(absOffset / 60));
+  const tzMM = pad(absOffset % 60);
+  return (
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+    `T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` +
+    `${sign}${tzHH}${tzMM}`
+  );
+}
+
+/**
+ * Ensure an existing date string matches YYYY-MM-DDTHH:mm:ss±HHMM.
+ * If it already matches, return as-is.
+ * If it ends with ±HH:MM (colon in offset), strip the colon.
+ * If it's a plain YYYY-MM-DD, append T00:00:00+0000.
+ * Handles Obsidian's space-separated format: YYYY-MM-DD HH:mm[:ss].
+ */
+function ensureDateFormat(raw: string): string {
+  const exactMatch = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}$/.test(raw);
+  if (exactMatch) return raw;
+
+  // ISO 8601 with colon in offset: 2025-07-18T00:00:00-05:00
+  const colonOffset = raw.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}):(\d{2})$/);
+  if (colonOffset) return colonOffset[1] + colonOffset[2];
+
+  // ISO 8601 with Z
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(raw)) {
+    return raw.replace("Z", "+0000");
+  }
+
+  // Obsidian space-separated without seconds: "YYYY-MM-DD HH:mm"
+  const obsidianShort = raw.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
+  if (obsidianShort) {
+    // Parse as local time by using the T-separated form (no TZ → local)
+    const parsed = Date.parse(`${obsidianShort[1]}T${obsidianShort[2]}:00`);
+    if (!isNaN(parsed)) return formatDate(parsed);
+  }
+
+  // Obsidian space-separated with seconds: "YYYY-MM-DD HH:mm:ss"
+  const obsidianFull = raw.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/);
+  if (obsidianFull) {
+    const parsed = Date.parse(`${obsidianFull[1]}T${obsidianFull[2]}`);
+    if (!isNaN(parsed)) return formatDate(parsed);
+  }
+
+  // Plain date
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return `${raw}T00:00:00+0000`;
+  }
+
+  // Try to parse as a date and reformat
+  const parsed = Date.parse(raw);
+  if (!isNaN(parsed)) return formatDate(parsed);
+
+  return raw;
+}
+
+/**
+ * Very simple YAML parser that handles the subset used in Obsidian frontmatter:
+ *  - key: scalar value
+ *  - key:
+ *      - item
+ *      - item
+ *  - key: true/false/null
+ */
+function parseSimpleYaml(yaml: string): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  const lines = yaml.split(/\r?\n/);
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const keyMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)?$/);
+    if (!keyMatch) { i++; continue; }
+
+    const key = keyMatch[1];
+    const rest = keyMatch[2]?.trim() ?? "";
+
+    if (rest === "" || rest === "|" || rest === ">") {
+      // Possibly a sequence or block scalar — look ahead
+      const items: string[] = [];
+      i++;
+      while (i < lines.length && /^\s+-\s+/.test(lines[i])) {
+        const item = lines[i].replace(/^\s+-\s+/, "").trim();
+        items.push(parseScalar(item));
+        i++;
+      }
+      result[key] = items;
+    } else if (rest === "null") {
+      result[key] = null;
+      i++;
+    } else if (rest === "true") {
+      result[key] = true;
+      i++;
+    } else if (rest === "false") {
+      result[key] = false;
+      i++;
+    } else if (/^\[.*\]$/.test(rest)) {
+      // Inline array: [a, b, c]
+      const inner = rest.slice(1, -1);
+      result[key] = inner
+        ? inner.split(",").map((s) => s.trim().replace(/^['"]|['"]$/g, ""))
+        : [];
+      i++;
+    } else {
+      // Scalar — strip surrounding quotes
+      result[key] = parseScalar(rest);
+      i++;
+    }
+  }
+
+  return result;
+}
+
+function parseScalar(value: string): string {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === "string") return parsed;
+    } catch {
+      // Fall back to the original simple quote stripping below.
+    }
+  }
+
+  if (value.startsWith("'") && value.endsWith("'")) {
+    return value.slice(1, -1).replace(/''/g, "'");
+  }
+
+  return value;
+}

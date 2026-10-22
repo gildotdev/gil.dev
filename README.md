@@ -1,75 +1,112 @@
-# Gil Creque’s Digital Garden
+# gil.dev monorepo
 
-![A laptop and plants beneath a starry sky, representing a digital garden](public/img/gil-dev-digital-garden-banner.png)
+![A laptop and plants beneath a starry sky, representing a digital garden](apps/gil.dev/public/img/gil-dev-digital-garden-banner.png)
 
-This repository contains the source for [gil.dev](https://gil.dev): my personal digital garden for notes, experiments, and the things I am learning as a software engineer.
+This pnpm workspace contains [gil.dev](https://gil.dev), my personal digital garden, and Gil Publisher, the Obsidian plugin I use to publish notes to it.
 
 I’m a Director of Engineering and full-stack web developer at [Codecraft Works](https://www.codecraftworks.com/), where I lead development on an education technology platform. My work spans Astro, Firebase, Google Cloud, .NET, AWS, and STEM education. Outside of work, I help organize [Google Developer Group Space Coast](https://gdg.community.dev/gdg-space-coast/), [Space Coast Devs](https://space-coast.dev/), and contribute to [Space Coast Mesh](https://scmesh.org/). I also volunteer with [c11y](https://c11y.org/), a cybersecurity team for students in grades 6–12.
 
-## What you’ll find here
+## Workspace layout
 
-The site is a place for small, useful pieces of work rather than a polished archive waiting for everything to be finished. Notes can be early seeds, actively growing ideas, or evergreen references.
-
-Topics include:
-
-* Web development and Astro
-* Developer tooling and automation
-* Cloud platforms, open source, and community technology
-* Local developer-community work and cybersecurity education
-
-New notes are also available through the [RSS feed](https://gil.dev/rss.xml).
-
-## Colophon
-
-This garden is intentionally built with a small, understandable stack:
-
-* [Astro](https://astro.build/) powers the site and its content collections.
-* [Netlify](https://www.netlify.com/) hosts and deploys it.
-* Markdown and MDX keep notes close to the source code, so writing and maintaining the site share one workflow.
-* And, occasionally, it is fueled by [burritos 🌯](https://gil.dev/chipotle).
-
-The design goal is a site that feels personal, quick to load, and easy to keep tending. The content lives in [`src/content/notes`](src/content/notes), and the site pages, layouts, and components remain deliberately straightforward to modify.
-
-## Run it locally
-
-Use Node.js 22.22.3 (pinned in `.nvmrc`) and pnpm 11.5.2 (pinned in `package.json`). The supported Node ranges are 22.22.2+, 24.15.0+, or 26+ within the majors listed in `package.json`.
-
-```bash
-pnpm install
-pnpm dev
+```text
+apps/
+├── gil.dev/          # Astro site and its content
+└── gil-publisher/    # Obsidian publishing plugin
 ```
 
-The local development server runs at `http://localhost:1716` by default.
+- [`apps/gil.dev`](apps/gil.dev) contains the Astro application, Markdown and MDX content, tests, and note-creation script.
+- [`apps/gil-publisher`](apps/gil-publisher) contains the TypeScript source, build configuration, and generated bundle for the Obsidian plugin.
+- [`pnpm-workspace.yaml`](pnpm-workspace.yaml) defines the workspace and the dependencies allowed to run install-time build scripts.
+- [`pnpm-lock.yaml`](pnpm-lock.yaml) is the repository's only dependency lockfile.
 
-To create a production build:
+The site is a place for small, useful pieces of work rather than a polished archive waiting for everything to be finished. Topics include web development, Astro, developer tooling, cloud platforms, community technology, and cybersecurity education. New notes are also available through the [RSS feed](https://gil.dev/rss.xml).
+
+## Requirements and installation
+
+Use Node.js 22.23.4 (pinned in [`.nvmrc`](.nvmrc)) and pnpm 11.5.2 (pinned in the root [`package.json`](package.json)). The supported Node ranges are 22.23.4+, 24.15.0+, or 26+ within the listed majors.
+
+Install every workspace dependency from the repository root:
 
 ```bash
-pnpm build
+pnpm install --frozen-lockfile
 ```
 
-Commit `pnpm-lock.yaml` with dependency changes. pnpm is the project's package manager; do not generate an npm lockfile.
+Keep dependency changes in the root `pnpm-lock.yaml`. Do not create npm lockfiles or install dependencies separately inside either app. Use `pnpm --filter <package> add <dependency>` when adding a dependency to one workspace package.
 
-Run `pnpm test` to check post HTML processing with Lambda's module-loading restrictions. jsdom stays on 26.x because newer releases require CommonJS-to-ESM loading that Lambda disables by default. Keep this check passing when upgrading it.
+## Common commands
 
-## Versioning and releases
+Run these commands from the repository root:
 
-[Release Please](https://github.com/googleapis/release-please-action) manages semantic versions, starting from the existing `0.0.1` version. Use Conventional Commits for commits merged into `main` (or for PR titles when squash merging):
+```bash
+pnpm dev             # Start the gil.dev development server
+pnpm build           # Build every workspace package
+pnpm test            # Run tests in every package that defines them
+pnpm typecheck       # Type-check every package that defines the script
+pnpm check           # Run tests, type-checks, and production builds
+pnpm plugin:dev      # Watch and rebuild the Obsidian plugin
+pnpm plugin:build    # Create the production Obsidian plugin bundle
+```
 
-* `fix: correct RSS links` bumps the patch version.
-* `feat: add a topic index` bumps the minor version.
-* `feat!: change public URLs` or a `BREAKING CHANGE:` footer bumps the major version, including before 1.0.0.
-* `docs:`, `chore:`, and other non-release changes alone do not trigger a release.
+The site development server runs at `http://localhost:1716` by default. Package-specific commands can also use pnpm filters directly, for example:
 
-After a successful build on `main`, the workflow opens or updates a release PR containing the version bump and `CHANGELOG.md`. Merge that PR to create the `vX.Y.Z` tag and GitHub release. The package remains private; the workflow does not publish to npm. Initial release history starts after the bootstrap commit recorded in `release-please-config.json`.
+```bash
+pnpm --filter @gilcreque/gil.dev build
+pnpm --filter @gilcreque/gil-publisher typecheck
+```
 
-In GitHub Settings → Actions → General, enable **Allow GitHub Actions to create and approve pull requests**. The workflow uses the built-in `GITHUB_TOKEN`; PRs it creates do not trigger other GitHub Actions runs automatically. If branch protection requires PR checks, use a GitHub App token or a suitable personal access token for Release Please, or manually run the build workflow on the release branch. The release job only runs on `main` and is gated by a successful build.
+The site test checks post HTML processing with Lambda's module-loading restrictions. jsdom stays on 26.x because newer releases require CommonJS-to-ESM loading that Lambda disables by default.
 
 ## Add a note
 
-Use the included script to create a note with the expected frontmatter:
+Create a note with the expected frontmatter from the repository root:
 
 ```bash
 pnpm new:note "A note title"
 ```
 
-The new file is placed in `src/content/notes`. Update its tags, topics, and status as the idea develops.
+The new file is placed in [`apps/gil.dev/src/content/notes`](apps/gil.dev/src/content/notes). Update its tags, topics, and status as the idea develops.
+
+## Gil Publisher
+
+Gil Publisher writes published notes and their attachments into the Astro app. Publishing follows Obsidian wikilinks recursively so linked notes such as clippings and the files they reference are published together. Recursion never enters folders listed in the plugin's ignore setting. Folder matching is case-insensitive and treats spaces, underscores, and hyphens equivalently; the defaults are `Clients`, `ai-work`, `daily-notes`, and `codecraft-works`.
+
+Published frontmatter always includes the Obsidian `topics` and `status` properties. Existing values are preserved and normalized for Astro; notes without them receive `topics: []` and the `seed` stage.
+
+Notes in a `Clippings` folder or tagged `clippings` are automatically assigned the `reference` stage unless they already have an explicit stage. References remain directly addressable, appear in a subdued collapsed section on the all-notes page, and remain discoverable through their tags. They are excluded from the homepage, topic discovery, and RSS.
+
+The homepage's **Wander the Garden** section rotates through a balanced mix of stages and topics without using recency. The all-notes page uses the same discovery-first approach with topic, stage, and tag filters, shuffle and alphabetical controls, and a wider responsive card layout. Individual notes offer additional paths through related ideas.
+
+Configure the plugin with the monorepo root as its repository path. Its defaults are:
+
+- Notes: `apps/gil.dev/src/content/notes`
+- Images: `apps/gil.dev/src/assets`
+
+Existing plugin data that still uses the old `src/content/notes` and `src/assets` defaults is migrated automatically when the plugin loads.
+
+To install a built plugin into an Obsidian vault:
+
+```bash
+pnpm plugin:build
+pnpm plugin:install -- --vault /absolute/path/to/vault
+```
+
+After installation, reload Obsidian (or disable and re-enable Gil Publisher), open the source note, and run **Gil Publisher: Publish current note to site** from the command palette. The upload ribbon button runs the same operation.
+
+## Colophon
+
+[Astro](https://astro.build/) powers the site and its content collections, [Netlify](https://www.netlify.com/) hosts it, and Markdown and MDX keep the writing close to the source. The design goal is a site that feels personal, quick to load, and easy to keep tending—and, occasionally, it is fueled by [burritos 🌯](https://gil.dev/chipotle).
+
+Netlify reads the root [`netlify.toml`](netlify.toml), builds only the Astro workspace package, and publishes `apps/gil.dev/dist`. Keep the Netlify base directory at the repository root and set the package directory to `apps/gil.dev` so Netlify detects Astro and deploys the adapter-generated SSR function.
+
+## Versioning and releases
+
+[Release Please](https://github.com/googleapis/release-please-action) manages the repository version and root [`CHANGELOG.md`](CHANGELOG.md). Use Conventional Commits for commits merged into `main`, or for PR titles when squash merging:
+
+- `fix: correct RSS links` bumps the patch version.
+- `feat: add a topic index` bumps the minor version.
+- `feat!: change public URLs` or a `BREAKING CHANGE:` footer bumps the major version.
+- `docs:`, `chore:`, and other non-release changes alone do not trigger a release.
+
+After a successful workspace check on `main`, the workflow opens or updates a release PR containing the version bump and changelog. Merging that PR creates the `vX.Y.Z` tag and GitHub release; neither private workspace package is published to npm.
+
+In GitHub Settings → Actions → General, enable **Allow GitHub Actions to create and approve pull requests**. The workflow uses the built-in `GITHUB_TOKEN`; if branch protection requires checks on Release Please PRs, use a GitHub App token or suitable personal access token, or manually run the workflow on the release branch.

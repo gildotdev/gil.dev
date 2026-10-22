@@ -4,8 +4,12 @@
     {
       "label": "New note",
       "type": "process",
-      "command": "npm",
-      "args": ["run", "new:note", "--", "${input:noteTitle}"],
+      "command": "pnpm",
+      "args": [
+        "new:note",
+        "--",
+        "${input:noteTitle}"
+      ],
       "options": {
         "env": {
           "VSCODE_CLI": "1"
@@ -17,6 +21,65 @@
         "panel": "shared",
         "clear": true
       }
+    },
+    {
+      "label": "dev",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["dev"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "build",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["build"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "plugin: dev",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["plugin:dev"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "plugin: build",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["plugin:build"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "plugin: install",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["plugin:install", "--", "--vault", "${input:vaultPath}"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
     }
   ],
   "inputs": [
@@ -24,6 +87,11 @@
       "id": "noteTitle",
       "type": "promptString",
       "description": "Note title"
+    },
+    {
+      "id": "vaultPath",
+      "type": "promptString",
+      "description": "Absolute path to the Obsidian vault"
     }
   ]
 }

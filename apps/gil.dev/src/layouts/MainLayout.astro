@@ -1,0 +1,257 @@
+---
+const {
+  title,
+  isHome = false,
+  frontmatter,
+  description,
+  ogImage,
+  canonicalURL,
+  pageAuthor,
+  wide = false,
+} = Astro.props;
+const useWideLayout = isHome || wide;
+const defaultDescription =
+  "Software Engineer, Cyber Security Coach, Tech Community Organizer";
+const pageTitle = title || frontmatter?.title;
+const pageDescription =
+  description || frontmatter?.description || defaultDescription;
+import Footer from "../components/Footer.astro";
+import GardenNotes from "../components/GardenNotes.astro";
+import WiggleWrap from "../components/WiggleWrap.astro";
+import avatarImage from "../assets/avatar-pink-tv-ghibli-small.png";
+import { ClientRouter } from "astro:transitions";
+import LatestPosts from "../components/LatestPosts.astro";
+import KnowledgeGarden from "../components/KnowledgeGarden.astro";
+import { Image } from "astro:assets";
+import "../styles/global.css";
+const resolvedOgImage = ogImage ?? avatarImage.src;
+---
+
+<!doctype html>
+<html
+  lang="en"
+  data-theme="light"
+  data-motion="full"
+  class="site-theme min-h-screen"
+>
+  <head>
+    <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8" />
+    <title>Gil Creque - {pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={pageAuthor ?? "Gil Creque"} />
+
+    <!-- Open Graph / Social Media
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`Gil Creque - ${pageTitle}`} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={resolvedOgImage} />
+    {canonicalURL && <meta property="og:url" content={canonicalURL} />}
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`Gil Creque - ${pageTitle}`} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+
+    <!-- Google Site Verification
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta
+      name="google-site-verification"
+      content="baTB5HjY84P_avk0rfsFGUFu6_CqqmyNZUh13QCsLM8"
+    />
+
+    <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script is:inline>
+      (() => {
+        try {
+          document.documentElement.dataset.theme =
+            localStorage.getItem("gil-theme") === "dark" ? "dark" : "light";
+          const savedMotion = localStorage.getItem("gil-motion");
+          document.documentElement.dataset.motion =
+            savedMotion === "reduced" || savedMotion === "full"
+              ? savedMotion
+              : matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? "reduced"
+                : "full";
+        } catch {
+          document.documentElement.dataset.theme = "light";
+          document.documentElement.dataset.motion = "full";
+        }
+      })();
+    </script>
+
+    <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="/img/avatar-pink-tv-ghibli-32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/img/avatar-pink-tv-ghibli-32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="apple-touch-icon-precomposed"
+      href="/img/avatar-pink-tv-ghibli-180.png"
+      sizes="180x180"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="RSS Feed for gil.dev"
+      href="/rss.xml"
+    />
+    <ClientRouter />
+  </head>
+  <body class:list={["mx-auto", useWideLayout ? "max-w-6xl" : "max-w-3xl"]}>
+    <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+    <header
+      class:list={[
+        "flex flex-row px-2 w-full items-center gap-8",
+        useWideLayout ? "max-w-6xl" : "max-w-3xl",
+        isHome ? "hero-header" : "justify-center",
+      ]}
+    >
+      {
+        isHome ? (
+          <>
+            <div class="hero-avatar-wrap mr-3 mb-3">
+              <div class="hero-ring" />
+              <Image
+                id="avatar"
+                transition:name="avatar"
+                src={avatarImage}
+                alt="Photo of Gil Creque in a pink TV"
+                width={256}
+                height={256}
+                format="webp"
+                quality={82}
+                loading="eager"
+                fetchpriority="high"
+                class="rounded-full w-32 h-32"
+                style="border: 2px solid var(--mint-green);"
+              />
+            </div>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="hero-greeting text-xs sm:text-sm">Hello, I'm</span>
+                <h1 class="inline mb-0 text-2xl sm:text-3xl">Gil</h1>
+              </div>
+              <p class="hero-tagline text-xs sm:text-sm">
+                Software Engineer, Cyber Security Coach, Tech Community
+                Organizer
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <a href="/" class="hero-avatar-wrap mr-3 focus:outline-none">
+              <div class="hero-ring hero-ring--hover" />
+              <Image
+                id="avatar"
+                transition:name="avatar"
+                src={avatarImage}
+                alt="Photo of Gil Creque in a pink TV"
+                width={200}
+                height={200}
+                format="webp"
+                quality={82}
+                loading="eager"
+                class="rounded-full"
+                style="width: 100px; height: 100px; border: 2px solid var(--mint-green);"
+              />
+            </a>
+            <h1 class="grow text-center">
+              <img
+                src="/img/worm.svg"
+                width="24px"
+                height="24px"
+                class="inline"
+                alt="Worm Icon"
+              />{" "}
+              <WiggleWrap>{pageTitle}</WiggleWrap>
+            </h1>
+          </>
+        )
+      }
+    </header>
+
+    {
+      isHome && (
+        <nav class="md:hidden flex flex-row justify-between px-6 py-4 w-full">
+          <a
+            href="/blog"
+            class="home-nav-btn flex flex-col items-center gap-1 text-xs w-16"
+          >
+            <img
+              src="/img/microblog.svg"
+              width="28px"
+              height="28px"
+              alt="Blog Icon"
+            />
+            Posts
+          </a>
+          <a
+            href="/notes"
+            class="home-nav-btn flex flex-col items-center gap-1 text-xs w-16"
+          >
+            <img
+              src="/img/plant.svg"
+              width="28px"
+              height="28px"
+              alt="Notes Icon"
+            />
+            Notes
+          </a>
+          <a
+            href="/topics"
+            class="home-nav-btn flex flex-col items-center gap-1 text-xs w-16"
+          >
+            <img
+              src="/img/worm.svg"
+              width="28px"
+              height="28px"
+              alt="Topics Icon"
+            />
+            Topics
+          </a>
+        </nav>
+      )
+    }
+
+    {
+      isHome ? null : (
+        <main class:list={["px-2 w-full", useWideLayout ? "max-w-6xl" : "max-w-3xl"]}>
+          <slot />
+        </main>
+      )
+    }
+
+    {
+      isHome ? (
+        <section id="home-content">
+          <div id="posts-notes-row">
+            <LatestPosts />
+            <GardenNotes />
+          </div>
+          <KnowledgeGarden />
+        </section>
+      ) : null
+    }
+
+    <Footer />
+  </body><!-- End Document
+    ––––––––––––––––––––––––––––––––––––––––––––––––––
+-->
+</html>

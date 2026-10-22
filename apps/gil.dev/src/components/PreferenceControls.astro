@@ -1,0 +1,205 @@
+<aside class="site-preferences" aria-label="Display preferences">
+  <span class="site-preferences__title">Display</span>
+  <div class="site-preferences__controls">
+    <button
+      type="button"
+      class="preference-control theme-switcher"
+      aria-label="Switch to Rosé Pine dark theme"
+      aria-pressed="false"
+      title="Switch to Rosé Pine dark theme"
+    >
+      <span class="preference-control__icon" aria-hidden="true">☀︎</span>
+      <span class="preference-control__label">Dawn</span>
+    </button>
+    <button
+      type="button"
+      class="preference-control motion-switcher"
+      aria-label="Reduce motion"
+      aria-pressed="false"
+      title="Reduce motion"
+    >
+      <span class="preference-control__icon" aria-hidden="true">✦</span>
+      <span class="preference-control__label">Motion</span>
+    </button>
+  </div>
+</aside>
+
+<script>
+  const themeStorageKey = "gil-theme";
+  const motionStorageKey = "gil-motion";
+
+  function applyStoredPreferences() {
+    try {
+      const savedTheme = localStorage.getItem(themeStorageKey);
+      const savedMotion = localStorage.getItem(motionStorageKey);
+
+      if (savedTheme === "light" || savedTheme === "dark") {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+      if (savedMotion === "full" || savedMotion === "reduced") {
+        document.documentElement.dataset.motion = savedMotion;
+      }
+    } catch {
+      // Keep the preferences already applied by the document bootstrap script.
+    }
+  }
+
+  function initializePreferenceControls() {
+    applyStoredPreferences();
+
+    const themeSwitcher =
+      document.querySelector<HTMLButtonElement>(".theme-switcher");
+    const motionSwitcher =
+      document.querySelector<HTMLButtonElement>(".motion-switcher");
+
+    if (themeSwitcher && themeSwitcher.dataset.initialized !== "true") {
+      themeSwitcher.dataset.initialized = "true";
+      const icon = themeSwitcher.querySelector<HTMLElement>(
+        ".preference-control__icon",
+      );
+      const label = themeSwitcher.querySelector<HTMLElement>(
+        ".preference-control__label",
+      );
+
+      const updateThemeSwitcher = () => {
+        const isDark = document.documentElement.dataset.theme === "dark";
+        themeSwitcher.setAttribute("aria-pressed", String(isDark));
+        themeSwitcher.setAttribute(
+          "aria-label",
+          isDark
+            ? "Switch to Rosé Pine Dawn theme"
+            : "Switch to Rosé Pine dark theme",
+        );
+        themeSwitcher.title =
+          themeSwitcher.getAttribute("aria-label") ?? "Switch theme";
+        if (icon) icon.textContent = isDark ? "☾" : "☀︎";
+        if (label) label.textContent = isDark ? "Pine" : "Dawn";
+      };
+
+      themeSwitcher.addEventListener("click", () => {
+        const nextTheme =
+          document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.theme = nextTheme;
+        try {
+          localStorage.setItem(themeStorageKey, nextTheme);
+        } catch {
+          // The selected theme still applies for this page when storage is unavailable.
+        }
+        updateThemeSwitcher();
+      });
+
+      updateThemeSwitcher();
+    }
+
+    if (motionSwitcher && motionSwitcher.dataset.initialized !== "true") {
+      motionSwitcher.dataset.initialized = "true";
+      const icon = motionSwitcher.querySelector<HTMLElement>(
+        ".preference-control__icon",
+      );
+      const label = motionSwitcher.querySelector<HTMLElement>(
+        ".preference-control__label",
+      );
+
+      const updateMotionSwitcher = () => {
+        const isReduced =
+          document.documentElement.dataset.motion === "reduced";
+        motionSwitcher.setAttribute("aria-pressed", String(isReduced));
+        motionSwitcher.setAttribute(
+          "aria-label",
+          isReduced ? "Enable motion" : "Reduce motion",
+        );
+        motionSwitcher.title =
+          motionSwitcher.getAttribute("aria-label") ?? "Switch motion setting";
+        if (icon) icon.textContent = isReduced ? "—" : "✦";
+        if (label) label.textContent = isReduced ? "Still" : "Motion";
+      };
+
+      motionSwitcher.addEventListener("click", () => {
+        const nextMotion =
+          document.documentElement.dataset.motion === "reduced"
+            ? "full"
+            : "reduced";
+        document.documentElement.dataset.motion = nextMotion;
+        try {
+          localStorage.setItem(motionStorageKey, nextMotion);
+        } catch {
+          // The selected preference still applies when storage is unavailable.
+        }
+        updateMotionSwitcher();
+      });
+
+      updateMotionSwitcher();
+    }
+  }
+
+  const preferenceWindow = window as Window & {
+    __gilPreferenceListenersReady?: boolean;
+  };
+
+  if (!preferenceWindow.__gilPreferenceListenersReady) {
+    document.addEventListener("astro:after-swap", applyStoredPreferences);
+    document.addEventListener("astro:page-load", initializePreferenceControls);
+    preferenceWindow.__gilPreferenceListenersReady = true;
+  }
+
+  initializePreferenceControls();
+</script>
+
+<style>
+  .site-preferences {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .site-preferences__title {
+    color: var(--quiet);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.46rem;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .site-preferences__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .preference-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: 1.7rem;
+    padding: 0.28rem 0.48rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+    font-family: "Departure Mono", monospace;
+    font-size: 0.48rem;
+    line-height: 1;
+  }
+
+  .preference-control:hover {
+    border-color: var(--iris);
+    color: var(--iris);
+  }
+
+  .preference-control[aria-pressed="true"] {
+    border-color: var(--pine);
+    background: color-mix(in srgb, var(--pine) 10%, var(--surface));
+  }
+
+  .preference-control:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--iris) 42%, transparent);
+    outline-offset: 3px;
+  }
+
+  .preference-control__icon {
+    font-family: "Dank Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+  }
+</style>

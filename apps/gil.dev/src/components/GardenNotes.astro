@@ -1,0 +1,199 @@
+---
+import { getCollection } from "astro:content";
+import {
+  getDailyGardenSeed,
+  isDiscoverableNote,
+  selectGardenNotes,
+} from "../lib/notes.ts";
+import NoteCard from "./NoteCard.astro";
+import WiggleWrap from "./WiggleWrap.astro";
+
+const notes = await getCollection("notes", ({ data }) =>
+  isDiscoverableNote(data),
+);
+const topics = await getCollection("topics");
+const topicTitles = Object.fromEntries(
+  topics.map((topic) => [topic.id, topic.data.title]),
+);
+const initialNotes = selectGardenNotes(
+  notes,
+  6,
+  `homepage-${getDailyGardenSeed()}`,
+);
+const initialIds = new Set(initialNotes.map((note) => note.id));
+---
+
+<aside id="garden-wander" class="mx-2" data-garden-wander>
+  <div class="garden-wander__header">
+    <div>
+      <h2 class="garden-wander__title">
+        <img
+          src="/img/plant.svg"
+          width="24px"
+          height="24px"
+          class="inline mr-1"
+          alt="Plant Icon"
+        />{" "}<WiggleWrap>Wander the Garden</WiggleWrap>
+      </h2>
+      <p class="garden-wander__intro">
+        A changing path through ideas I’m growing, revisiting, and connecting.
+      </p>
+    </div>
+    <button type="button" class="garden-action" data-garden-shuffle>
+      Shuffle ↻
+    </button>
+  </div>
+  <div class="garden-wander__grid" data-garden-grid>
+    {
+      notes.map((note, index) => (
+        <NoteCard
+          note={note}
+          topicTitles={topicTitles}
+          hidden={!initialIds.has(note.id)}
+          compact
+          index={index}
+        />
+      ))
+    }
+  </div>
+  <div class="garden-wander__footer">
+    <a href="/notes">Explore all notes →</a>
+    <a href="/" data-surprise-note>Surprise me →</a>
+  </div>
+</aside>
+
+<script>
+  function initializeGardenWander() {
+    document.querySelectorAll("[data-garden-wander]").forEach((garden) => {
+      if (!(garden instanceof HTMLElement) || garden.dataset.ready) return;
+      garden.dataset.ready = "true";
+
+      const cards = Array.from(garden.querySelectorAll("[data-note-card]"));
+      const shuffleButton = garden.querySelector("[data-garden-shuffle]");
+      const surpriseLink = garden.querySelector("[data-surprise-note]");
+
+      const chooseCards = () => {
+        const remaining = [...cards].sort(() => Math.random() - 0.5);
+        const chosen = [];
+        const statuses = new Set();
+        const topics = new Set();
+
+        while (chosen.length < 6 && remaining.length > 0) {
+          let bestIndex = 0;
+          let bestScore = -1;
+          remaining.forEach((card, index) => {
+            const status = card.getAttribute("data-status") || "unstaged";
+            const cardTopics = JSON.parse(card.getAttribute("data-topics") || "[]");
+            const newTopics = cardTopics.filter((topic) => !topics.has(topic)).length;
+            const score = (statuses.has(status) ? 0 : 3) + newTopics * 2;
+            if (score > bestScore) {
+              bestIndex = index;
+              bestScore = score;
+            }
+          });
+          const [card] = remaining.splice(bestIndex, 1);
+          chosen.push(card);
+          statuses.add(card.getAttribute("data-status") || "unstaged");
+          JSON.parse(card.getAttribute("data-topics") || "[]").forEach((topic) =>
+            topics.add(topic),
+          );
+        }
+
+        cards.forEach((card) => {
+          card.hidden = !chosen.includes(card);
+        });
+      };
+
+      shuffleButton?.addEventListener("click", chooseCards);
+      surpriseLink?.addEventListener("click", (event) => {
+        const card = cards[Math.floor(Math.random() * cards.length)];
+        const link = card?.querySelector(".garden-note-card__title a");
+        if (link instanceof HTMLAnchorElement) {
+          event.preventDefault();
+          window.location.assign(link.href);
+        }
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initializeGardenWander);
+  initializeGardenWander();
+</script>
+
+<style>
+  .garden-wander__header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .garden-wander__header > div {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .garden-wander__title {
+    margin: 0;
+    padding: 0;
+  }
+
+  .garden-wander__intro {
+    margin: 0.3rem 0 0;
+    padding: 0;
+    color: var(--subtle);
+    font-size: 0.62rem;
+    line-height: 1.5;
+  }
+
+  .garden-wander__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .garden-wander__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.8rem;
+    font-size: 0.62rem;
+  }
+
+  .garden-action {
+    flex-shrink: 0;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rose-readable);
+    border-radius: 999px;
+    color: var(--rose-readable);
+    cursor: pointer;
+    font-family: "Departure Mono", monospace;
+    font-size: 0.54rem;
+    line-height: 1.3;
+  }
+
+  .garden-action:hover,
+  .garden-action:focus-visible {
+    background: var(--rose-readable);
+    color: var(--surface);
+  }
+
+  @media (max-width: 700px) {
+    .garden-wander__header {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .garden-wander__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .garden-wander__header {
+      flex-direction: column;
+    }
+  }
+</style>

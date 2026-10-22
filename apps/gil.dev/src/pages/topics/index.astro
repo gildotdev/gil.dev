@@ -1,0 +1,469 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { isDiscoverableNote } from "../../lib/notes";
+import "../../styles/global.css";
+
+const topics = await getCollection("topics");
+const notes = await getCollection("notes", ({ data }) =>
+  isDiscoverableNote(data),
+);
+
+const topicVisuals: Record<string, { marker: string; accent: string }> = {
+  ai: { marker: "✦", accent: "var(--iris)" },
+  angular: { marker: "△", accent: "var(--love)" },
+  astro: { marker: "✺", accent: "var(--gold)" },
+  community: { marker: "◎", accent: "var(--rose)" },
+  "cyber-security": { marker: "◇", accent: "var(--foam)" },
+  "dev-tools": { marker: "⌘", accent: "var(--pine)" },
+};
+
+const sortedTopics = topics.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+
+const topicCards = sortedTopics.map((topic, index) => {
+  const relatedNotes = notes
+    .filter((note) => (note.data.topics ?? []).includes(topic.id))
+    .sort((a, b) => a.data.title.localeCompare(b.data.title));
+  const visual = topicVisuals[topic.id] ?? {
+    marker: "○",
+    accent: "var(--iris)",
+  };
+
+  return {
+    topic,
+    relatedNotes,
+    number: String(index + 1).padStart(2, "0"),
+    ...visual,
+  };
+});
+
+const connectedNoteCount = new Set(
+  topicCards.flatMap(({ relatedNotes }) => relatedNotes.map((note) => note.id)),
+).size;
+const connectionCount = topicCards.reduce(
+  (total, { relatedNotes }) => total + relatedNotes.length,
+  0,
+);
+---
+
+<MainLayout
+  title="Topics"
+  description="Explore the subjects and ideas growing across Gil's digital garden."
+  wide={true}
+>
+  <div class="topics-page">
+    <section class="topics-intro" aria-labelledby="topics-intro-title">
+      <div class="topics-intro__copy">
+        <p class="topics-eyebrow">Choose a garden path</p>
+        <h2 id="topics-intro-title">Follow an idea, not a timeline.</h2>
+        <p>
+          These are the subjects I keep returning to. Each path gathers notes,
+          experiments, useful references, and connections that are still
+          growing.
+        </p>
+      </div>
+      <dl class="topics-stats" aria-label="Garden topic statistics">
+        <div>
+          <dt>Paths</dt>
+          <dd>{topicCards.length}</dd>
+        </div>
+        <div>
+          <dt>Notes</dt>
+          <dd>{connectedNoteCount}</dd>
+        </div>
+        <div>
+          <dt>Connections</dt>
+          <dd>{connectionCount}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <ul class="topic-grid" aria-label="Topics">
+      {
+        topicCards.map(({ topic, relatedNotes, number, marker, accent }) => (
+          <li>
+            <a
+              class="topic-card"
+              href={`/topics/${topic.id}`}
+              style={`--topic-accent: ${accent}`}
+            >
+              <span class="topic-card__number" aria-hidden="true">{number}</span>
+              <span class="topic-card__marker" aria-hidden="true">{marker}</span>
+              <div class="topic-card__heading">
+                <h2>{topic.data.title}</h2>
+                <span class="topic-card__count">
+                  {relatedNotes.length} {relatedNotes.length === 1 ? "note" : "notes"}
+                </span>
+              </div>
+              <p class="topic-card__description">{topic.data.description}</p>
+              {relatedNotes.length > 0 ? (
+                <div class="topic-card__samples">
+                  <span>A few notes along this path</span>
+                  <ul>
+                    {relatedNotes.slice(0, 2).map((note) => (
+                      <li>{note.data.title}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p class="topic-card__empty">Ready for its first note.</p>
+              )}
+              <span class="topic-card__action">
+                Explore this topic <span aria-hidden="true">→</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="topics-all-notes">
+      Prefer to roam without a map? <a href="/notes">Browse all notes →</a>
+    </p>
+  </div>
+</MainLayout>
+
+<style>
+  .topics-page {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .topics-intro {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(14rem, 0.8fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: end;
+    overflow: hidden;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    border: 1px solid var(--highlight-high);
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(
+        circle at 90% 5%,
+        color-mix(in srgb, var(--iris) 18%, transparent),
+        transparent 13rem
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--pine) 10%, var(--surface)),
+        color-mix(in srgb, var(--gold) 9%, var(--surface))
+      );
+    box-shadow: 0 22px 48px -38px var(--shadow);
+  }
+
+  .topics-intro::after {
+    position: absolute;
+    top: -2.5rem;
+    right: 1rem;
+    color: color-mix(in srgb, var(--iris) 10%, transparent);
+    content: "✦";
+    font-family: "Departure Mono", monospace;
+    font-size: clamp(7rem, 15vw, 12rem);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .topics-intro__copy,
+  .topics-stats {
+    position: relative;
+    z-index: 1;
+  }
+
+  .topics-eyebrow {
+    margin-bottom: 0.45rem;
+    color: var(--love);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .topics-intro h2 {
+    max-width: 18ch;
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.35rem, 4vw, 2.25rem);
+    line-height: 1.15;
+  }
+
+  .topics-intro__copy > p:last-child {
+    max-width: 58ch;
+    margin-bottom: 0;
+    color: var(--quiet);
+    font-size: 0.75rem;
+    line-height: 1.65;
+  }
+
+  .topics-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .topics-stats div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column-reverse;
+    gap: 0.15rem;
+    padding: 0.75rem 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--pine) 22%, transparent);
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    text-align: center;
+  }
+
+  .topics-stats dt {
+    color: var(--quiet);
+    font-size: 0.48rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .topics-stats dd {
+    margin: 0;
+    color: var(--pine);
+    font-family: "Departure Mono", monospace;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .topic-grid > li {
+    min-width: 0;
+    list-style: none;
+  }
+
+  .topic-card,
+  .topic-card:visited {
+    position: relative;
+    display: flex;
+    min-height: 18rem;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1.15rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 1.15rem;
+    background: var(--panel);
+    box-shadow: 0 18px 38px -34px var(--shadow);
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+  .topic-card::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 0.22rem;
+    background: var(--topic-accent);
+    content: "";
+  }
+
+  .topic-card::after {
+    position: absolute;
+    right: -1.2rem;
+    bottom: -2.5rem;
+    width: 7rem;
+    height: 7rem;
+    border: 1.5rem solid color-mix(in srgb, var(--topic-accent) 9%, transparent);
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+  }
+
+  .topic-card:hover {
+    border-color: var(--topic-accent);
+    background: var(--surface);
+    box-shadow: 0 22px 48px -32px var(--shadow);
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transform: translateY(-0.18rem);
+  }
+
+  .topic-card:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--topic-accent) 48%, transparent);
+    outline-offset: 3px;
+    text-decoration: none !important;
+  }
+
+  .topic-card__number {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.9rem;
+    color: var(--muted);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+  }
+
+  .topic-card__marker {
+    display: grid;
+    width: 2.4rem;
+    height: 2.4rem;
+    place-items: center;
+    margin-bottom: 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--topic-accent) 45%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--topic-accent) 11%, var(--surface));
+    color: var(--topic-accent);
+    font-family: "Departure Mono", monospace;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .topic-card__heading {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .topic-card__heading h2 {
+    margin: 0;
+    color: color-mix(in srgb, var(--topic-accent) 55%, var(--text));
+    font-size: 1rem;
+    line-height: 1.25;
+    text-shadow: none;
+  }
+
+  .topic-card__count {
+    flex: none;
+    padding: 0.14rem 0.38rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 999px;
+    color: var(--quiet);
+    font-size: 0.46rem;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .topic-card__description {
+    margin: 0.65rem 0 0;
+    color: var(--quiet);
+    font-size: 0.65rem;
+    line-height: 1.55;
+  }
+
+  .topic-card__samples {
+    margin-top: 1rem;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--highlight-high);
+  }
+
+  .topic-card__samples > span {
+    color: var(--muted);
+    font-size: 0.45rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .topic-card__samples ul {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0.4rem 0 0;
+    padding: 0;
+  }
+
+  .topic-card__samples li {
+    display: grid;
+    grid-template-columns: 0.45rem minmax(0, 1fr);
+    gap: 0.35rem;
+    color: var(--text);
+    font-size: 0.55rem;
+    line-height: 1.45;
+    list-style: none;
+  }
+
+  .topic-card__samples li::before {
+    color: var(--topic-accent);
+    content: "↳";
+  }
+
+  .topic-card__empty {
+    color: var(--muted);
+    font-size: 0.55rem;
+    font-style: italic;
+  }
+
+  .topic-card__action {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    color: color-mix(in srgb, var(--topic-accent) 55%, var(--text));
+    font-family: "Departure Mono", monospace;
+    font-size: 0.55rem;
+  }
+
+  .topics-all-notes {
+    margin: 0.5rem 0 0;
+    color: var(--quiet);
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  @media (max-width: 1023px) {
+    .topic-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .topics-intro {
+      grid-template-columns: 1fr;
+    }
+
+    .topics-stats {
+      max-width: 24rem;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .topics-intro {
+      padding: 1rem;
+      border-radius: 1rem;
+    }
+
+    .topics-intro h2 {
+      font-size: 1.25rem;
+    }
+
+    .topics-stats div {
+      padding-inline: 0.25rem;
+    }
+
+    .topics-stats dt {
+      font-size: 0.42rem;
+    }
+
+    .topic-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .topic-card {
+      min-height: 16rem;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .topic-card:hover {
+    transform: none;
+  }
+</style>
