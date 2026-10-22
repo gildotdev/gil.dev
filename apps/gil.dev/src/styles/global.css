@@ -2,40 +2,115 @@
 
 html {
   overflow-x: hidden;
-  background-color: #0d1527;
+  color-scheme: light;
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, #286983 11%, transparent), transparent 28rem),
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, #d7827e 12%, transparent), transparent 25rem),
+    #faf4ed;
+  background-attachment: fixed;
 }
 
 :root {
-  --main-accent-color: #2bf0c2;
-  --border-color: var(--yellow);
-  --mint-green: #2bf0c2;
-  --yellow: yellow;
-  --pink: hotpink;
-  --blue: #21b2e3;
+  --base: #faf4ed;
+  --surface: #fffaf3;
+  --overlay: #f2e9e1;
+  --muted: #9893a5;
+  --subtle: #797593;
+  --text: #464261;
+  --love: #b4637a;
+  --gold: #ea9d34;
+  --rose: #d7827e;
+  --pine: #286983;
+  --foam: #56949f;
+  --iris: #907aa9;
+  --highlight-low: #f4ede8;
+  --highlight-med: #dfdad9;
+  --highlight-high: #cecacd;
+  --shadow: color-mix(in srgb, var(--text) 16%, transparent);
+  --panel: color-mix(in srgb, var(--surface) 88%, transparent);
+  --quiet: color-mix(in srgb, var(--subtle) 68%, var(--text));
+  --rose-readable: color-mix(in srgb, var(--love) 72%, var(--text));
+
+  --main-accent-color: var(--pine);
+  --border-color: var(--gold);
+  --mint-green: var(--pine);
+  --yellow: var(--gold);
+  --pink: var(--love);
+  --blue: var(--foam);
   font-size: 24px;
-  --yellowalpha: #ffff0088;
-  --astro-code-color-text: white;
-  --astro-code-color-background: rgb(28 25 23);
-  --astro-code-token-constant: var(--mint-green);
-  --astro-code-token-string: var(--pink);
-  --astro-code-token-comment: var(--pink);
-  --astro-code-token-keyword: var(--blue);
-  --astro-code-token-parameter: var(--blue);
-  --astro-code-token-function: var(--pink);
-  --astro-code-token-string-expression: var(--yellow);
-  --astro-code-token-punctuation: var(--blue);
-  --astro-code-token-link: var(--blue);
+  --yellowalpha: color-mix(in srgb, var(--gold) 48%, transparent);
+  --astro-code-color-text: var(--text);
+  --astro-code-color-background: var(--surface);
+  --astro-code-token-constant: var(--pine);
+  --astro-code-token-string: var(--love);
+  --astro-code-token-comment: var(--subtle);
+  --astro-code-token-keyword: var(--iris);
+  --astro-code-token-parameter: var(--rose);
+  --astro-code-token-function: var(--pine);
+  --astro-code-token-string-expression: var(--gold);
+  --astro-code-token-punctuation: var(--foam);
+  --astro-code-token-link: var(--iris);
 }
 
 @font-face {
-  font-family: "Alfa Slab One";
-  src: local("Alfa Slab One"),
-    url("/fonts/AlfaSlabOne-Regular.ttf") format("truetype");
+  font-family: "Departure Mono";
+  src:
+    local("Departure Mono"),
+    url("/fonts/DepartureMono-Regular.woff2") format("woff2"),
+    url("/fonts/DepartureMono-Regular.woff") format("woff"),
+    url("/fonts/DepartureMono-Regular.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Dank Mono";
+  src: local("Dank Mono"), url("/fonts/DankMono-Regular.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Dank Mono";
+  src: local("Dank Mono Italic"), url("/fonts/DankMono-Italic.otf") format("opentype");
+  font-display: swap;
+  font-style: italic;
+  font-weight: 400;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, #31748f 16%, transparent), transparent 28rem),
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, #eb6f92 12%, transparent), transparent 25rem),
+    #191724;
+}
+
+:root[data-theme="dark"] {
+  --base: #191724;
+  --surface: #1f1d2e;
+  --overlay: #26233a;
+  --muted: #6e6a86;
+  --subtle: #908caa;
+  --text: #e0def4;
+  --love: #eb6f92;
+  --gold: #f6c177;
+  --rose: #ebbcba;
+  --pine: #31748f;
+  --foam: #9ccfd8;
+  --iris: #c4a7e7;
+  --highlight-low: #21202e;
+  --highlight-med: #403d52;
+  --highlight-high: #524f67;
+  --shadow: color-mix(in srgb, black 42%, transparent);
+  --panel: color-mix(in srgb, var(--surface) 86%, transparent);
 }
 
 ::selection {
   background-color: var(--main-accent-color);
-  color: black;
+  color: var(--surface);
 }
 
 h1,
@@ -44,18 +119,18 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Alfa Slab One", cursive;
+  font-family: "Departure Mono", monospace;
   font-size: 32px;
-  color: var(--yellow);
+  color: var(--pine);
   margin-bottom: 2rem;
   letter-spacing: 2px;
   paint-order: stroke fill;  
-  text-shadow: 0.2em 0.2em 0.2em var(--astro-code-color-background);
+  text-shadow: 0.12em 0.12em 0 var(--highlight-med);
   overflow-wrap: normal;
 }
 
 .slab {
-  font-family: "Alfa Slab One", cursive;
+  font-family: "Departure Mono", monospace;
   letter-spacing: 2px;
 }
 
@@ -66,6 +141,8 @@ body {
   grid-row-gap: 2rem;
   line-height: 2rem !important;
   overflow-x: hidden;
+  color: var(--text);
+  font-family: "Dank Mono", ui-monospace, monospace;
 }
 
 p {
@@ -92,7 +169,8 @@ li {
 }
 
 mark {
-  background-color: var(--pink);
+  background-color: var(--rose);
+  color: var(--text);
   padding: 0.25rem;
 }
 
@@ -101,8 +179,8 @@ blockquote {
   margin: 1.5rem 0;
   padding: 1rem 1.25rem 1rem 1.5rem;
   border-left: 4px solid var(--mint-green);
-  background: rgba(43, 240, 194, 0.05);
-  color: rgba(232, 230, 223, 0.85);
+  background: color-mix(in srgb, var(--pine) 8%, var(--surface));
+  color: var(--subtle);
   font-style: italic;
 }
 
@@ -111,7 +189,7 @@ blockquote::before {
   position: absolute;
   top: -0.5rem;
   left: 0.75rem;
-  font-family: "Alfa Slab One", cursive;
+  font-family: "Departure Mono", monospace;
   font-size: 3rem;
   font-style: normal;
   color: var(--mint-green);
@@ -149,7 +227,7 @@ a:hover {
 
 header {
   margin-top: 2rem;
-  font-family: "Alfa Slab One", cursive;
+  font-family: "Departure Mono", monospace;
   font-size: 1rem;
   min-width: 0;
 }
@@ -183,7 +261,7 @@ footer {
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  border: 1.5px dashed rgba(43, 240, 194, 0.4);
+  border: 1.5px dashed color-mix(in srgb, var(--pine) 45%, transparent);
   animation: hero-spin 18s linear infinite;
   pointer-events: none;
 }
@@ -203,7 +281,7 @@ footer {
 
 .hero-header {
   gap: clamp(1rem, 4vw, 2rem);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--highlight-med);
 }
 
 .hero-greeting {
@@ -248,12 +326,12 @@ footer {
 
 /* ── Post cards ── */
 .post-card-item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--highlight-med);
   transition: background 0.15s;
 }
 
 .post-card-item:first-child {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--highlight-med);
 }
 
 .post-card-item:last-child {
@@ -283,7 +361,7 @@ footer {
 .post-card-date {
   display: block;
   font-size: 11px;
-  color: rgba(232, 230, 223, 0.45);
+  color: var(--quiet);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 0.25rem;
@@ -291,9 +369,9 @@ footer {
 }
 
 .post-card-title {
-  font-family: "Alfa Slab One", cursive;
+  font-family: "Departure Mono", monospace;
   font-size: 16px;
-  color: #e8e6df;
+  color: var(--text);
   line-height: 1.3;
   margin: 0 0 0.25rem;
   padding: 0;
@@ -305,7 +383,7 @@ footer {
 }
 
 .post-card-excerpt {
-  color: white;
+  color: var(--subtle);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -320,8 +398,8 @@ footer {
   height: 72px;
   border-radius: 8px;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--highlight-med);
   object-fit: cover;
 }
 
@@ -445,6 +523,39 @@ footer {
   }
 }
 
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+html[data-motion="reduced"] .rotating-char {
+  animation: none !important;
+  transform: none !important;
+}
+
+html[data-motion="reduced"] .hero-ring {
+  animation: none !important;
+}
+
+html[data-motion="reduced"] .topic-card:hover,
+html[data-motion="reduced"] .garden-note-card:hover {
+  transform: none;
+}
+
+html[data-motion="reduced"] .post-card-link:hover {
+  padding-left: 0;
+}
+
+html[data-motion="reduced"]::view-transition-group(*),
+html[data-motion="reduced"]::view-transition-old(*),
+html[data-motion="reduced"]::view-transition-new(*) {
+  animation: none !important;
+}
+
 .astro-code {
   padding: 1rem;
   border-radius: 1rem;
@@ -495,7 +606,7 @@ li {
 }
 
 li::marker {
-  color: hotpink;
+  color: var(--rose);
 }
 
 ul ul {

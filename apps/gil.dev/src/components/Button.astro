@@ -1,3 +1,58 @@
-<button type="button" class="focus:outline-none text-white bg-slate-900 hover:bg-slate-700  focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2">
-  <slot></slot>
-</button>
+---
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<a
+  href={href}
+  class="site-button focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
+>
+  <slot />
+</a>
+
+<style>
+  .site-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--pine);
+    background: var(--pine);
+    color: var(--surface) !important;
+    line-height: 1.25;
+    text-decoration: none !important;
+  }
+
+  .site-button:hover {
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--base) !important;
+    text-decoration: none !important;
+  }
+
+  .site-button:focus-visible {
+    color: var(--surface) !important;
+    outline: 2px solid var(--surface);
+    outline-offset: -4px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--iris) 32%, transparent);
+  }
+
+  :global(html[data-theme="dark"]) .site-button {
+    border-color: var(--foam);
+    background: var(--foam);
+    color: var(--base) !important;
+  }
+
+  :global(html[data-theme="dark"]) .site-button:hover {
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--base) !important;
+  }
+
+  :global(html[data-theme="dark"]) .site-button:focus-visible {
+    color: var(--base) !important;
+    outline-color: var(--base);
+  }
+</style>

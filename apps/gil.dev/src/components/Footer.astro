@@ -1,11 +1,13 @@
 ---
 import FooterMenu from "./FooterMenu.astro";
 import SocialLinks from "./SocialLinks.astro";
+import PreferenceControls from "./PreferenceControls.astro";
 ---
 
 <footer
-  class="mx-2 flex flex-row justify-between items-start basis-full flex-1"
+  class="mx-2 flex flex-row flex-wrap gap-4 justify-between items-start basis-full flex-1"
 >
   <SocialLinks />
+  <PreferenceControls />
   <FooterMenu />
 </footer>

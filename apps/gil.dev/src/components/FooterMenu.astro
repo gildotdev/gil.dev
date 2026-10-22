@@ -1,85 +1,104 @@
----
-import WiggleWrap from "./WiggleWrap.astro";
----
-
 <style>
   li {
     list-style-type: none;
+  }
+
+  .footer-menu-link,
+  .footer-menu-link:visited,
+  .footer-menu-link:hover,
+  .footer-menu-link:focus-visible {
+    display: grid;
+    grid-template-columns: 24px auto;
+    align-items: center;
+    column-gap: 0.25rem;
+    width: fit-content;
+    text-decoration: none !important;
+  }
+
+  .footer-menu-icon {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .footer-menu-icon img {
+    display: block;
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  .footer-menu-icon--emoji {
+    font-size: 1rem;
+  }
+
+  .footer-menu-link:hover .footer-menu-label,
+  .footer-menu-link:focus-visible .footer-menu-label {
+    text-decoration: underline wavy !important;
+    text-underline-offset: 0.12em;
   }
 </style>
 
 <aside id="footer-menu" class="w-1/2 md:w-fit md:pl-5">
   <ul class="whitespace-nowrap">
     <li>
-      <img
-        src="/img/avatar-pink-tv-ghibli-small.png"
-        width="24px"
-        height="24px"
-        class="inline mr-1"
-        alt="About"
-      />
-      <a href="/about">About </a>
+      <a class="footer-menu-link" href="/about">
+        <span class="footer-menu-icon" aria-hidden="true">
+          <img src="/img/avatar-pink-tv-ghibli-small.png" alt="" />
+        </span>
+        <span class="footer-menu-label">About</span>
+      </a>
     </li>
     <li>
-      <img
-        src="/img/colophon.svg"
-        width="24px"
-        height="24px"
-        class="inline mr-1"
-        alt="Colophon"
-      />
-      <a href="/colophon">Colophon </a>
+      <a class="footer-menu-link" href="/colophon">
+        <span class="footer-menu-icon" aria-hidden="true">
+          <img src="/img/colophon.svg" alt="" />
+        </span>
+        <span class="footer-menu-label">Colophon</span>
+      </a>
     </li>
     <li class="hidden md:block">
-      <a href="/notes"
-        ><img
-          src="/img/plant.svg"
-          width="24px"
-          height="24px"
-          class="inline mr-1"
-          alt="Plant Icon"
-        />
-        Notes</a
-      >
+      <a class="footer-menu-link" href="/notes">
+        <span class="footer-menu-icon" aria-hidden="true">
+          <img src="/img/plant.svg" alt="" />
+        </span>
+        <span class="footer-menu-label">Notes</span>
+      </a>
     </li>
     <li class="hidden md:block">
-      <a href="/topics"
-        ><img
-          src="/img/sticky-note.svg"
-          width="24px"
-          height="24px"
-          class="inline mr-1"
-          alt="Topics Icon"
-        />
-        Topics</a
-      >
+      <a class="footer-menu-link" href="/topics">
+        <span class="footer-menu-icon" aria-hidden="true">
+          <img src="/img/sticky-note.svg" alt="" />
+        </span>
+        <span class="footer-menu-label">Topics</span>
+      </a>
     </li>
     <li class="hidden md:block">
-      <a href="/blog"
-        ><img
-          src="/img/microblog.svg"
-          width="24px"
-          height="24px"
-          class="inline mr-1"
-          alt="Blog Icon"
-        />
-        Blog</a
-      >
+      <a class="footer-menu-link" href="/blog">
+        <span class="footer-menu-icon" aria-hidden="true">
+          <img src="/img/microblog.svg" alt="" />
+        </span>
+        <span class="footer-menu-label">Blog</span>
+      </a>
     </li>
     <li>
-      <a href="/tags"
-        ><img
-          src="/img/tags.svg"
-          width="24px"
-          height="24px"
-          class="inline mr-1"
-          alt="Tags Icon"
-        />
-        Tags</a
-      >
+      <a class="footer-menu-link" href="/tags">
+        <span class="footer-menu-icon" aria-hidden="true">
+          <img src="/img/tags.svg" alt="" />
+        </span>
+        <span class="footer-menu-label">Tags</span>
+      </a>
     </li>
     <li>
-      <span class="mr-1">🌯</span><a href="/chipotle">Chipotle</a>
+      <a class="footer-menu-link" href="/chipotle">
+        <span class="footer-menu-icon footer-menu-icon--emoji" aria-hidden="true"
+          >🌯</span
+        >
+        <span class="footer-menu-label">Chipotle</span>
+      </a>
     </li>
   </ul>
 </aside>

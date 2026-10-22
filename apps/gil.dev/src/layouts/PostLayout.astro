@@ -22,7 +22,9 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
 <!doctype html>
 <html
   lang="en"
-  class="bg-no-repeat bg-cover bg-gradient-to-r from-indigo-950 to-emerald-950 text-violet-50 min-h-screen"
+  data-theme="light"
+  data-motion="full"
+  class="site-theme min-h-screen"
 >
   <head>
     <!-- Basic Page Needs
@@ -56,6 +58,25 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
     <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script is:inline>
+      (() => {
+        try {
+          document.documentElement.dataset.theme =
+            localStorage.getItem("gil-theme") === "dark" ? "dark" : "light";
+          const savedMotion = localStorage.getItem("gil-motion");
+          document.documentElement.dataset.motion =
+            savedMotion === "reduced" || savedMotion === "full"
+              ? savedMotion
+              : matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? "reduced"
+                : "full";
+        } catch {
+          document.documentElement.dataset.theme = "light";
+          document.documentElement.dataset.motion = "full";
+        }
+      })();
+    </script>
 
     <!-- FONT
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->

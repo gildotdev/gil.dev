@@ -221,8 +221,8 @@ const originalSource = canonicalURL ?? source;
     align-items: center;
     gap: 0.45rem;
     margin-bottom: 1.25rem;
-    color: rgba(232, 230, 223, 0.52);
-    font-family: "Alfa Slab One", cursive;
+    color: var(--quiet);
+    font-family: "Departure Mono", monospace;
     font-size: 0.55rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -256,18 +256,18 @@ const originalSource = canonicalURL ?? source;
     top: 1rem;
     min-width: 0;
     padding: 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--highlight-med);
     border-top: 3px solid var(--pink);
     border-radius: 0.7rem;
-    background: rgba(13, 21, 39, 0.72);
-    box-shadow: 0 18px 45px -30px rgba(0, 0, 0, 0.9);
+    background: var(--panel);
+    box-shadow: 0 18px 45px -30px var(--shadow);
   }
 
   .note-context__eyebrow {
     margin: 0 0 0.6rem;
     padding: 0;
-    color: var(--pink);
-    font-family: "Alfa Slab One", cursive;
+    color: var(--rose-readable);
+    font-family: "Departure Mono", monospace;
     font-size: 0.52rem;
     letter-spacing: 0.1em;
     line-height: 1.4;
@@ -280,9 +280,9 @@ const originalSource = canonicalURL ?? source;
     gap: 0.5rem;
     align-items: center;
     padding: 0.55rem;
-    border: 1px solid rgba(43, 240, 194, 0.22);
+    border: 1px solid color-mix(in srgb, var(--pine) 28%, transparent);
     border-radius: 0.55rem;
-    background: rgba(43, 240, 194, 0.06);
+    background: color-mix(in srgb, var(--pine) 8%, var(--surface));
     text-decoration: none !important;
   }
 
@@ -302,7 +302,7 @@ const originalSource = canonicalURL ?? source;
   }
 
   .note-stage small {
-    color: rgba(232, 230, 223, 0.52);
+    color: var(--quiet);
     font-size: 0.45rem;
     line-height: 1.2;
     text-transform: uppercase;
@@ -310,7 +310,7 @@ const originalSource = canonicalURL ?? source;
 
   .note-stage strong {
     color: var(--mint-green);
-    font-family: "Alfa Slab One", cursive;
+    font-family: "Departure Mono", monospace;
     font-size: 0.65rem;
     line-height: 1.4;
     text-transform: capitalize;
@@ -321,19 +321,19 @@ const originalSource = canonicalURL ?? source;
     gap: 0.45rem;
     margin: 0.8rem 0;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--highlight-med);
   }
 
   .note-byline {
     margin: 0.7rem 0 0;
     padding: 0;
-    color: rgba(232, 230, 223, 0.82);
+    color: var(--text);
     font-size: 0.55rem;
     line-height: 1.45;
   }
 
   .note-byline span {
-    color: rgba(232, 230, 223, 0.45);
+    color: var(--quiet);
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
@@ -346,7 +346,7 @@ const originalSource = canonicalURL ?? source;
   }
 
   .note-dates dt {
-    color: rgba(232, 230, 223, 0.45);
+    color: var(--quiet);
     font-size: 0.46rem;
     letter-spacing: 0.06em;
     line-height: 1.4;
@@ -355,7 +355,7 @@ const originalSource = canonicalURL ?? source;
 
   .note-dates dd {
     margin: 0;
-    color: rgba(232, 230, 223, 0.78);
+    color: var(--subtle);
     font-size: 0.52rem;
     line-height: 1.4;
   }
@@ -366,8 +366,8 @@ const originalSource = canonicalURL ?? source;
 
   .note-path-group h2 {
     margin: 0 0 0.35rem;
-    color: rgba(232, 230, 223, 0.52);
-    font-family: system-ui, sans-serif;
+    color: var(--quiet);
+    font-family: "Dank Mono", ui-monospace, monospace;
     font-size: 0.46rem;
     letter-spacing: 0.08em;
     line-height: 1.4;
@@ -383,9 +383,9 @@ const originalSource = canonicalURL ?? source;
 
   .note-path-links a {
     padding: 0.14rem 0.4rem;
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    border: 1px solid var(--highlight-high);
     border-radius: 999px;
-    color: #e8e6df !important;
+    color: var(--text) !important;
     font-size: 0.5rem;
     line-height: 1.35;
     text-decoration: none !important;
@@ -397,13 +397,13 @@ const originalSource = canonicalURL ?? source;
   }
 
   .note-path-links--tags a {
-    color: rgba(232, 230, 223, 0.66) !important;
+    color: var(--subtle) !important;
   }
 
   .note-all-link {
     display: inline-block;
     margin-top: 0.9rem;
-    font-family: "Alfa Slab One", cursive;
+    font-family: "Departure Mono", monospace;
     font-size: 0.52rem;
     line-height: 1.4;
     text-decoration: none !important;
@@ -413,7 +413,7 @@ const originalSource = canonicalURL ?? source;
     display: block;
     margin-top: 0.9rem;
     padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--highlight-med);
     font-size: 0.52rem;
     line-height: 1.4;
     text-decoration: none !important;
@@ -430,7 +430,7 @@ const originalSource = canonicalURL ?? source;
   }
 
   .continue-wandering > p {
-    color: rgba(232, 230, 223, 0.68);
+    color: var(--subtle);
     font-size: 0.65rem;
   }
 

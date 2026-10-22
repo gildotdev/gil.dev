@@ -260,24 +260,24 @@ const statusOptions = [
     max-width: 34rem;
     margin: 0;
     padding: 0;
-    color: rgba(232, 230, 223, 0.78);
+    color: var(--subtle);
   }
 
   .garden-control-button {
     flex-shrink: 0;
     padding: 0.4rem 0.7rem;
-    border: 1px solid var(--pink);
+    border: 1px solid var(--rose-readable);
     border-radius: 999px;
-    color: var(--pink);
+    color: var(--rose-readable);
     cursor: pointer;
-    font-family: "Alfa Slab One", cursive;
+    font-family: "Departure Mono", monospace;
     font-size: 0.58rem;
   }
 
   .garden-control-button:hover,
   .garden-control-button:focus-visible {
-    background: var(--pink);
-    color: #0d1527;
+    background: var(--rose-readable);
+    color: var(--surface);
   }
 
   .garden-filters {
@@ -285,17 +285,17 @@ const statusOptions = [
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.6rem;
     padding: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--highlight-med);
     border-radius: 0.65rem;
-    background: rgba(255, 255, 255, 0.035);
+    background: var(--panel);
   }
 
   .garden-filters label {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-    color: rgba(232, 230, 223, 0.62);
-    font-family: "Alfa Slab One", cursive;
+    color: var(--quiet);
+    font-family: "Departure Mono", monospace;
     font-size: 0.5rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -304,11 +304,11 @@ const statusOptions = [
   .garden-filters select {
     min-width: 0;
     padding: 0.35rem;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid var(--highlight-high);
     border-radius: 0.35rem;
-    background: #111a2d;
-    color: #e8e6df;
-    font-family: system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    font-family: "Dank Mono", ui-monospace, monospace;
     font-size: 0.58rem;
     text-transform: none;
   }
@@ -316,7 +316,7 @@ const statusOptions = [
   .garden-result-count {
     margin: 0.65rem 0;
     padding: 0;
-    color: rgba(232, 230, 223, 0.55);
+    color: var(--quiet);
     font-size: 0.58rem;
   }
 

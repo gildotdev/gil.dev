@@ -20,3 +20,4 @@ Release Please maintains this file from Conventional Commits when preparing a re
 - Redesigned individual note pages with a responsive garden-paths panel linking to all notes, the note's stage, topics, and tags.
 - Added article attribution, original-source navigation, and canonical URL support to notes, and archived the complete Dale Earnhardt data-center clipping on-site.
 - Corrected relative cross-note URLs and added a generated-site link audit to catch broken internal navigation during validation.
+- Reworked the site typography and color system with Departure Mono display type, Dank Mono body copy, Rosé Pine Dawn as the default light palette, Rosé Pine for dark mode, and persistent theme and reduced-motion controls.

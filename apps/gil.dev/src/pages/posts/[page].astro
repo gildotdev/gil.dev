@@ -4,9 +4,12 @@ export const prerender = false;
 import { marked } from "marked";
 import { getLiveCollection } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
-import { formatPublishDate, truncateHTML } from "../../lib/utils";
+import {
+  extractFirstImage,
+  formatPublishDate,
+  generateDescription,
+} from "../../lib/utils";
 import "../../styles/global.css";
-import { Masonry } from "astro-masonry";
 import type { MicroblogPost } from "../../lib/micropubLoader";
 
 const PAGE_SIZE = 12;
@@ -27,52 +30,574 @@ if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
 
 const posts = allPosts
   .slice((pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE)
-  .map((entry) => ({
-    slug: entry.id,
-    content: truncateHTML(
-      marked.parse(entry.data.rawContent, { async: false }),
-      entry.id,
-    ),
-    published: entry.data.published,
-    title: entry.data.title,
-  }));
+  .map((entry, index) => {
+    const html = marked.parse(entry.data.rawContent, {
+      async: false,
+    }) as string;
+
+    return {
+      slug: entry.id,
+      excerpt:
+        generateDescription(html, 220) || "A short dispatch from the blog.",
+      image: extractFirstImage(html),
+      published: entry.data.published,
+      title: entry.data.title,
+      categories: entry.data.category ?? [],
+      featured: pageNum === 1 && index === 0,
+    };
+  });
 
 const firstPage = pageNum > 1 ? "/posts/1" : null;
 const prevPage = pageNum > 1 ? `/posts/${pageNum - 1}` : null;
 const nextPage = pageNum < totalPages ? `/posts/${pageNum + 1}` : null;
 const lastPage = pageNum < totalPages ? `/posts/${totalPages}` : null;
 ---
-<style>
-a {
-  color: #f5f3ff !important;
-  text-decoration: none !important;
-}
-a:hover {
-  text-decoration: none !important;
-}
-</style>
 
 <PostLayout title="Posts">
-  <Masonry
-    breakpointCols={{ default: 4, 1100: 3, 700: 2, 500: 1 }}
-    class="gap-6"
-  >
-    {posts.map((post) => (
-      <a href={`/posts/${post.slug}`}>
-        <article id={post.slug} class="mb-6 p-6 border border-gray-900 rounded-xl shadow-2xl hover:bg-black hover:bg-opacity-50">
-          {post.title && <span class="slab">{post.title}</span>}
-          <Fragment set:html={post.content} />
-          <time class="slab text-[12px]" datetime={post.published}>
-            {formatPublishDate(post.published)}
-          </time>
-        </article>
-      </a>
-    ))}
-  </Masonry>
-  <section class="inline-flex rounded-md shadow-xs">
-    {firstPage && <a class="px-4 py-2 text-sm font-medium" href={firstPage}>First</a>}
-    {prevPage  && <a class="px-4 py-2 text-sm font-medium" href={prevPage}>Previous</a>}
-    {nextPage  && <a class="px-4 py-2 text-sm font-medium" href={nextPage}>Next</a>}
-    {lastPage  && <a class="px-4 py-2 text-sm font-medium" href={lastPage}>Last</a>}
-  </section>
+  <div class="posts-archive">
+    <section class="posts-intro" aria-labelledby="posts-intro-title">
+      <div>
+        <p class="posts-eyebrow">Dispatches from the garden</p>
+        <h2 id="posts-intro-title">Small posts, observations, and updates.</h2>
+        <p class="posts-intro__copy">
+          The chronological side of the site: quick thoughts, things worth
+          sharing, and occasional snapshots from whatever has my attention.
+        </p>
+      </div>
+      <dl class="posts-stats" aria-label="Blog archive statistics">
+        <div>
+          <dt>Posts</dt>
+          <dd>{allPosts.length}</dd>
+        </div>
+        <div>
+          <dt>Page</dt>
+          <dd>{pageNum}<span>/{totalPages}</span></dd>
+        </div>
+      </dl>
+    </section>
+
+    {
+      posts.length > 0 ? (
+        <ol class="posts-grid" aria-label={`Blog posts, page ${pageNum}`}>
+          {posts.map((post) => (
+            <li class:list={["post-item", post.featured && "post-item--featured"]}>
+              <a class="post-tile" href={`/posts/${post.slug}`}>
+                {post.image && (
+                  <div class="post-tile__media">
+                    <img src={post.image} alt="" loading="lazy" />
+                  </div>
+                )}
+                <div class="post-tile__body">
+                  <div class="post-tile__meta">
+                    <time datetime={post.published}>
+                      {formatPublishDate(post.published)}
+                    </time>
+                    {post.featured && <span>Newest dispatch</span>}
+                  </div>
+                  {post.title ? (
+                    <h2>{post.title}</h2>
+                  ) : (
+                    <p class="post-tile__kind">Field note</p>
+                  )}
+                  <p class="post-tile__excerpt">{post.excerpt}</p>
+                  {post.categories.length > 0 && (
+                    <ul class="post-tile__categories" aria-label="Categories">
+                      {post.categories.slice(0, 3).map((category) => (
+                        <li>{category}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <span class="post-tile__action">
+                    Read post <span aria-hidden="true">→</span>
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <section class="posts-empty">
+          <span aria-hidden="true">✦</span>
+          <h2>The archive is resting.</h2>
+          <p>Posts are unavailable right now. Please wander back soon.</p>
+        </section>
+      )
+    }
+
+    {
+      totalPages > 1 && (
+        <nav class="posts-pagination" aria-label="Blog archive pages">
+          <div class="posts-pagination__edge">
+            {firstPage ? (
+              <a href={firstPage}>← First</a>
+            ) : (
+              <span aria-disabled="true">← First</span>
+            )}
+            {prevPage ? (
+              <a href={prevPage}>Previous</a>
+            ) : (
+              <span aria-disabled="true">Previous</span>
+            )}
+          </div>
+          <p>
+            <span>Page</span> {pageNum} of {totalPages}
+          </p>
+          <div class="posts-pagination__edge posts-pagination__edge--next">
+            {nextPage ? (
+              <a href={nextPage}>Next</a>
+            ) : (
+              <span aria-disabled="true">Next</span>
+            )}
+            {lastPage ? (
+              <a href={lastPage}>Last →</a>
+            ) : (
+              <span aria-disabled="true">Last →</span>
+            )}
+          </div>
+        </nav>
+      )
+    }
+  </div>
 </PostLayout>
+
+<style>
+  .posts-archive {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .posts-intro {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(1.5rem, 6vw, 5rem);
+    align-items: end;
+    overflow: hidden;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    border: 1px solid var(--highlight-high);
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(
+        circle at 92% 0%,
+        color-mix(in srgb, var(--love) 15%, transparent),
+        transparent 14rem
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--iris) 9%, var(--surface)),
+        color-mix(in srgb, var(--pine) 9%, var(--surface))
+      );
+    box-shadow: 0 22px 48px -38px var(--shadow);
+  }
+
+  .posts-intro::after {
+    position: absolute;
+    top: -3.4rem;
+    right: 2rem;
+    color: color-mix(in srgb, var(--love) 9%, transparent);
+    content: "✺";
+    font-family: "Departure Mono", monospace;
+    font-size: clamp(8rem, 17vw, 14rem);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .posts-intro > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .posts-eyebrow {
+    margin-bottom: 0.45rem;
+    color: var(--love);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .posts-intro h2 {
+    max-width: 22ch;
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.35rem, 4vw, 2.25rem);
+    line-height: 1.15;
+  }
+
+  .posts-intro__copy {
+    max-width: 62ch;
+    margin: 0;
+    color: var(--quiet);
+    font-size: 0.75rem;
+    line-height: 1.65;
+  }
+
+  .posts-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(5rem, 1fr));
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .posts-stats div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column-reverse;
+    gap: 0.15rem;
+    padding: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--love) 24%, transparent);
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    text-align: center;
+  }
+
+  .posts-stats dt {
+    color: var(--quiet);
+    font-size: 0.48rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .posts-stats dd {
+    margin: 0;
+    color: var(--love);
+    font-family: "Departure Mono", monospace;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .posts-stats dd span {
+    color: var(--muted);
+    font-size: 0.6rem;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .post-item {
+    min-width: 0;
+    list-style: none;
+  }
+
+  .post-item--featured {
+    grid-column: span 2;
+  }
+
+  .post-tile,
+  .post-tile:visited {
+    position: relative;
+    display: flex;
+    height: 100%;
+    min-height: 15rem;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--highlight-high);
+    border-radius: 1.15rem;
+    background: var(--panel);
+    box-shadow: 0 18px 38px -34px var(--shadow);
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+  .post-tile::before {
+    position: absolute;
+    z-index: 2;
+    inset: 0 0 auto;
+    height: 0.2rem;
+    background: linear-gradient(90deg, var(--love), var(--iris), var(--foam));
+    content: "";
+  }
+
+  .post-tile:hover {
+    border-color: var(--iris);
+    background: var(--surface);
+    box-shadow: 0 22px 48px -32px var(--shadow);
+    color: var(--text) !important;
+    text-decoration: none !important;
+    transform: translateY(-0.18rem);
+  }
+
+  .post-tile:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--iris) 48%, transparent);
+    outline-offset: 3px;
+    text-decoration: none !important;
+  }
+
+  .post-tile__media {
+    aspect-ratio: 16 / 8;
+    overflow: hidden;
+    border-bottom: 1px solid var(--highlight-high);
+    background: var(--overlay);
+  }
+
+  .post-tile__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 240ms ease;
+  }
+
+  .post-tile:hover .post-tile__media img {
+    transform: scale(1.025);
+  }
+
+  .post-tile__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .post-tile__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    margin-bottom: 0.65rem;
+    color: var(--muted);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.46rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .post-tile__meta span {
+    padding: 0.15rem 0.38rem;
+    border: 1px solid color-mix(in srgb, var(--love) 35%, transparent);
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--love) 58%, var(--text));
+  }
+
+  .post-tile h2 {
+    margin: 0 0 0.65rem;
+    color: var(--pine);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    text-shadow: none;
+  }
+
+  .post-item--featured .post-tile h2 {
+    max-width: 28ch;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+  }
+
+  .post-tile__kind {
+    margin: 0 0 0.5rem;
+    color: color-mix(in srgb, var(--love) 58%, var(--text));
+    font-family: "Departure Mono", monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .post-tile__excerpt {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--quiet);
+    font-size: 0.62rem;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+  }
+
+  .post-item--featured .post-tile__excerpt {
+    max-width: 70ch;
+    font-size: 0.68rem;
+    -webkit-line-clamp: 4;
+  }
+
+  .post-tile__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+    margin: 0.8rem 0 0;
+    padding: 0;
+  }
+
+  .post-tile__categories li {
+    padding: 0.12rem 0.35rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 999px;
+    color: var(--quiet);
+    font-size: 0.43rem;
+    line-height: 1.3;
+    list-style: none;
+  }
+
+  .post-tile__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+    color: var(--pine);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.52rem;
+  }
+
+  .posts-empty {
+    padding: 3rem 1rem;
+    border: 1px dashed var(--highlight-high);
+    border-radius: 1.15rem;
+    background: var(--panel);
+    text-align: center;
+  }
+
+  .posts-empty > span {
+    color: var(--love);
+    font-size: 2rem;
+  }
+
+  .posts-empty h2 {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+
+  .posts-empty p {
+    margin: 0;
+    color: var(--quiet);
+    font-size: 0.65rem;
+  }
+
+  .posts-pagination {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.8rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 1rem;
+    background: var(--panel);
+  }
+
+  .posts-pagination__edge {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .posts-pagination__edge--next {
+    justify-content: flex-end;
+  }
+
+  .posts-pagination a,
+  .posts-pagination a:visited,
+  .posts-pagination span[aria-disabled="true"] {
+    display: inline-flex;
+    min-height: 1.8rem;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 0.55rem;
+    font-size: 0.52rem;
+    line-height: 1;
+    text-decoration: none !important;
+  }
+
+  .posts-pagination a,
+  .posts-pagination a:visited {
+    background: var(--surface);
+    color: var(--pine) !important;
+  }
+
+  .posts-pagination a:hover {
+    border-color: var(--pine);
+    background: color-mix(in srgb, var(--pine) 9%, var(--surface));
+    text-decoration: none !important;
+  }
+
+  .posts-pagination a:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--iris) 42%, transparent);
+    outline-offset: 2px;
+  }
+
+  .posts-pagination span[aria-disabled="true"] {
+    color: var(--muted);
+    opacity: 0.55;
+  }
+
+  .posts-pagination > p {
+    margin: 0;
+    color: var(--text);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.62rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .posts-pagination > p span {
+    color: var(--muted);
+    font-size: 0.46rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1023px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .posts-intro {
+      grid-template-columns: 1fr;
+    }
+
+    .posts-stats {
+      max-width: 14rem;
+    }
+
+    .posts-pagination {
+      grid-template-columns: 1fr;
+    }
+
+    .posts-pagination__edge,
+    .posts-pagination__edge--next {
+      justify-content: center;
+    }
+
+    .posts-pagination > p {
+      grid-row: 1;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .posts-intro {
+      padding: 1rem;
+      border-radius: 1rem;
+    }
+
+    .posts-intro h2 {
+      font-size: 1.25rem;
+    }
+
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .post-item--featured {
+      grid-column: auto;
+    }
+
+    .post-tile,
+    .post-item--featured .post-tile {
+      min-height: 14rem;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .post-tile:hover,
+  :global(html[data-motion="reduced"]) .post-tile:hover .post-tile__media img {
+    transform: none;
+  }
+</style>
