@@ -20,6 +20,7 @@ import {
   buildRecursivePublicationPaths,
   isIgnoredVaultPath,
 } from "./publication-plan";
+import { normalizeReferenceNote } from "./reference-note";
 
 export interface PublishResult {
   published: string[];
@@ -182,6 +183,7 @@ export async function publishFile(
     publishedPaths,
     slugifyFilename
   );
+  const normalizedReference = normalizeReferenceNote(normalizedFm, transformed);
 
   // Copy referenced images to the assets directory
   const assetsDir = path.join(settings.targetRepoPath, settings.imageTargetSubpath);
@@ -200,7 +202,10 @@ export async function publishFile(
 
   const outputName = slugifyFilename(file.name);
   const outputPath = path.join(notesDir, outputName);
-  const outputContent = serializeFrontmatter(normalizedFm) + "\n\n" + transformed;
+  const outputContent =
+    serializeFrontmatter(normalizedReference.frontmatter) +
+    "\n\n" +
+    normalizedReference.body;
   fs.writeFileSync(outputPath, outputContent, "utf-8");
 }
 
