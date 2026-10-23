@@ -212,6 +212,94 @@ blockquote cite {
   text-transform: uppercase;
 }
 
+article table {
+  width: 100%;
+  margin: 1.5rem 0 2rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--pine) 42%, var(--highlight-high));
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.85rem;
+  background: var(--surface);
+  box-shadow: 0 18px 38px -34px var(--shadow);
+  font-size: 0.62rem;
+  line-height: 1.55;
+  table-layout: fixed;
+}
+
+article thead {
+  background: color-mix(in srgb, var(--pine) 12%, var(--surface));
+}
+
+article th,
+article td {
+  padding: 0.7rem 0.75rem;
+  overflow-wrap: anywhere;
+  text-align: left;
+  vertical-align: top;
+}
+
+article th {
+  border-bottom: 2px solid var(--pine);
+  color: var(--text);
+  font-family: "Departure Mono", monospace;
+  font-size: 0.54rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+article th:nth-child(1) {
+  width: 25%;
+  background: color-mix(in srgb, var(--pine) 13%, transparent);
+}
+
+article th:nth-child(2) {
+  background: color-mix(in srgb, var(--iris) 13%, transparent);
+}
+
+article th:nth-child(3) {
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+article th + th,
+article td + td {
+  border-left: 1px solid color-mix(in srgb, var(--iris) 32%, var(--highlight-high));
+}
+
+article tbody tr:nth-child(odd) td {
+  background: color-mix(in srgb, var(--pine) 4%, var(--surface));
+}
+
+article tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--iris) 8%, var(--surface));
+}
+
+article tbody tr:not(:last-child) td {
+  border-bottom: 1px solid var(--highlight-high);
+}
+
+article tbody tr:hover td {
+  background: color-mix(in srgb, var(--gold) 11%, var(--surface));
+}
+
+@media (max-width: 639px) {
+  article table {
+    font-size: 0.54rem;
+  }
+
+  article th,
+  article td {
+    padding: 0.5rem 0.45rem;
+  }
+
+  article th {
+    font-size: 0.46rem;
+    letter-spacing: 0.035em;
+  }
+}
+
 a,
 a:visited {
   color: var(--main-accent-color) !important;

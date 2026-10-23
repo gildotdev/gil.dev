@@ -1,9 +1,10 @@
 ---
 import { getCollection, render } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
+import NoteCard from "../../components/NoteCard.astro";
 import Tag from "../../components/Tag.astro";
-import { formatPublishDate } from "../../lib/utils.ts";
-import { isDiscoverableNote, noteStatusEmoji } from "../../lib/notes.ts";
+import { isPublishedNote } from "../../lib/notes.ts";
+import { collectTopicExternalLinks } from "../../lib/external-links.ts";
 import "../../styles/global.css";
 
 export async function getStaticPaths() {
@@ -18,7 +19,7 @@ const { topic } = Astro.props;
 const { Content } = await render(topic);
 
 const allNotes = await getCollection("notes", ({ data }) =>
-  isDiscoverableNote(data),
+  isPublishedNote(data),
 );
 
 const relatedNotes = allNotes
@@ -32,68 +33,650 @@ const allTopics = await getCollection("topics");
 const relatedTopics = allTopics.filter((t) =>
   (topic.data.relatedTopics ?? []).includes(t.id),
 );
+const topicTitles = Object.fromEntries(
+  allTopics.map((entry) => [entry.id, entry.data.title]),
+);
+const externalLinks = collectTopicExternalLinks(
+  relatedNotes,
+  topic.data.externalLinks,
+);
+const featuredLinks = collectTopicExternalLinks([], topic.data.externalLinks);
+const featuredUrls = new Set(featuredLinks.map((link) => link.url));
+const discoveredLinks = externalLinks.filter(
+  (link) => !featuredUrls.has(link.url),
+);
+
+const siteNames: Record<string, string> = {
+  "github.com": "GitHub",
+  "medium.com": "Medium",
+  "wikipedia.org": "Wikipedia",
+  "youtube.com": "YouTube",
+};
+
+const getSiteKey = (url: string) =>
+  new URL(url).hostname.replace(/^www\./, "").replace(/^[a-z]{2}\./, "");
+
+const resourceGroups = Object.values(
+  discoveredLinks.reduce(
+    (groups, link) => {
+      const key = getSiteKey(link.url);
+      const group = groups[key] ?? {
+        hostname: key,
+        name: siteNames[key] ?? key,
+        links: [],
+      };
+
+      group.links.push(link);
+      groups[key] = group;
+      return groups;
+    },
+    {} as Record<
+      string,
+      { hostname: string; name: string; links: typeof discoveredLinks }
+    >,
+  ),
+).sort(
+  (a, b) =>
+    b.links.length - a.links.length || a.name.localeCompare(b.name, "en"),
+);
+const resourceSiteCount = new Set(externalLinks.map((link) => getSiteKey(link.url)))
+  .size;
+
+const topicVisuals: Record<string, { marker: string; accent: string }> = {
+  ai: { marker: "✦", accent: "var(--iris)" },
+  angular: { marker: "△", accent: "var(--love)" },
+  astro: { marker: "✺", accent: "var(--gold)" },
+  community: { marker: "◎", accent: "var(--rose)" },
+  "cyber-security": { marker: "◇", accent: "var(--foam)" },
+  "dev-tools": { marker: "⌘", accent: "var(--pine)" },
+  "digital-garden": { marker: "✿", accent: "var(--foam)" },
+};
+const topicVisual = topicVisuals[topic.id] ?? {
+  marker: "○",
+  accent: "var(--iris)",
+};
 
 ---
 
-<MainLayout title={topic.data.title} description={topic.data.description}>
-  <article>
-    <p>{topic.data.description}</p>
-    {topic.data.intro && <p>{topic.data.intro}</p>}
-    <Content />
+<MainLayout
+  title={topic.data.title}
+  description={topic.data.description}
+  wide={true}
+>
+  <article
+    class="topic-page"
+    style={`--topic-accent: ${topicVisual.accent}`}
+  >
+    <nav class="topic-navigation" aria-label="Topic navigation">
+      <a href="/topics">
+        <span aria-hidden="true">←</span>
+        All topics
+      </a>
+    </nav>
+
+    <header class="topic-intro">
+      <div class="topic-intro__marker" aria-hidden="true">
+        {topicVisual.marker}
+      </div>
+      <div class="topic-intro__copy">
+        <p class="topic-eyebrow">Garden path</p>
+        <p class="topic-description">{topic.data.description}</p>
+        {topic.data.intro && <p>{topic.data.intro}</p>}
+      </div>
+      <dl class="topic-stats" aria-label={`${topic.data.title} statistics`}>
+        <div>
+          <dt>Notes</dt>
+          <dd>{relatedNotes.length}</dd>
+        </div>
+        <div>
+          <dt>Resources</dt>
+          <dd>{externalLinks.length}</dd>
+        </div>
+        <div>
+          <dt>Sites</dt>
+          <dd>{resourceSiteCount}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="topic-copy">
+      <Content />
+    </div>
 
     {
       relatedNotes.length > 0 && (
-        <section>
-          <h2>Notes</h2>
-          <ul>
-            {relatedNotes.map((note) => (
-              <li>
-                <a href={`/${note.data.slug || note.id}`}>
-                  {note.data.status && (
-                    <span title={note.data.status}>
-                      {noteStatusEmoji[note.data.status]}{" "}
-                    </span>
-                  )}
-                  {note.data.title}
-                </a>
-                <span class="slab text-sm ml-2">
-                  {formatPublishDate(note.data.created)}
-                </span>
-              </li>
+        <section class="topic-section" aria-labelledby="topic-notes-title">
+          <div class="topic-section__heading">
+            <div>
+              <p class="topic-eyebrow">Along this path</p>
+              <h2 id="topic-notes-title">Notes</h2>
+            </div>
+            <span class="topic-section__count">
+              {relatedNotes.length} {relatedNotes.length === 1 ? "note" : "notes"}
+            </span>
+          </div>
+          <div class="topic-note-grid">
+            {relatedNotes.map((note, index) => (
+              <NoteCard
+                note={note}
+                topicTitles={topicTitles}
+                index={index}
+                compact
+              />
             ))}
-          </ul>
+          </div>
         </section>
       )
     }
 
     {
-      topic.data.externalLinks && topic.data.externalLinks.length > 0 && (
-        <section>
-          <h2>External Links</h2>
-          <ul>
-            {topic.data.externalLinks.map((link) => (
-              <li>
-                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  {link.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+      externalLinks.length > 0 && (
+        <section
+          class="topic-section resource-library"
+          aria-labelledby="topic-resources-title"
+        >
+          <div class="topic-section__heading">
+            <div>
+              <p class="topic-eyebrow">Beyond the garden</p>
+              <h2 id="topic-resources-title">Resource shelf</h2>
+              <p class="topic-section__description">
+                Useful paths gathered from the notes in this topic.
+              </p>
+            </div>
+            <span class="topic-section__count">
+              {externalLinks.length} {externalLinks.length === 1 ? "link" : "links"}
+            </span>
+          </div>
+
+          {featuredLinks.length > 0 && (
+            <div class="featured-resources">
+              <p class="resource-label">Featured</p>
+              <div class="featured-resources__grid">
+                {featuredLinks.map((link) => (
+                  <a
+                    class="featured-resource"
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>{link.title}</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {resourceGroups.length > 0 && (
+            <div class="resource-directory">
+              <p class="resource-label">From the notes</p>
+              <div class="resource-groups">
+                {resourceGroups.map((group, index) => (
+                  <details class="resource-group" open={index === 0}>
+                    <summary>
+                      <span class="resource-group__site">
+                        <span class="resource-group__marker" aria-hidden="true">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span>
+                          <strong>{group.name}</strong>
+                          <small>{group.hostname}</small>
+                        </span>
+                      </span>
+                      <span class="resource-group__count">
+                        {group.links.length}
+                      </span>
+                    </summary>
+                    <ul>
+                      {group.links.map((link) => (
+                        <li>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <span>{link.title}</span>
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       )
     }
 
     {
       relatedTopics.length > 0 && (
-        <section>
-          <h2>Related Topics</h2>
-          <p>
+        <section class="topic-section related-topics">
+          <p class="topic-eyebrow">Keep wandering</p>
+          <h2>Related topics</h2>
+          <div>
             {relatedTopics.map((t) => (
               <Tag tag={t.data.title} href={`/topics/${t.id}`} i={0} />
             ))}
-          </p>
+          </div>
         </section>
       )
     }
   </article>
 </MainLayout>
+
+<style>
+  .topic-page {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .topic-navigation {
+    margin-bottom: calc(clamp(1.5rem, 4vw, 2.5rem) * -0.55);
+  }
+
+  .topic-navigation a,
+  .topic-navigation a:visited {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.58rem;
+    border: 1px solid color-mix(in srgb, var(--topic-accent) 38%, transparent);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--topic-accent) !important;
+    font-family: "Departure Mono", monospace;
+    font-size: 0.5rem;
+    line-height: 1.4;
+    text-decoration: none !important;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .topic-navigation a:hover {
+    border-color: var(--topic-accent);
+    background: color-mix(in srgb, var(--topic-accent) 10%, var(--surface));
+    transform: translateX(-0.12rem);
+  }
+
+  .topic-navigation a:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--topic-accent) 38%, transparent);
+    outline-offset: 3px;
+  }
+
+  .topic-intro {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(15rem, 0.7fr);
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: center;
+    overflow: hidden;
+    padding: clamp(1.2rem, 4vw, 2.25rem);
+    border: 1px solid var(--highlight-high);
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(
+        circle at 94% 0%,
+        color-mix(in srgb, var(--topic-accent) 20%, transparent),
+        transparent 13rem
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--topic-accent) 8%, var(--surface)),
+        var(--panel)
+      );
+    box-shadow: 0 22px 48px -38px var(--shadow);
+  }
+
+  .topic-intro__marker {
+    display: grid;
+    width: clamp(3.5rem, 8vw, 5rem);
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--topic-accent) 45%, transparent);
+    border-radius: 1.2rem;
+    background: color-mix(in srgb, var(--topic-accent) 11%, var(--surface));
+    color: var(--topic-accent);
+    font-family: "Departure Mono", monospace;
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+  }
+
+  .topic-eyebrow,
+  .resource-label {
+    margin: 0 0 0.35rem;
+    padding: 0;
+    color: var(--topic-accent);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .topic-description {
+    margin: 0 0 0.6rem;
+    padding: 0;
+    color: var(--text);
+    font-size: clamp(0.85rem, 2vw, 1.05rem);
+    line-height: 1.5;
+  }
+
+  .topic-intro__copy > p:last-child {
+    margin: 0;
+    padding: 0;
+    color: var(--quiet);
+    font-size: 0.65rem;
+    line-height: 1.6;
+  }
+
+  .topic-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  .topic-stats div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column-reverse;
+    gap: 0.15rem;
+    padding: 0.7rem 0.35rem;
+    border: 1px solid color-mix(in srgb, var(--topic-accent) 24%, transparent);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    text-align: center;
+  }
+
+  .topic-stats dt {
+    color: var(--quiet);
+    font-size: 0.45rem;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .topic-stats dd {
+    margin: 0;
+    color: var(--topic-accent);
+    font-family: "Departure Mono", monospace;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .topic-copy {
+    max-width: 44rem;
+    color: var(--quiet);
+    font-size: 0.67rem;
+  }
+
+  .topic-copy :global(p:last-child) {
+    margin: 0;
+    padding: 0;
+  }
+
+  .topic-section {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .topic-section__heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px dashed var(--highlight-high);
+  }
+
+  .topic-section h2 {
+    margin: 0;
+    color: color-mix(in srgb, var(--topic-accent) 55%, var(--text));
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    line-height: 1.2;
+    text-shadow: none;
+  }
+
+  .topic-section__description {
+    margin: 0.3rem 0 0;
+    padding: 0;
+    color: var(--quiet);
+    font-size: 0.62rem;
+    line-height: 1.5;
+  }
+
+  .topic-section__count {
+    flex: none;
+    padding: 0.18rem 0.48rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 999px;
+    color: var(--quiet);
+    font-size: 0.48rem;
+    line-height: 1.4;
+  }
+
+  .topic-note-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .featured-resources,
+  .resource-directory {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .featured-resources__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .featured-resource,
+  .featured-resource:visited {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--topic-accent) 35%, transparent);
+    border-left: 0.22rem solid var(--topic-accent);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--topic-accent) 7%, var(--panel));
+    color: var(--text) !important;
+    font-size: 0.62rem;
+    line-height: 1.45;
+    text-decoration: none !important;
+    transition: transform 160ms ease, border-color 160ms ease;
+  }
+
+  .featured-resource:hover {
+    border-color: var(--topic-accent);
+    transform: translateY(-0.12rem);
+  }
+
+  .resource-groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    align-items: start;
+  }
+
+  .resource-group {
+    overflow: hidden;
+    border: 1px solid var(--highlight-high);
+    border-radius: 0.85rem;
+    background: var(--panel);
+  }
+
+  .resource-group[open] {
+    border-color: color-mix(in srgb, var(--topic-accent) 55%, transparent);
+    box-shadow: 0 18px 36px -32px var(--shadow);
+  }
+
+  .resource-group > summary {
+    display: flex;
+    width: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.75rem;
+    color: var(--text);
+    list-style: none;
+    text-decoration: none;
+  }
+
+  .resource-group > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .resource-group > summary::after {
+    color: var(--topic-accent);
+    content: "+";
+    font-family: "Departure Mono", monospace;
+    font-size: 0.8rem;
+  }
+
+  .resource-group[open] > summary::after {
+    content: "−";
+  }
+
+  .resource-group__site {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .resource-group__marker {
+    display: grid;
+    width: 1.55rem;
+    height: 1.55rem;
+    flex: none;
+    place-items: center;
+    border-radius: 0.45rem;
+    background: color-mix(in srgb, var(--topic-accent) 12%, var(--surface));
+    color: var(--topic-accent);
+    font-family: "Departure Mono", monospace;
+    font-size: 0.43rem;
+  }
+
+  .resource-group__site > span:last-child {
+    display: grid;
+    min-width: 0;
+  }
+
+  .resource-group__site strong {
+    overflow: hidden;
+    font-size: 0.58rem;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .resource-group__site small {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.43rem;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .resource-group__count {
+    margin-left: auto;
+    padding: 0.08rem 0.3rem;
+    border: 1px solid var(--highlight-high);
+    border-radius: 999px;
+    color: var(--quiet);
+    font-size: 0.43rem;
+    line-height: 1.3;
+  }
+
+  .resource-group ul {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0 0.75rem 0.6rem;
+    list-style: none;
+  }
+
+  .resource-group li {
+    margin: 0;
+    border-top: 1px dashed var(--highlight-high);
+    list-style: none;
+  }
+
+  .resource-group a,
+  .resource-group a:visited {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.55rem 0;
+    color: var(--subtle) !important;
+    font-size: 0.5rem;
+    line-height: 1.5;
+    text-decoration: none !important;
+  }
+
+  .resource-group a:hover {
+    color: var(--topic-accent) !important;
+  }
+
+  .related-topics > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  @media (max-width: 900px) {
+    .topic-intro {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .topic-stats {
+      grid-column: 1 / -1;
+    }
+
+    .topic-note-grid,
+    .resource-groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .topic-intro {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+      border-radius: 1rem;
+    }
+
+    .topic-intro__marker {
+      width: 3rem;
+    }
+
+    .topic-section__heading {
+      align-items: start;
+    }
+
+    .topic-note-grid,
+    .featured-resources__grid,
+    .resource-groups {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .featured-resource:hover {
+    transform: none;
+  }
+
+  :global(html[data-motion="reduced"]) .topic-navigation a:hover {
+    transform: none;
+  }
+</style>

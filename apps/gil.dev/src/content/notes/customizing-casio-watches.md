@@ -24,11 +24,11 @@ The thread connecting them: **pick a purpose or a visual theme, then choose modi
 
 ## Three starting points
 
-| Watch | Direction in the clippings | What makes it interesting |
-|---|---|---|
-| AE-1200, the “Casio Royale” | NASA theme; custom logo; half-negative display; oil filling | A face with several distinct areas to customize |
-| W800 | SR-71-inspired Project Blackbird | A restrained palette, negative display, and custom strap working together |
-| F-91W / module 593 family | Ollee replacement electronics; tint; NFC; custom housing | Keeping the retro exterior while changing what the watch can do |
+| Watch                       | Direction in the clippings                                  | What makes it interesting                                                 |
+| --------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------- |
+| AE-1200, the “Casio Royale” | NASA theme; custom logo; half-negative display; oil filling | A face with several distinct areas to customize                           |
+| W800                        | SR-71-inspired Project Blackbird                            | A restrained palette, negative display, and custom strap working together |
+| F-91W / module 593 family   | Ollee replacement electronics; tint; NFC; custom housing    | Keeping the retro exterior while changing what the watch can do           |
 
 These are examples from the saved builds, rather than a parts compatibility list. Exact case, module, strap, and adapter fit still need checking for an individual project.
 

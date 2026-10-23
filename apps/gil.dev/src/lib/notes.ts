@@ -43,7 +43,7 @@ export function isPublishedNote(data: NoteVisibilityData): boolean {
 }
 
 export function isDiscoverableNote(data: NoteVisibilityData): boolean {
-  return isPublishedNote(data) && !isReferenceNote(data);
+  return isPublishedNote(data);
 }
 
 function hashSeed(seed: string): number {

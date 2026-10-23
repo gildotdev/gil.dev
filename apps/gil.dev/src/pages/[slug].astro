@@ -64,7 +64,7 @@ const createdLabel = formatPublishDate(created);
 const updatedLabel = formatPublishDate(updated);
 const statusHref =
   status === "reference"
-    ? "/notes?status=reference#references"
+    ? "/notes?status=reference"
     : `/notes?status=${encodeURIComponent(status ?? "unstaged")}`;
 const getTopicHref = (topic: string) =>
   topicTitles[topic]

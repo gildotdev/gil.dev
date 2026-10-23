@@ -1,6 +1,7 @@
 ---
 title: "Casio W800 Mod—Project Blackbird. Custom Strap. Negative Display Mod."
 source: "https://www.youtube.com/watch?v=JYmBn8XwadU"
+canonicalURL: "https://www.youtube.com/watch?v=JYmBn8XwadU"
 author:
   - "[[Casi Mods]]"
 published: "2020-09-14"
@@ -14,16 +15,18 @@ created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:40:34-0400"
 topics: []
 status: "reference"
-description: "+Full Build Write-up: https://casimods.com/builds/blackbird/+Instagram: https://www.instagram.com/casimods/+Custom Casios Club: https://facebook.com/groups/customcasiosclub::This is a Casio W800 m"
+description: "A Casio W800 modification inspired by the SR-71 Blackbird, featuring a negative display, custom leather strap, stopwatch, and detailed case accents."
 ---
 
-![](https://www.youtube.com/watch?v=JYmBn8XwadU)
+<iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/JYmBn8XwadU" title="Casio W800 Mod—Project Blackbird. Custom Strap. Negative Display Mod." frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-+Full Build Write-up: https://casimods.com/builds/blackbird/  
-+Instagram: https://www.instagram.com/casimods/  
-+Custom Casios Club: https://facebook.com/groups/customcasiosclub  
-::  
 This is a Casio W800 mod inspired by the legendary SR-71 Blackbird. Blacked-out with a red and yellow accent similar to the labels on the jets. Further modifications include the negative display, custom Zulu leather strap, enabling stopwatch, and case details.
+
+## Links and resources mentioned
+
+- [Full Project Blackbird build write-up](https://casimods.com/builds/blackbird/)
+- [Casi Mods on Instagram](https://www.instagram.com/casimods/)
+- [Custom Casios Club on Facebook](https://facebook.com/groups/customcasiosclub)
 
 ## Transcript
 

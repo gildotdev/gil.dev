@@ -1,6 +1,7 @@
 ---
 title: "Turning a $30 Casio Into a Custom Oil-Filled Watch"
 source: "https://www.youtube.com/watch?v=3lDeurBV2dY"
+canonicalURL: "https://www.youtube.com/watch?v=3lDeurBV2dY"
 author:
   - "[[Northern Lume Watches]]"
 published: "2026-04-15"
@@ -14,10 +15,10 @@ created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:41:07-0400"
 topics: []
 status: "reference"
-description: "In this tutorial, I'm walking you through the hardest watch build I've ever attempted: a stainless steel Casio Royale (AE1200) with three mods stacked on top of each other. A custom logo on the dial,"
+description: "A stainless steel Casio Royale build combining a custom dial logo, half-negative display, and a full oil-filled hydromod."
 ---
 
-![](https://www.youtube.com/watch?v=3lDeurBV2dY)
+<iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/3lDeurBV2dY" title="Turning a $30 Casio Into a Custom Oil-Filled Watch" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 In this tutorial, I'm walking you through the hardest watch build I've ever attempted: a stainless steel Casio Royale (AE1200) with three mods stacked on top of each other. A custom logo on the dial, a half negative screen mod, and a full hydromod where the entire case gets filled with oil.  
   
@@ -27,24 +28,29 @@ If you want a watch like this built for you, or you just want to see what I'm wo
   
 Disclaimer: Some of the links below are referral links. I receive a small commission at no extra cost to you!  
   
-Get $30 and up to 15% back at AliExpress - https://www.rakuten.ca/referrer?referrerid=WSCeJLooI7g%3D&src=iOS  
-  
-🛠️ TOOLS & MATERIALS:  
-\* Casio Royale AE1200W (https://amzn.to/4ryjWcW)  
-\* Small Phillips screwdriver (https://s.click.aliexpress.com/e/\_c2JZbOfr)  
-\* Tweezers (https://s.click.aliexpress.com/e/\_c2zpLy9L)  
-\* Transparency film (https://s.click.aliexpress.com/e/\_c4ro6lHR)  
-\* Scissors and craft knife (https://s.click.aliexpress.com/e/\_c4KExva1)  
-\* Gel Filters (https://s.click.aliexpress.com/e/\_c3bbVghb)  
-\* Polarizing Film (https://s.click.aliexpress.com/e/\_c2xemTYz)  
-  
-00:00 Intro & Tools  
-00:51 Strap Removal & Case back Removal  
-01:31 Logo Mod  
-02:06 Taking Apart the Module  
-03:06 Negative Screen Mod  
-05:25 Hydro Mod  
-07:55 Final Reveal  
+## Links and resources mentioned
+
+- [Get $30 and up to 15% back at AliExpress through Rakuten](https://www.rakuten.ca/referrer?referrerid=WSCeJLooI7g%3D&src=iOS)
+
+### Tools and materials
+
+- [Casio Royale AE1200W](https://amzn.to/4ryjWcW)
+- [Small Phillips screwdriver](https://s.click.aliexpress.com/e/_c2JZbOfr)
+- [Tweezers](https://s.click.aliexpress.com/e/_c2zpLy9L)
+- [Transparency film](https://s.click.aliexpress.com/e/_c4ro6lHR)
+- [Scissors and craft knife](https://s.click.aliexpress.com/e/_c4KExva1)
+- [Gel filters](https://s.click.aliexpress.com/e/_c3bbVghb)
+- [Polarizing film](https://s.click.aliexpress.com/e/_c2xemTYz)
+
+## Timestamps
+
+- [0:00](https://www.youtube.com/watch?v=3lDeurBV2dY&t=0s) — Intro and tools
+- [0:51](https://www.youtube.com/watch?v=3lDeurBV2dY&t=51s) — Strap and case-back removal
+- [1:31](https://www.youtube.com/watch?v=3lDeurBV2dY&t=91s) — Logo mod
+- [2:06](https://www.youtube.com/watch?v=3lDeurBV2dY&t=126s) — Taking apart the module
+- [3:06](https://www.youtube.com/watch?v=3lDeurBV2dY&t=186s) — Negative-screen mod
+- [5:25](https://www.youtube.com/watch?v=3lDeurBV2dY&t=325s) — Hydromod
+- [7:55](https://www.youtube.com/watch?v=3lDeurBV2dY&t=475s) — Final reveal
   
 #casio #watchmod #customwatch #diy #watchcollector #retrowatch #tutorial
 

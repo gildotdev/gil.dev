@@ -1,12 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 import WiggleWrap from "./WiggleWrap.astro";
-import { isDiscoverableNote } from "../lib/notes";
+import { isPublishedNote } from "../lib/notes";
 import "../styles/global.css";
 
 const topics = await getCollection("topics");
 const notes = await getCollection("notes", ({ data }) =>
-  isDiscoverableNote(data),
+  isPublishedNote(data),
 );
 
 // Count notes per topic
@@ -108,11 +108,11 @@ const sortedTopics = topics.sort((a, b) =>
 <aside id="knowledge-garden" class="mx-2">
   <h2>
     <img
-      src="/img/sticky-note.svg"
+      src="/img/worm.svg"
       width="24px"
       height="24px"
       class="inline mr-1"
-      alt="Topics Icon"
+      alt="Worm Icon"
     />{" "}<WiggleWrap>Digital Garden</WiggleWrap>
   </h2>
   <ul

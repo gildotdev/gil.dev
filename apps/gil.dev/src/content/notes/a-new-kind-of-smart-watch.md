@@ -1,6 +1,7 @@
 ---
 title: "a new kind of Smart Watch."
 source: "https://www.youtube.com/watch?v=iBSRyRcO2HQ"
+canonicalURL: "https://www.youtube.com/watch?v=iBSRyRcO2HQ"
 author:
   - "[[cam shand]]"
 published: "2026-05-02"
@@ -14,49 +15,46 @@ created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:39:02-0400"
 topics: []
 status: "reference"
-description: "Sneak Peek NEW TECH 👉 https://www.instagram.com/camshand.jpgGet cheap & quick PCB/3D Printing/CNC machining services from today's Sponsor PCBWay 👉 https://www.pcbway.com/SUBSCRIBE 🔔  @camshand"
+description: "A custom Casio F-91W build that combines an Ollee Watch module with display, case, and strap modifications."
 ---
 
-![](https://www.youtube.com/watch?v=iBSRyRcO2HQ)
+<iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/iBSRyRcO2HQ" title="a new kind of Smart Watch." frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-Sneak Peek NEW TECH 👉 https://www.instagram.com/camshand.jpg  
-Get cheap & quick PCB/3D Printing/CNC machining services from today's Sponsor PCBWay 👉 https://www.pcbway.com/  
-  
-SUBSCRIBE 🔔 @camshand  
-  
-✱ ✱ ✱  
-  
-▼ ▽ LINKS MENTIONED IN VIDEO  
-  
-Ollee Watch Module 👉 https://www.olleewatch.com/  
-  
-Suede Watch Straps (Sky Blue, 18mm) 👉 https://s.click.aliexpress.com/e/\_c3geDtmP  
-  
-Tint Display Screen Coating For Casio Small Square (TF-blue) 👉 https://s.click.aliexpress.com/e/\_c444Hw63  
-  
-My custom Smart Watch to MP3 Player mod vid 👉 https://youtu.be/ps7ZpXGIuBA  
-  
-Dopeamine Industries (Order Custom) 👉 https://www.instagram.com/dopeamine\_industries/  
-LCD Screen Mod for Casio Watch (negative blue) 👉 https://s.click.aliexpress.com/e/\_c3M0g92n  
-EVT-01 CNC Case 👉 https://www.kickstarter.com/projects/umw/evt-01-reinventing-the-icon-handcrafted-in-italy  
-  
-🤖 3D Printed  
-Casio F91-W case by Alan.U 👉 https://makerworld.com/en/models/229605-casio-f91-w-case?from=search#profileId-439535  
-Watch Glass Screen Protectors (useful for 3D print designs) 👉 https://www.amazon.com/dp/B0C3B92TT6  
-Mochii 3D printed watch by Makeyo 👉 https://www.printables.com/model/1355310-mochii-3d-printed-watch  
-CASIO F-105W/F-91W Watch Strap by se038 👉 https://www.printables.com/model/1018107-casio-f-105wf-91w-watch-strap  
-  
-⌚ Alternatives Menitoned  
-Pebble Watch 👉 https://repebble.com/  
-UNA Watch 👉 https://unawatch.com/  
-Mi Band by Xiaomi 👉 https://geni.us/MiBand10Xiaomi  
-CASIO Step Counter ABL100WE-1A 👉 https://www.shopcasio.shriro.com.au/collections/casio-vintage-step-tracker-watches/products/casio-abl100we-1a-watch  
-  
-If you purchase from the links above, I may receive a small commission, this helps support the channel and costs you nothing extra.  
-✱ ✱ ✱  
-  
-▶ CONNECT WITH ME  
-WEBSITE: https://camshand.com/links  
+## Links and resources mentioned
+
+- [Cam Shand on Instagram](https://www.instagram.com/camshand.jpg)
+- [PCBWay](https://www.pcbway.com/)
+
+### Watch parts and modifications
+
+- [Ollee Watch Module](https://www.olleewatch.com/)
+- [Suede watch straps — sky blue, 18mm](https://s.click.aliexpress.com/e/_c3geDtmP)
+- [Tint display screen coating for Casio Small Square — TF-blue](https://s.click.aliexpress.com/e/_c444Hw63)
+- [Smart Watch to MP3 Player mod video](https://youtu.be/ps7ZpXGIuBA)
+- [Dopeamine Industries custom orders](https://www.instagram.com/dopeamine_industries/)
+- [LCD screen mod for Casio watches — negative blue](https://s.click.aliexpress.com/e/_c3M0g92n)
+- [EVT-01 CNC case](https://www.kickstarter.com/projects/umw/evt-01-reinventing-the-icon-handcrafted-in-italy)
+
+### 3D-printed options
+
+- [Casio F91-W case by Alan.U](https://makerworld.com/en/models/229605-casio-f91-w-case?from=search#profileId-439535)
+- [Watch glass screen protectors](https://www.amazon.com/dp/B0C3B92TT6)
+- [Mochii 3D-printed watch by Makeyo](https://www.printables.com/model/1355310-mochii-3d-printed-watch)
+- [Casio F-105W/F-91W watch strap by se038](https://www.printables.com/model/1018107-casio-f-105wf-91w-watch-strap)
+
+### Alternatives mentioned
+
+- [Pebble Watch](https://repebble.com/)
+- [UNA Watch](https://unawatch.com/)
+- [Mi Band by Xiaomi](https://geni.us/MiBand10Xiaomi)
+- [Casio Step Counter ABL100WE-1A](https://www.shopcasio.shriro.com.au/collections/casio-vintage-step-tracker-watches/products/casio-abl100we-1a-watch)
+
+If you purchase from the links above, the creator may receive a small commission at no extra cost to you.
+
+### Connect with Cam Shand
+
+- [Website and social links](https://camshand.com/links)
+
 SPONSORSHIPS: Email available in About section of Channel Profile.
 
 ## Transcript
