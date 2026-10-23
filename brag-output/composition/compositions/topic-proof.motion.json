@@ -1,0 +1,1 @@
+{"duration":5,"assertions":[{"kind":"appearsBy","selector":".title","bySec":1.6},{"kind":"before","a":".title","b":".stat"},{"kind":"staysInFrame","selector":".hero"},{"kind":"keepsMoving","withinSelector":"#topic-proof","maxStaticSec":1.7}]}
