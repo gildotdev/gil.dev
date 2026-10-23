@@ -5,7 +5,6 @@ import NoteCard from "../components/NoteCard.astro";
 import {
   getDailyGardenSeed,
   isPublishedNote,
-  isReferenceNote,
   noteStatusEmoji,
   seededShuffle,
 } from "../lib/notes.ts";
@@ -13,12 +12,9 @@ import "../styles/global.css";
 
 const notes = await getCollection("notes", ({ data }) => isPublishedNote(data));
 const primaryNotes = seededShuffle(
-  notes.filter(({ data }) => !isReferenceNote(data)),
+  notes,
   `all-notes-${getDailyGardenSeed()}`,
 );
-const referenceNotes = notes
-  .filter(({ data }) => isReferenceNote(data))
-  .sort((a, b) => a.data.title.localeCompare(b.data.title));
 
 const allTopics = await getCollection("topics");
 const topicTitles = Object.fromEntries(
@@ -106,32 +102,6 @@ const statusOptions = [
     </div>
   </section>
 
-  {
-    referenceNotes.length > 0 && (
-      <details
-        id="references"
-        class="reference-notes"
-        data-reference-notes
-      >
-        <summary>
-          Supporting references and clippings ({referenceNotes.length})
-        </summary>
-        <p>
-          Source material collected for the notes above. References are also
-          available while browsing their tags.
-        </p>
-        <ul>
-          {referenceNotes.map((note) => (
-            <li>
-              <a href={`/${note.data.slug || note.id}`}>
-                {noteStatusEmoji.reference} {note.data.title}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </details>
-    )
-  }
 </MainLayout>
 
 <script>
@@ -175,17 +145,11 @@ const statusOptions = [
 
       if (
         requestedStatus &&
-        requestedStatus !== "reference" &&
         Array.from(statusFilter.options).some(
           (option) => option.value === requestedStatus,
         )
       ) {
         statusFilter.value = requestedStatus;
-      }
-
-      if (requestedStatus === "reference") {
-        const references = document.querySelector("[data-reference-notes]");
-        if (references instanceof HTMLDetailsElement) references.open = true;
       }
 
       if (
@@ -324,21 +288,6 @@ const statusOptions = [
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
-  }
-
-  .reference-notes {
-    margin-top: 2.5rem;
-    opacity: 0.72;
-  }
-
-  .reference-notes summary {
-    font-size: 0.75rem;
-  }
-
-  .reference-notes p,
-  .reference-notes ul {
-    font-size: 0.65rem;
-    line-height: 1.55;
   }
 
   @media (max-width: 850px) {

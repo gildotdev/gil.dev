@@ -1,12 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
-import { isDiscoverableNote } from "../../lib/notes";
+import { isPublishedNote } from "../../lib/notes";
 import "../../styles/global.css";
 
 const topics = await getCollection("topics");
 const notes = await getCollection("notes", ({ data }) =>
-  isDiscoverableNote(data),
+  isPublishedNote(data),
 );
 
 const topicVisuals: Record<string, { marker: string; accent: string }> = {

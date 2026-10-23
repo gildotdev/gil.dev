@@ -34,6 +34,14 @@ schema: z.object({
       draft: z.boolean().optional(),
       topics: z.array(z.string()).optional().default([]),
       status: z.enum(['seed', 'growing', 'evergreen', 'reference']).optional(),
+  }).superRefine((data, ctx) => {
+    if (data.status === 'reference' && !data.canonicalURL) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['canonicalURL'],
+        message: 'Reference notes must define a canonicalURL.',
+      });
+    }
   }),
 
 });

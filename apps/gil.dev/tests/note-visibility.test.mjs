@@ -11,12 +11,12 @@ import {
   selectRelatedNotes,
 } from "../src/lib/notes.ts";
 
-test("reference-stage notes stay out of discovery listings", () => {
+test("reference-stage notes remain available to discovery listings", () => {
   const note = { status: "reference", tags: [] };
 
   assert.equal(isPublishedNote(note), true);
   assert.equal(isReferenceNote(note), true);
-  assert.equal(isDiscoverableNote(note), false);
+  assert.equal(isDiscoverableNote(note), true);
 });
 
 test("legacy clipping tags are treated as references", () => {

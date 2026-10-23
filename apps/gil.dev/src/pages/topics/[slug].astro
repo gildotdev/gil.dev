@@ -3,7 +3,7 @@ import { getCollection, render } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import Tag from "../../components/Tag.astro";
 import { formatPublishDate } from "../../lib/utils.ts";
-import { isDiscoverableNote, noteStatusEmoji } from "../../lib/notes.ts";
+import { isPublishedNote, noteStatusEmoji } from "../../lib/notes.ts";
 import "../../styles/global.css";
 
 export async function getStaticPaths() {
@@ -18,7 +18,7 @@ const { topic } = Astro.props;
 const { Content } = await render(topic);
 
 const allNotes = await getCollection("notes", ({ data }) =>
-  isDiscoverableNote(data),
+  isPublishedNote(data),
 );
 
 const relatedNotes = allNotes

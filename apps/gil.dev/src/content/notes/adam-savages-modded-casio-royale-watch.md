@@ -1,6 +1,7 @@
 ---
 title: "Adam Savage's Modded \"Casio Royale\" Watch!"
 source: "https://www.youtube.com/watch?v=DDv-GFTo87E"
+canonicalURL: "https://www.youtube.com/watch?v=DDv-GFTo87E"
 author:
   - "[[Adam Savage’s Tested]]"
 published: "2024-10-01"
@@ -14,29 +15,29 @@ created: "2026-10-21T00:00:00+0000"
 updated: "2026-10-21T22:40:14-0400"
 topics: []
 status: "reference"
-description: "Adam opens and shares two gifts from fans he received at a recent convention: a COD-inspired mask based on a pun, and this lovely modded Casio AE-1200 watch, aka the \"Casio Royale\". Adam loves the NAS"
+description: "Adam Savage examines a fan-made Casio AE-1200 watch with NASA-inspired modifications and a custom strap designed to match his ACES suit gloves."
 ---
 
-![](https://www.youtube.com/watch?v=DDv-GFTo87E)
+<iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/DDv-GFTo87E" title="Adam Savage's Modded &quot;Casio Royale&quot; Watch!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 Adam opens and shares two gifts from fans he received at a recent convention: a COD-inspired mask based on a pun, and this lovely modded Casio AE-1200 watch, aka the "Casio Royale". Adam loves the NASA-inspired upgrades--especially the custom strap that looks perfectly suited for his orange ACES suit gloves!  
-  
-Subscribe for more videos (and click the bell for notifications): http://www.youtube.com/subscription\_center?add\_user=testedcom  
-  
-Join this channel to support Tested and get access to perks:  
-https://www.youtube.com/channel/UCiDJtJKMICpb9B1qf7qjEOA/join  
-Tested and Adam Savage Ts, stickers, (de) merit badges and more: https://tested-store.com  
-About Tested: https://www.tested.com/about  
-Meet Adam in Person: https://www.tested.com/events  
-TikTok: https://www.tiktok.com/@testedcom  
-Instagram: https://www.instagram.com/testedcom/  
-Twitter: http://www.twitter.com/testedcom  
-Facebook: http://www.facebook.com/testedcom  
-Discord: https://www.discord.gg/tested  
-Amazon Storefront: http://www.amazon.com/shop/adamsavagestested  
-  
-Intro bumper by Abe Dieckman  
-  
+
+## Links and resources mentioned
+
+- [Subscribe to Tested on YouTube](http://www.youtube.com/subscription_center?add_user=testedcom)
+- [Join the Tested YouTube channel](https://www.youtube.com/channel/UCiDJtJKMICpb9B1qf7qjEOA/join)
+- [Tested merchandise](https://tested-store.com/)
+- [About Tested](https://www.tested.com/about)
+- [Meet Adam in person](https://www.tested.com/events)
+- [Tested on TikTok](https://www.tiktok.com/@testedcom)
+- [Tested on Instagram](https://www.instagram.com/testedcom/)
+- [Tested on Twitter](http://www.twitter.com/testedcom)
+- [Tested on Facebook](http://www.facebook.com/testedcom)
+- [Tested on Discord](https://www.discord.gg/tested)
+- [Adam Savage’s Tested Amazon storefront](http://www.amazon.com/shop/adamsavagestested)
+
+Intro bumper by Abe Dieckman.
+
 Thanks for watching!
 
 ## Transcript
