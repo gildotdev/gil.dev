@@ -120,7 +120,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
       class:list={[
         "flex flex-row px-2 w-full items-center gap-8",
         useWideLayout ? "max-w-6xl" : "max-w-3xl",
-        isHome ? "hero-header" : "justify-center",
+        isHome ? "hero-header" : "page-header justify-center",
       ]}
     >
       {
@@ -172,7 +172,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
                 style="width: 100px; height: 100px; border: 2px solid var(--mint-green);"
               />
             </a>
-            <h1 class="grow text-center">
+            <h1 class="page-title grow text-center">
               <img
                 src="/img/worm.svg"
                 width="24px"
