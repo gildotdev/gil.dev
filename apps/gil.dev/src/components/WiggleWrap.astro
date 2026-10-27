@@ -1,18 +1,15 @@
 ---
-// const text: string = String(Astro.props.text || Astro.slots.default || "");
+import { JSDOM } from "jsdom";
+
 const { text } = Astro.props;
-
-// Initialize content variable
-let content = text;
-
-// Check if the text prop is not provided and a default slot exists
-if (!content && Astro.slots.default) {
-  content = await Astro.slots.render("default");
-  content = content.replace(/<\/?[^>]+(>|$)/g, "");
-}
+// Slots are serialized HTML: recover text before splitting it into characters.
+// Astro escapes each character again when rendering, so markup stays inert.
+const content = text ?? (Astro.slots.default
+  ? JSDOM.fragment(await Astro.slots.render("default")).textContent
+  : "");
 
 // Split into words (discard the whitespace tokens — spacing is handled via CSS)
-const words = String(content).split(/\s+/).filter(Boolean);
+const words = String(content ?? "").split(/\s+/).filter(Boolean);
 
 const wordGroups = words.map((word) => ({
   chars: [...word].map((char) => ({
@@ -45,10 +42,12 @@ const wordGroups = words.map((word) => ({
     min-width: 0.5em;
   }
 
-  /* Each word is a non-breaking unit; margin-right provides inter-word spacing */
+  /* Keep words together when they fit; allow oversized words to wrap. */
   .word-group {
     display: inline-block;
-    white-space: nowrap;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
     margin-right: 0.3em;
   }
 </style>

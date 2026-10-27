@@ -118,7 +118,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
 
     <header
       class:list={[
-        "flex flex-col md:flex-row px-2 w-full items-center justify-center",
+        "page-header flex flex-col md:flex-row px-2 w-full items-center justify-center",
         isPost ? "max-w-3xl" : "max-w-7xl",
       ]}
     >
@@ -138,7 +138,7 @@ const resolvedOgImage = ogImage ?? avatarImage.src;
           style="width: 100px; height: 100px; border: 2px solid var(--mint-green);"
         />
       </a>
-      <h1 class="grow text-center">
+      <h1 class="page-title grow text-center">
         <img
           src="/img/microblog.svg"
           width="24px"
