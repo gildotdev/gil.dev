@@ -9,6 +9,40 @@ export interface NormalizedReferenceNote {
 }
 
 /**
+ * Turn standalone YouTube references into privacy-enhanced embeds. Inline
+ * links and list items remain links so prose and timestamp lists are not
+ * unexpectedly expanded into players.
+ */
+export function transformYoutubeEmbeds(body: string, fallbackTitle: string): string {
+  const emittedVideoIds = new Set<string>();
+
+  return body
+    .split(/\r?\n/)
+    .map((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return line;
+
+      const image = trimmed.match(/^!\[([^\]]*)\]\((https?:\/\/[^)]+)\)$/);
+      const link = trimmed.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
+      const iframe = trimmed.match(
+        /^<iframe\b[^>]*\bsrc=["'](https?:\/\/[^"']+)["'][^>]*><\/iframe>$/i
+      );
+      const bare = trimmed.match(/^(https?:\/\/\S+)$/);
+      const url = image?.[2] ?? link?.[2] ?? iframe?.[1] ?? bare?.[1];
+      if (!url) return line;
+
+      const videoId = youtubeVideoId(url);
+      if (!videoId) return line;
+      if (emittedVideoIds.has(videoId)) return "";
+
+      emittedVideoIds.add(videoId);
+      return youtubeEmbed(videoId, image?.[1] || link?.[1] || fallbackTitle);
+    })
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+/**
  * Clean imported reference material before it is written to the Astro site.
  * Regular garden notes pass through unchanged.
  */
@@ -98,7 +132,7 @@ export function normalizeReferenceMarkdown(
   const preamble = body.slice(0, preambleEnd);
   const transcript = body.slice(preambleEnd);
   const videoId = youtubeVideoId(canonicalURL);
-  let emittedYoutubeEmbed = false;
+  const emittedYoutubeEmbeds = new Set<string>();
   let sawTimestampHeading = false;
 
   const normalizedLines = preamble.split(/\r?\n/).map((line) => {
@@ -106,32 +140,37 @@ export function normalizeReferenceMarkdown(
     if (!trimmed) return "";
 
     const videoImage = trimmed.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)$/);
-    if (videoImage && youtubeVideoId(videoImage[1]) === videoId && videoId) {
-      if (emittedYoutubeEmbed) return "";
-      emittedYoutubeEmbed = true;
-      return youtubeEmbed(videoId, title);
+    const imageVideoId = videoImage ? youtubeVideoId(videoImage[1]) : null;
+    if (imageVideoId) {
+      if (emittedYoutubeEmbeds.has(imageVideoId)) return "";
+      emittedYoutubeEmbeds.add(imageVideoId);
+      return youtubeEmbed(imageVideoId, title);
     }
     if (videoImage && !looksLikeImageUrl(videoImage[1])) {
       const url = normalizeResourceUrl(videoImage[1]);
       return `[View referenced content on ${linkLabelForUrl(url)}](${url})`;
     }
 
-    const watchLink = trimmed.match(
-      /^\[Watch .+ on YouTube\]\((https?:\/\/[^)]+)\)$/i
+    const standaloneLink = trimmed.match(
+      /^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/
     );
-    if (watchLink && youtubeVideoId(watchLink[1]) === videoId && videoId) {
-      if (emittedYoutubeEmbed) return "";
-      emittedYoutubeEmbed = true;
-      return youtubeEmbed(videoId, title);
+    const linkedVideoId = standaloneLink
+      ? youtubeVideoId(standaloneLink[2])
+      : null;
+    if (standaloneLink && linkedVideoId) {
+      if (emittedYoutubeEmbeds.has(linkedVideoId)) return "";
+      emittedYoutubeEmbeds.add(linkedVideoId);
+      return youtubeEmbed(linkedVideoId, standaloneLink[1] || title);
     }
 
     const iframe = trimmed.match(
       /^<iframe\b[^>]*\bsrc=["'](https?:\/\/[^"']+)["'][^>]*><\/iframe>$/i
     );
-    if (iframe && youtubeVideoId(iframe[1]) === videoId && videoId) {
-      if (emittedYoutubeEmbed) return "";
-      emittedYoutubeEmbed = true;
-      return youtubeEmbed(videoId, title);
+    const iframeVideoId = iframe ? youtubeVideoId(iframe[1]) : null;
+    if (iframeVideoId) {
+      if (emittedYoutubeEmbeds.has(iframeVideoId)) return "";
+      emittedYoutubeEmbeds.add(iframeVideoId);
+      return youtubeEmbed(iframeVideoId, title);
     }
 
     const heading = resourceHeading(trimmed);
@@ -169,6 +208,12 @@ export function normalizeReferenceMarkdown(
     const bareUrl = trimmed.match(/^(?:[-*]\s+)?(https?:\/\/\S+)$/);
     if (bareUrl) {
       const url = normalizeResourceUrl(bareUrl[1]);
+      const bareVideoId = youtubeVideoId(url);
+      if (bareVideoId) {
+        if (emittedYoutubeEmbeds.has(bareVideoId)) return "";
+        emittedYoutubeEmbeds.add(bareVideoId);
+        return youtubeEmbed(bareVideoId, title);
+      }
       return `- [${linkLabelForUrl(url)}](${url})`;
     }
 
@@ -296,5 +341,5 @@ function youtubeEmbed(videoId: string, title: string): string {
     .replace(/"/g, "&quot;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-  return `<iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/${videoId}" title="${escapedTitle}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+  return `<iframe width="1024" height="576" src="https://www.youtube-nocookie.com/embed/${videoId}" title="${escapedTitle}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
 }

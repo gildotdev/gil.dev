@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   extractReferencedNotes,
+  transformMarkdownImages,
   transformWikilinks,
 } from "../src/wikilink.ts";
 
@@ -32,6 +33,26 @@ test("transforms related notes and collects image and file attachments", () => {
   assert.deepEqual(result.referencedAttachments, [
     { vaultPath: "Photo One.PNG", destName: "photo-one.png", isImage: true },
     { vaultPath: "Manual.pdf", destName: "manual.pdf", isImage: false },
+  ]);
+});
+
+test("transforms local Markdown images and collects their attachments", () => {
+  const result = transformMarkdownImages(
+    "Local ![Dawn](attachments/Ros%C3%A9_Pine_Dawn.jpeg) and remote ![site](https://example.com/image.png).",
+    "../../assets",
+    (name) => name.toLowerCase().replaceAll(" ", "-")
+  );
+
+  assert.equal(
+    result.transformed,
+    "Local ![Dawn](../../assets/rosé_pine_dawn.jpeg) and remote ![site](https://example.com/image.png)."
+  );
+  assert.deepEqual(result.referencedAttachments, [
+    {
+      vaultPath: "attachments/Rosé_Pine_Dawn.jpeg",
+      destName: "rosé_pine_dawn.jpeg",
+      isImage: true,
+    },
   ]);
 });
 

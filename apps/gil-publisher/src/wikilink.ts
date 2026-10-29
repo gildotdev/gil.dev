@@ -115,6 +115,58 @@ export function transformWikilinks(
 }
 
 /**
+ * Rewrite ordinary Markdown image links that point at files in the vault.
+ *
+ * Obsidian supports both `![[image.png]]` and `![alt](image.png)`. The
+ * wikilink pass above handles the first form; this pass gives the second form
+ * the same asset-copying and filename-normalization behavior. Remote, data,
+ * root-relative, and fragment URLs are intentionally left alone.
+ */
+export function transformMarkdownImages(
+  content: string,
+  imageAssetsSubpath = "../../assets",
+  imageNameTransform?: (name: string) => string
+): { transformed: string; referencedAttachments: ReferencedAttachment[] } {
+  const referencedAttachments: ReferencedAttachment[] = [];
+  const markdownImageRegex =
+    /!\[([^\]]*)\]\((<[^>]+>|[^\s)]+)(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?\)/g;
+
+  const transformed = content.replace(
+    markdownImageRegex,
+    (match, alt: string, rawTarget: string) => {
+      const target = rawTarget.replace(/^<|>$/g, "");
+      if (isExternalOrSiteUrl(target)) return match;
+
+      const targetWithoutSuffix = target.split(/[?#]/, 1)[0];
+      let vaultPath: string;
+      try {
+        vaultPath = decodeURIComponent(targetWithoutSuffix);
+      } catch {
+        vaultPath = targetWithoutSuffix;
+      }
+      if (!isImageFile(vaultPath)) return match;
+
+      const attachmentName = path.basename(vaultPath);
+      const destName = imageNameTransform
+        ? imageNameTransform(attachmentName)
+        : attachmentName;
+      referencedAttachments.push({
+        vaultPath,
+        destName,
+        isImage: true,
+      });
+
+      const urlName = imageNameTransform
+        ? destName
+        : encodeURIComponent(attachmentName);
+      return `![${alt}](${imageAssetsSubpath}/${urlName})`;
+    }
+  );
+
+  return { transformed, referencedAttachments };
+}
+
+/**
  * Return the unique Markdown notes referenced by Obsidian wikilinks in content.
  * Attachments are intentionally excluded from the note dependency graph.
  */
@@ -138,6 +190,15 @@ export function extractReferencedNotes(
 function isAttachmentFile(name: string): boolean {
   const extension = path.extname(name).toLowerCase();
   return extension !== "" && extension !== ".md" && extension !== ".mdx";
+}
+
+function isExternalOrSiteUrl(target: string): boolean {
+  return (
+    /^[a-z][a-z0-9+.-]*:/i.test(target) ||
+    target.startsWith("//") ||
+    target.startsWith("/") ||
+    target.startsWith("#")
+  );
 }
 
 /**

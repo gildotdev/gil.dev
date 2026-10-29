@@ -32,6 +32,30 @@ test("round-trips quoted strings", () => {
   assert.deepEqual(parseFrontmatter(`${serializeFrontmatter(frontmatter)}\nBody`), frontmatter);
 });
 
+test("distinguishes empty properties from YAML lists", () => {
+  const parsed = parseFrontmatter(`---
+source:
+tags:
+  - astro
+---
+Body`);
+
+  assert.equal(parsed.source, null);
+  assert.deepEqual(parsed.tags, ["astro"]);
+});
+
+test("omits non-string source properties", () => {
+  const normalized = normalizeFrontmatter(
+    { source: [], tags: [] },
+    "Local Note.md",
+    0,
+    0
+  );
+
+  assert.equal(normalized.source, undefined);
+  assert.doesNotMatch(serializeFrontmatter(normalized), /^source:/m);
+});
+
 test("marks clippings as reference notes", () => {
   const fromFolder = normalizeFrontmatter(
     {},

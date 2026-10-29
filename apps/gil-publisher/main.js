@@ -214,6 +214,7 @@ function normalizeFrontmatter(existing, fileName, ctime, mtime, sourcePath = fil
   const updated = rawUpdated ? ensureDateFormat(rawUpdated) : formatDate(mtime);
   const tags = normalizeStringList(existing.tags);
   const topics = normalizeStringList(existing.topics);
+  const source = typeof existing.source === "string" && existing.source.trim() ? existing.source.trim() : void 0;
   const isClipping = tags.some((tag) => tag.toLowerCase() === "clippings") || sourcePath.replace(/\\/g, "/").split("/").some((part) => part.toLowerCase() === "clippings");
   const status = normalizeStatus(
     existing.status,
@@ -233,6 +234,7 @@ function normalizeFrontmatter(existing, fileName, ctime, mtime, sourcePath = fil
     description: _desc,
     topics: _topics,
     status: _status,
+    source: _source,
     ...rest
   } = existing;
   const result = {
@@ -244,6 +246,7 @@ function normalizeFrontmatter(existing, fileName, ctime, mtime, sourcePath = fil
     tags,
     topics,
     status,
+    ...source !== void 0 ? { source } : {},
     ...description !== void 0 ? { description } : {}
   };
   for (const key of Object.keys(result)) {
@@ -320,7 +323,16 @@ function parseSimpleYaml(yaml) {
     }
     const key = keyMatch[1];
     const rest = (_b = (_a = keyMatch[2]) == null ? void 0 : _a.trim()) != null ? _b : "";
-    if (rest === "" || rest === "|" || rest === ">") {
+    if (rest === "") {
+      const items = [];
+      i++;
+      while (i < lines.length && /^\s+-\s+/.test(lines[i])) {
+        const item = lines[i].replace(/^\s+-\s+/, "").trim();
+        items.push(parseScalar(item));
+        i++;
+      }
+      result[key] = items.length > 0 ? items : null;
+    } else if (rest === "|" || rest === ">") {
       const items = [];
       i++;
       while (i < lines.length && /^\s+-\s+/.test(lines[i])) {
@@ -415,6 +427,35 @@ function transformWikilinks(content, slugMap, imageAssetsSubpath = "../../assets
   );
   return { transformed, referencedAttachments };
 }
+function transformMarkdownImages(content, imageAssetsSubpath = "../../assets", imageNameTransform) {
+  const referencedAttachments = [];
+  const markdownImageRegex = /!\[([^\]]*)\]\((<[^>]+>|[^\s)]+)(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?\)/g;
+  const transformed = content.replace(
+    markdownImageRegex,
+    (match, alt, rawTarget) => {
+      const target = rawTarget.replace(/^<|>$/g, "");
+      if (isExternalOrSiteUrl(target)) return match;
+      const targetWithoutSuffix = target.split(/[?#]/, 1)[0];
+      let vaultPath;
+      try {
+        vaultPath = decodeURIComponent(targetWithoutSuffix);
+      } catch (e) {
+        vaultPath = targetWithoutSuffix;
+      }
+      if (!isImageFile(vaultPath)) return match;
+      const attachmentName = import_path2.default.basename(vaultPath);
+      const destName = imageNameTransform ? imageNameTransform(attachmentName) : attachmentName;
+      referencedAttachments.push({
+        vaultPath,
+        destName,
+        isImage: true
+      });
+      const urlName = imageNameTransform ? destName : encodeURIComponent(attachmentName);
+      return `![${alt}](${imageAssetsSubpath}/${urlName})`;
+    }
+  );
+  return { transformed, referencedAttachments };
+}
 function extractReferencedNotes(content, slugMap) {
   const references = /* @__PURE__ */ new Map();
   const wikilinkRegex = /!?\[\[([^\]|#]+)(?:#[^\]|]*)?((?:\|[^\]]*)?)\]\]/g;
@@ -429,6 +470,9 @@ function extractReferencedNotes(content, slugMap) {
 function isAttachmentFile(name) {
   const extension = import_path2.default.extname(name).toLowerCase();
   return extension !== "" && extension !== ".md" && extension !== ".mdx";
+}
+function isExternalOrSiteUrl(target) {
+  return /^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("//") || target.startsWith("/") || target.startsWith("#");
 }
 function resolveEntry(target, slugMap) {
   const normalizedTarget = target.replace(/\\/g, "/");
@@ -472,6 +516,27 @@ function normalizeFolderName(name) {
 // src/reference-note.ts
 var URL_PATTERN = /https?:\/\/\S+/;
 var COMPLETE_DESCRIPTION_PATTERN = /[.!?]["'”’)]?$/;
+function transformYoutubeEmbeds(body, fallbackTitle) {
+  const emittedVideoIds = /* @__PURE__ */ new Set();
+  return body.split(/\r?\n/).map((line) => {
+    var _a, _b, _c;
+    const trimmed = line.trim();
+    if (!trimmed) return line;
+    const image = trimmed.match(/^!\[([^\]]*)\]\((https?:\/\/[^)]+)\)$/);
+    const link = trimmed.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
+    const iframe = trimmed.match(
+      /^<iframe\b[^>]*\bsrc=["'](https?:\/\/[^"']+)["'][^>]*><\/iframe>$/i
+    );
+    const bare = trimmed.match(/^(https?:\/\/\S+)$/);
+    const url = (_c = (_b = (_a = image == null ? void 0 : image[2]) != null ? _a : link == null ? void 0 : link[2]) != null ? _b : iframe == null ? void 0 : iframe[1]) != null ? _c : bare == null ? void 0 : bare[1];
+    if (!url) return line;
+    const videoId = youtubeVideoId(url);
+    if (!videoId) return line;
+    if (emittedVideoIds.has(videoId)) return "";
+    emittedVideoIds.add(videoId);
+    return youtubeEmbed(videoId, (image == null ? void 0 : image[1]) || (link == null ? void 0 : link[1]) || fallbackTitle);
+  }).join("\n").replace(/\n{3,}/g, "\n\n");
+}
 function normalizeReferenceNote(frontmatter, body) {
   if (frontmatter.status !== "reference") return { frontmatter, body };
   const rawCanonical = stringValue(frontmatter.canonicalURL) || stringValue(frontmatter.source);
@@ -525,36 +590,39 @@ function normalizeReferenceMarkdown(body, title, canonicalURL) {
   const preamble = body.slice(0, preambleEnd);
   const transcript = body.slice(preambleEnd);
   const videoId = youtubeVideoId(canonicalURL);
-  let emittedYoutubeEmbed = false;
+  const emittedYoutubeEmbeds = /* @__PURE__ */ new Set();
   let sawTimestampHeading = false;
   const normalizedLines = preamble.split(/\r?\n/).map((line) => {
     const trimmed = line.trim();
     if (!trimmed) return "";
     const videoImage = trimmed.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)$/);
-    if (videoImage && youtubeVideoId(videoImage[1]) === videoId && videoId) {
-      if (emittedYoutubeEmbed) return "";
-      emittedYoutubeEmbed = true;
-      return youtubeEmbed(videoId, title);
+    const imageVideoId = videoImage ? youtubeVideoId(videoImage[1]) : null;
+    if (imageVideoId) {
+      if (emittedYoutubeEmbeds.has(imageVideoId)) return "";
+      emittedYoutubeEmbeds.add(imageVideoId);
+      return youtubeEmbed(imageVideoId, title);
     }
     if (videoImage && !looksLikeImageUrl(videoImage[1])) {
       const url = normalizeResourceUrl(videoImage[1]);
       return `[View referenced content on ${linkLabelForUrl(url)}](${url})`;
     }
-    const watchLink = trimmed.match(
-      /^\[Watch .+ on YouTube\]\((https?:\/\/[^)]+)\)$/i
+    const standaloneLink = trimmed.match(
+      /^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/
     );
-    if (watchLink && youtubeVideoId(watchLink[1]) === videoId && videoId) {
-      if (emittedYoutubeEmbed) return "";
-      emittedYoutubeEmbed = true;
-      return youtubeEmbed(videoId, title);
+    const linkedVideoId = standaloneLink ? youtubeVideoId(standaloneLink[2]) : null;
+    if (standaloneLink && linkedVideoId) {
+      if (emittedYoutubeEmbeds.has(linkedVideoId)) return "";
+      emittedYoutubeEmbeds.add(linkedVideoId);
+      return youtubeEmbed(linkedVideoId, standaloneLink[1] || title);
     }
     const iframe = trimmed.match(
       /^<iframe\b[^>]*\bsrc=["'](https?:\/\/[^"']+)["'][^>]*><\/iframe>$/i
     );
-    if (iframe && youtubeVideoId(iframe[1]) === videoId && videoId) {
-      if (emittedYoutubeEmbed) return "";
-      emittedYoutubeEmbed = true;
-      return youtubeEmbed(videoId, title);
+    const iframeVideoId = iframe ? youtubeVideoId(iframe[1]) : null;
+    if (iframeVideoId) {
+      if (emittedYoutubeEmbeds.has(iframeVideoId)) return "";
+      emittedYoutubeEmbeds.add(iframeVideoId);
+      return youtubeEmbed(iframeVideoId, title);
     }
     const heading = resourceHeading(trimmed);
     if (heading) {
@@ -589,6 +657,12 @@ ${timestampLink}`;
     const bareUrl = trimmed.match(/^(?:[-*]\s+)?(https?:\/\/\S+)$/);
     if (bareUrl) {
       const url = normalizeResourceUrl(bareUrl[1]);
+      const bareVideoId = youtubeVideoId(url);
+      if (bareVideoId) {
+        if (emittedYoutubeEmbeds.has(bareVideoId)) return "";
+        emittedYoutubeEmbeds.add(bareVideoId);
+        return youtubeEmbed(bareVideoId, title);
+      }
       return `- [${linkLabelForUrl(url)}](${url})`;
     }
     if (/^[^\p{L}\p{N}]+$/u.test(trimmed)) return "";
@@ -685,7 +759,7 @@ function stringValue(value) {
 }
 function youtubeEmbed(videoId, title) {
   const escapedTitle = title.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  return `<iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/${videoId}" title="${escapedTitle}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+  return `<iframe width="1024" height="576" src="https://www.youtube-nocookie.com/embed/${videoId}" title="${escapedTitle}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
 }
 
 // src/publisher.ts
@@ -778,14 +852,30 @@ async function publishFile(app, file, settings, slugMap, publishedPaths) {
   );
   const body = stripFrontmatter(raw);
   const imageAssetsSubpath = buildImageRelativePath(settings);
-  const { transformed, referencedAttachments } = transformWikilinks(
+  const markdownImageResult = transformMarkdownImages(
     body,
+    imageAssetsSubpath,
+    slugifyFilename
+  );
+  const wikilinkResult = transformWikilinks(
+    markdownImageResult.transformed,
     slugMap,
     imageAssetsSubpath,
     publishedPaths,
     slugifyFilename
   );
-  const normalizedReference = normalizeReferenceNote(normalizedFm, transformed);
+  const referencedAttachments = [
+    ...wikilinkResult.referencedAttachments,
+    ...markdownImageResult.referencedAttachments
+  ];
+  const bodyWithYoutubeEmbeds = transformYoutubeEmbeds(
+    wikilinkResult.transformed,
+    normalizedFm.title
+  );
+  const normalizedReference = normalizeReferenceNote(
+    normalizedFm,
+    bodyWithYoutubeEmbeds
+  );
   const assetsDir = import_path3.default.join(settings.targetRepoPath, settings.imageTargetSubpath);
   await ensureDir(assetsDir);
   const copiedAttachments = /* @__PURE__ */ new Set();

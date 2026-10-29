@@ -115,6 +115,10 @@ export function normalizeFrontmatter(
 
   const tags = normalizeStringList(existing.tags);
   const topics = normalizeStringList(existing.topics);
+  const source =
+    typeof existing.source === "string" && existing.source.trim()
+      ? existing.source.trim()
+      : undefined;
 
   // Clippings are supporting source material rather than standalone garden
   // notes. Default them to `reference`; regular notes begin as `seed`.
@@ -147,6 +151,7 @@ export function normalizeFrontmatter(
     description: _desc,
     topics: _topics,
     status: _status,
+    source: _source,
     ...rest
   } = existing;
 
@@ -159,6 +164,7 @@ export function normalizeFrontmatter(
     tags,
     topics,
     status,
+    ...(source !== undefined ? { source } : {}),
     ...(description !== undefined ? { description } : {}),
   };
 
@@ -293,8 +299,19 @@ function parseSimpleYaml(yaml: string): Record<string, unknown> {
     const key = keyMatch[1];
     const rest = keyMatch[2]?.trim() ?? "";
 
-    if (rest === "" || rest === "|" || rest === ">") {
-      // Possibly a sequence or block scalar — look ahead
+    if (rest === "") {
+      // An empty value is null unless indented list items follow it.
+      const items: string[] = [];
+      i++;
+      while (i < lines.length && /^\s+-\s+/.test(lines[i])) {
+        const item = lines[i].replace(/^\s+-\s+/, "").trim();
+        items.push(parseScalar(item));
+        i++;
+      }
+      result[key] = items.length > 0 ? items : null;
+    } else if (rest === "|" || rest === ">") {
+      // Block scalars are outside the subset emitted by this plugin. Preserve
+      // the previous list-oriented fallback for compatibility.
       const items: string[] = [];
       i++;
       while (i < lines.length && /^\s+-\s+/.test(lines[i])) {

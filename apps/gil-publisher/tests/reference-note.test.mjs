@@ -6,6 +6,7 @@ import {
   normalizeReferenceDescription,
   normalizeReferenceMarkdown,
   normalizeReferenceNote,
+  transformYoutubeEmbeds,
 } from "../src/reference-note.ts";
 
 test("normalizes a YouTube reference preamble", () => {
@@ -36,7 +37,7 @@ The Sweater Curse: https://en.wikipedia.org/wiki/Sweater\\_curse
 
   assert.match(
     result,
-    /^<iframe width="1280" height="720" src="https:\/\/www\.youtube-nocookie\.com\/embed\/TkdP_-83c8M"/
+    /^<iframe width="1024" height="576" src="https:\/\/www\.youtube-nocookie\.com\/embed\/TkdP_-83c8M"/
   );
   assert.equal(
     (result.match(/youtube-nocookie\.com\/embed\/TkdP_-83c8M/g) ?? []).length,
@@ -62,6 +63,37 @@ The Sweater Curse: https://en.wikipedia.org/wiki/Sweater\\_curse
     /- \[2:36\]\(https:\/\/www\.youtube\.com\/watch\?v=TkdP_-83c8M&t=156s\) — History of digital gardens/
   );
   assert.match(result, /## Transcript\n\n\*\*0:00\*\* · Transcript text stays unchanged\.$/);
+});
+
+test("embeds a referenced YouTube video when the canonical source is elsewhere", () => {
+  const result = normalizeReferenceMarkdown(
+    "### Watch the video version\n\n![](https://www.youtube.com/watch?v=lHQr5ingftk&si=tracking)",
+    "Language Model Builder with Felix Rieseberg",
+    "https://www.hanselminutes.com/1053/language-model-builder-with-felix-rieseberg"
+  );
+
+  assert.match(
+    result,
+    /<iframe width="1024" height="576" src="https:\/\/www\.youtube-nocookie\.com\/embed\/lHQr5ingftk"/
+  );
+  assert.doesNotMatch(result, /youtube\.com\/watch|si=tracking/);
+});
+
+test("embeds standalone YouTube links in regular notes without expanding inline links", () => {
+  const result = transformYoutubeEmbeds(
+    `Watch this:\n\n[Video walkthrough](https://youtu.be/lHQr5ingftk?si=tracking)\n\nKeep [this inline video](https://www.youtube.com/watch?v=another123) as a link.`,
+    "Fallback title"
+  );
+
+  assert.match(
+    result,
+    /<iframe width="1024" height="576" src="https:\/\/www\.youtube-nocookie\.com\/embed\/lHQr5ingftk" title="Video walkthrough"/
+  );
+  assert.doesNotMatch(result, /si=tracking/);
+  assert.match(
+    result,
+    /Keep \[this inline video\]\(https:\/\/www\.youtube\.com\/watch\?v=another123\) as a link\./
+  );
 });
 
 test("normalizes arrow links, tool lists, decorated headings, and timestamp groups", () => {

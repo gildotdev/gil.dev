@@ -11,6 +11,7 @@ import {
 } from "./frontmatter";
 import {
   extractReferencedNotes,
+  transformMarkdownImages,
   transformWikilinks,
   isImageFile,
   type ReferencedAttachment,
@@ -20,7 +21,10 @@ import {
   buildRecursivePublicationPaths,
   isIgnoredVaultPath,
 } from "./publication-plan";
-import { normalizeReferenceNote } from "./reference-note";
+import {
+  normalizeReferenceNote,
+  transformYoutubeEmbeds,
+} from "./reference-note";
 
 export interface PublishResult {
   published: string[];
@@ -176,14 +180,30 @@ export async function publishFile(
   // Strip old frontmatter and transform wikilinks
   const body = stripFrontmatter(raw);
   const imageAssetsSubpath = buildImageRelativePath(settings);
-  const { transformed, referencedAttachments } = transformWikilinks(
+  const markdownImageResult = transformMarkdownImages(
     body,
+    imageAssetsSubpath,
+    slugifyFilename
+  );
+  const wikilinkResult = transformWikilinks(
+    markdownImageResult.transformed,
     slugMap,
     imageAssetsSubpath,
     publishedPaths,
     slugifyFilename
   );
-  const normalizedReference = normalizeReferenceNote(normalizedFm, transformed);
+  const referencedAttachments = [
+    ...wikilinkResult.referencedAttachments,
+    ...markdownImageResult.referencedAttachments,
+  ];
+  const bodyWithYoutubeEmbeds = transformYoutubeEmbeds(
+    wikilinkResult.transformed,
+    normalizedFm.title
+  );
+  const normalizedReference = normalizeReferenceNote(
+    normalizedFm,
+    bodyWithYoutubeEmbeds
+  );
 
   // Copy referenced images to the assets directory
   const assetsDir = path.join(settings.targetRepoPath, settings.imageTargetSubpath);

@@ -90,6 +90,20 @@ pnpm plugin:build
 pnpm plugin:install -- --vault /absolute/path/to/vault
 ```
 
+The vault path can also be stored in the `GIL_PUBLISHER_VAULT` environment
+variable or as the first non-comment line of a repository-root
+`.gil-publisher-vault` file. The command-line value takes precedence, followed
+by the environment variable and then the hidden file. The hidden file is
+gitignored because vault locations are machine-specific.
+
+```bash
+printf '%s\n' "$HOME/Documents/second-brain" > .gil-publisher-vault
+pnpm plugin:install
+```
+
+Run `pnpm plugin:install -- --vault` without a value to enter the path in an
+interactive prompt. Press Tab while entering it to complete files and folders.
+
 After installation, reload Obsidian (or disable and re-enable Gil Publisher), open the source note, and run **Gil Publisher: Publish current note to site** from the command palette. The upload ribbon button runs the same operation.
 
 ## Colophon
